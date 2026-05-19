@@ -1,0 +1,171 @@
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { ArrowRight, Clock, Tag } from 'lucide-react'
+import Navbar from '../components/Navbar'
+import { sanityClient } from '../lib/sanity'
+
+const CATEGORIES = ['All', 'Marketing', 'Analytics', 'Tips & Tricks', 'Product']
+
+const CATEGORY_COLORS = {
+  Marketing: 'bg-indigo-50 text-indigo-600',
+  Analytics: 'bg-orange-50 text-orange-600',
+  'Tips & Tricks': 'bg-violet-50 text-violet-600',
+  Product: 'bg-green-50 text-green-600',
+}
+
+export default function Blog() {
+  const [activeCategory, setActiveCategory] = useState('All')
+  const [posts, setPosts] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    sanityClient.fetch(`*[_type == "post"] | order(date desc)`)
+      .then((data) => {
+        setPosts(data)
+        setIsLoading(false)
+      })
+      .catch(console.error)
+  }, [])
+
+  const featured = posts.find(p => p.featured)
+  const filtered = posts.filter(p =>
+    !p.featured &&
+    (activeCategory === 'All' || p.category === activeCategory)
+  )
+
+  return (
+    <div className="min-h-screen bg-white">
+      <Navbar />
+
+      {/* Hero */}
+      <section className="pt-28 pb-12 px-6 text-center border-b border-slate-100">
+        <div className="max-w-2xl mx-auto">
+          <span className="inline-block bg-indigo-50 text-indigo-600 text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full mb-4">
+            The Brevly Blog
+          </span>
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+            Insights on links, analytics & growth
+          </h1>
+          <p className="text-slate-500 text-lg">
+            Practical guides and ideas for marketers, developers, and builders who care about their links.
+          </p>
+        </div>
+      </section>
+
+      <div className="max-w-5xl mx-auto px-6 py-12">
+        {isLoading ? (
+          <div className="text-center py-20 text-slate-400 text-sm">
+            Loading posts...
+          </div>
+        ) : (
+          <>
+            {/* Featured post */}
+            {featured && (activeCategory === 'All') && (
+              <Link
+                to={`/blog/${featured.slug.current}`}
+                className="group block mb-14 bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow"
+              >
+                <div className={`h-52 bg-gradient-to-br ${featured.coverColor} relative flex items-end p-8`}>
+                  <span className="absolute top-5 left-5 bg-white/20 backdrop-blur text-white text-xs font-semibold px-3 py-1 rounded-full">
+                    Featured
+                  </span>
+                  <span className={`text-xs font-semibold px-3 py-1 rounded-full bg-white/90 ${CATEGORY_COLORS[featured.category] || 'text-slate-600'}`}>
+                    {featured.category}
+                  </span>
+                </div>
+                <div className="p-8">
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors mb-3">
+                    {featured.title}
+                  </h2>
+                  <p className="text-slate-500 text-base leading-relaxed mb-5 max-w-2xl">
+                    {featured.excerpt}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white font-bold text-sm">
+                        {featured.author.avatar}
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-slate-800">{featured.author.name}</div>
+                        <div className="text-xs text-slate-400 flex items-center gap-1.5">
+                          <Clock size={11} /> {featured.readTime} · {featured.date}
+                        </div>
+                      </div>
+                    </div>
+                    <span className="flex items-center gap-1.5 text-sm font-semibold text-indigo-600 group-hover:gap-2.5 transition-all">
+                      Read article <ArrowRight size={15} />
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            )}
+
+            {/* Category filter */}
+            <div className="flex items-center gap-2 flex-wrap mb-8">
+              {CATEGORIES.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`text-sm font-medium px-4 py-1.5 rounded-full border transition-all ${
+                    activeCategory === cat
+                      ? 'bg-indigo-600 text-white border-indigo-600'
+                      : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Post grid */}
+            <div className="grid sm:grid-cols-2 gap-6">
+              {filtered.map(post => (
+                <Link
+                  key={post._id}
+                  to={`/blog/${post.slug.current}`}
+                  className="group bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col"
+                >
+                  <div className={`h-32 bg-gradient-to-br ${post.coverColor}`} />
+                  <div className="p-6 flex flex-col flex-1">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${CATEGORY_COLORS[post.category] || 'bg-slate-100 text-slate-600'}`}>
+                        {post.category}
+                      </span>
+                      <span className="text-xs text-slate-400 flex items-center gap-1">
+                        <Clock size={10} /> {post.readTime}
+                      </span>
+                    </div>
+                    <h3 className="font-bold text-slate-900 text-lg leading-snug group-hover:text-indigo-600 transition-colors mb-2">
+                      {post.title}
+                    </h3>
+                    <p className="text-slate-500 text-sm leading-relaxed flex-1 mb-4">
+                      {post.excerpt}
+                    </p>
+                    <div className="flex items-center gap-2.5 pt-3 border-t border-slate-100">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white font-bold text-xs">
+                        {post.author.avatar}
+                      </div>
+                      <div className="text-xs text-slate-500">
+                        <span className="font-medium text-slate-700">{post.author.name}</span> · {post.date}
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {filtered.length === 0 && (
+              <div className="text-center py-20 text-slate-400 text-sm">
+                No posts in this category yet.
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      <footer className="border-t border-slate-100 py-8 px-6 text-center text-slate-400 text-sm">
+        © {new Date().getFullYear()} Brevly. Built with ♥ for the web.
+      </footer>
+    </div>
+  )
+}
