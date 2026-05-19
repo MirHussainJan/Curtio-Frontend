@@ -3,7 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { Zap, Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { useGoogleLogin } from "@react-oauth/google";
 
-const API = "http://localhost:6090/api/auth";
+// http://localhost:6090 BackURl for local testing
+
+const API = "https://bravely-backend.vercel.app/api/auth";
 
 export default function Login() {
   const navigate = useNavigate();

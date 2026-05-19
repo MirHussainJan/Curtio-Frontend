@@ -64,9 +64,12 @@ export default function Landing() {
 
     const token = localStorage.getItem('apiToken')
 
+
+      // http://localhost:6090 -> BackURl for local testing
+
     if (token) {
       try {
-        const res = await fetch('http://localhost:6090/api/urls', {
+        const res = await fetch('https://bravely-backend.vercel.app/api/urls', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
