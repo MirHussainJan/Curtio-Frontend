@@ -1,10 +1,10 @@
 import { createClient } from '@sanity/client'
 
 export const sanityClient = createClient({
-  projectId: 'fk4ygrwd',
-  dataset: 'production',
-  useCdn: true, // set to `false` to bypass the edge cache
-  apiVersion: '2024-05-14', // use current date (YYYY-MM-DD) to target the latest API version
+  projectId: import.meta.env.VITE_SANITY_PROJECT_ID,
+  dataset: import.meta.env.VITE_SANITY_DATASET,
+  useCdn: true,
+  apiVersion: import.meta.env.VITE_SANITY_API_VERSION,
 })
 
 export const urlForImage = (source) => {
@@ -16,5 +16,5 @@ export const urlForImage = (source) => {
   const id = parts[1]
   const dimensions = parts[2]
   const extension = parts[3]
-  return `https://cdn.sanity.io/images/fk4ygrwd/production/${id}-${dimensions}.${extension}`
+  return `${import.meta.env.VITE_SANITY_CDN_BASE_URL}/${import.meta.env.VITE_SANITY_PROJECT_ID}/${import.meta.env.VITE_SANITY_DATASET}/${id}-${dimensions}.${extension}`
 }
