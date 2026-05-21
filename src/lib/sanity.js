@@ -18,3 +18,12 @@ export const urlForImage = (source) => {
   const extension = parts[3]
   return `${import.meta.env.VITE_SANITY_CDN_BASE_URL}/${import.meta.env.VITE_SANITY_PROJECT_ID}/${import.meta.env.VITE_SANITY_DATASET}/${id}-${dimensions}.${extension}`
 }
+
+export const fetchPosts = async () => {
+  return sanityClient.fetch(`*[_type == "post"] | order(date desc)`)
+}
+
+export const fetchPostBySlug = async (slug) => {
+  return sanityClient.fetch(`*[_type == "post" && slug.current == $slug][0]`, { slug })
+}
+
