@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import Shortener, { SHORTENER_DOMAIN, generateSlug } from '../components/Shortner'
+import ShortenerModal from '../components/shortenerModal'
 
 const FEATURES = [
   { icon: <Zap size={20} className="text-indigo-500" />, title: 'Lightning Fast Shortening', desc: 'Turn any URL into a clean short link in under a second. No friction, no account needed for quick shares.' },
@@ -50,6 +51,7 @@ export default function Landing() {
   const [copied, setCopied] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showAuthModal, setShowAuthModal] = useState(false)
 
   function isValidUrl(str) {
     try { new URL(str); return true } catch { return false }
@@ -65,11 +67,10 @@ export default function Landing() {
     const token = localStorage.getItem('apiToken')
 
 
-      // http://localhost:6090 -> BackURl for local testing
-
     if (token) {
       try {
-        const res = await fetch('https://bravely-backend.vercel.app/api/urls', {
+          const baseUrl = import.meta.env.VITE_API_BASE_URL;
+        const res = await fetch(`${baseUrl}/urls`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -124,22 +125,27 @@ export default function Landing() {
         </div>
 
         <div className="relative max-w-3xl mx-auto">
-          <span className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-600 text-sm font-semibold px-4 py-1.5 rounded-full mb-6 border border-indigo-100">
+          <span className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-600 text-xs md:text-sm font-semibold px-4 py-1.5 rounded-full mb-6 border border-indigo-100">
             <Zap size={14} fill="currentColor" /> Free forever · No credit card needed
           </span>
 
-          <h1 className="text-5xl sm:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight mb-5">
+          <h1 className="text-3xl md:text-5xl sm:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight mb-5">
             Shorten. Share.{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-orange-500">
               Track.
             </span>
           </h1>
-          <p className="text-lg sm:text-xl text-slate-500 mb-4 max-w-xl mx-auto leading-relaxed">
+          <p className=" md:text-lg sm:text-xl text-slate-500 mb-4 max-w-xl mx-auto leading-relaxed">
             Brevly turns long URLs into clean, trackable links — with real-time analytics, QR codes, and link controls built right in.
           </p>
 
           {/* Free tier callout */}
-          <div className="inline-flex items-center gap-2 text-sm text-slate-500 bg-slate-50 border border-slate-200 rounded-full px-4 py-2 mb-8">
+          <div className="md:hidden inline-flex items-center gap-2 text-sm text-slate-500 bg-slate-50 border border-slate-200 rounded-full px-4 py-2 mb-4">
+            <span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
+            <Link to="/register" className="text-indigo-600 font-semibold hover:underline">Sign up for free</Link>.
+          </div>
+
+          <div className="hidden md:inline-flex items-center gap-2 text-sm text-slate-500 bg-slate-50 border border-slate-200 rounded-full px-4 py-2 mb-8">
             <span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
             Shorten instantly — no account needed.
             <Link to="/register" className="text-indigo-600 font-semibold hover:underline">Sign up free</Link>
@@ -166,19 +172,26 @@ export default function Landing() {
           </form>
 
           {shortened && (
-            <div className="max-w-2xl mx-auto mt-4 bg-indigo-50 border border-indigo-200 rounded-xl px-5 py-4 flex items-center justify-between gap-4">
+            <div className="max-w-2xl mx-auto mt-4 rounded-xl px-5 py-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border transition-all bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-indigo-600">
                   <Zap size={14} className="text-white" fill="white" />
                 </div>
-                <span className="text-indigo-700 font-semibold text-sm truncate">{shortened}</span>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 min-w-0 text-left">
+                  <span className="font-semibold text-sm truncate text-indigo-700">
+                    {shortened}
+                  </span>
+                </div>
               </div>
-              <button
-                onClick={handleCopy}
-                className="flex items-center gap-2 text-sm font-medium bg-white border border-indigo-200 hover:border-indigo-400 text-indigo-600 px-4 py-2 rounded-lg transition-all shrink-0"
-              >
-                {copied ? <><Check size={14} /> Copied!</> : <><Copy size={14} /> Copy</>}
-              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={handleCopy}
+                  type="button"
+                  className="flex items-center gap-2 text-sm font-medium bg-white border border-indigo-200 hover:border-indigo-400 text-indigo-600 px-4 py-2 rounded-lg transition-all"
+                >
+                  {copied ? <><Check size={14} /> Copied!</> : <><Copy size={14} /> Copy</>}
+                </button>
+              </div>
             </div>
           )}
 
@@ -207,21 +220,21 @@ export default function Landing() {
         <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6">
           {STATS.map(stat => (
             <div key={stat.label} className="text-center">
-              <div className="text-3xl font-extrabold text-slate-900">{stat.value}</div>
-              <div className="text-sm text-slate-500 mt-1">{stat.label}</div>
+              <div className="text-2xl md:text-3xl font-extrabold text-slate-900">{stat.value}</div>
+              <div className="text-xs md:text-sm text-slate-500 mt-1">{stat.label}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* Free vs Registered */}
-      <section className="py-20 px-6">
+      <section className="py-10 md:py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
               Always free. Seriously.
             </h2>
-            <p className="text-slate-500 text-lg max-w-xl mx-auto">
+            <p className="text-slate-500 md:text-lg max-w-xl mx-auto">
               No credit card. No trial. No catch. Use Brevly as a guest or sign up to unlock analytics.
             </p>
           </div>
@@ -288,14 +301,14 @@ export default function Landing() {
       </section>
 
       {/* Features grid */}
-      <section className="py-20 px-6 bg-slate-50 border-y border-slate-100">
+      <section className="py-10 md:py-20 px-6 bg-slate-50 border-y border-slate-100">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
+          <div className="text-center mb-6 md:mb-12">
+            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight mb-3">
               Everything you need to{' '}
               <span className="text-indigo-600">go further</span>
             </h2>
-            <p className="text-slate-500 text-lg max-w-xl mx-auto">
+            <p className="text-slate-500 text-sm md:text-lg max-w-xl mx-auto">
               Brevly isn't just a URL shortener — it's a full link management platform.
             </p>
           </div>
@@ -314,12 +327,12 @@ export default function Landing() {
       </section>
 
       {/* How it works */}
-      <section className="py-20 px-6">
+      <section className="py-10 md:py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight mb-3">
             How it works
           </h2>
-          <p className="text-slate-500 text-lg mb-12">Three steps from long URL to full insight.</p>
+          <p className="text-slate-500 text-sm md:text-lg mb-12">Three steps from long URL to full insight.</p>
           <div className="grid sm:grid-cols-3 gap-8">
             {[
               { step: '01', title: 'Paste your URL', desc: 'Drop any long URL into the Brevly shortener — no account needed for a basic short link.' },
@@ -327,11 +340,11 @@ export default function Landing() {
               { step: '03', title: 'Track every click', desc: 'Watch real-time analytics roll in: who clicked, from where, on what device, from which channel.' },
             ].map(item => (
               <div key={item.step} className="flex flex-col items-center text-center">
-                <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-extrabold text-lg mb-4 shadow-md shadow-indigo-200">
+                <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-extrabold md:text-lg mb-4 shadow-md shadow-indigo-200">
                   {item.step}
                 </div>
-                <h3 className="font-bold text-slate-900 text-lg mb-2">{item.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
+                <h3 className="font-bold text-slate-900 text-sm md:text-lg mb-2">{item.title}</h3>
+                <p className="text-slate-500 text-sm md:text-md leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -339,21 +352,30 @@ export default function Landing() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 px-6">
+      <section className="py-10 md:py-20 px-6">
         <div className="max-w-3xl mx-auto bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-3xl px-8 py-14 text-center shadow-xl shadow-indigo-200 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500 opacity-10 rounded-full -translate-y-1/2 translate-x-1/3 blur-2xl" />
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-4">
             Ready to level up your links?
           </h2>
-          <p className="text-indigo-200 text-lg mb-8 max-w-md mx-auto">
+          <p className="text-indigo-200 text-sm md:text-lg mb-8 max-w-md mx-auto">
             Create your free account in 30 seconds. Get one tracked link with full analytics, forever free.
           </p>
           <Link
             to="/register"
-            className="inline-flex items-center gap-2 bg-white text-indigo-700 font-bold text-sm px-7 py-3.5 rounded-xl hover:bg-indigo-50 transition-colors shadow-sm"
+            className="hidden md:inline-flex items-center gap-2 bg-white text-indigo-700 font-bold text-sm px-7 py-3.5 rounded-xl hover:bg-indigo-50 transition-colors shadow-sm"
           >
             Get Started — It's Free <ArrowRight size={16} />
           </Link>
+
+          <Link
+            to="/register"
+            className="inline-flex md:hidden items-center gap-2 bg-white text-indigo-700 font-bold text-sm px-7 py-3.5 rounded-xl hover:bg-indigo-50 transition-colors shadow-sm"
+          >
+            Get Started<ArrowRight size={16} />
+          </Link>
+
+
           <p className="text-indigo-300 text-xs mt-4">No credit card · No trial · Cancel anytime</p>
         </div>
       </section>
@@ -372,6 +394,7 @@ export default function Landing() {
             <span>Terms</span>
           </div>
           <p className="text-slate-400 text-sm">© {new Date().getFullYear()} Brevly</p>
+          <ShortenerModal open={showAuthModal} onClose={() => setShowAuthModal(false)} shortened={shortened} originalUrl={url} />
         </div>
       </footer>
     </div>

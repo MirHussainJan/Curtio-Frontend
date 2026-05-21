@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Clock, Tag } from 'lucide-react'
 import Navbar from '../components/Navbar'
-import { sanityClient } from '../lib/sanity'
+import { sanityClient, urlForImage } from '../lib/sanity'
 
 const CATEGORIES = ['All', 'Marketing', 'Analytics', 'Tips & Tricks', 'Product']
 
@@ -38,15 +38,15 @@ export default function Blog() {
       <Navbar />
 
       {/* Hero */}
-      <section className="pt-28 pb-12 px-6 text-center border-b border-slate-100">
+      <section className="pt-28 pb-6 md:pb-12 px-6 text-center border-b border-slate-100">
         <div className="max-w-2xl mx-auto">
           <span className="inline-block bg-indigo-50 text-indigo-600 text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full mb-4">
             The Brevly Blog
           </span>
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+          <h1 className="text-2xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
             Insights on links, analytics & growth
           </h1>
-          <p className="text-slate-500 text-lg">
+          <p className="text-slate-500 md:text-lg">
             Practical guides and ideas for marketers, developers, and builders who care about their links.
           </p>
         </div>
@@ -65,22 +65,33 @@ export default function Blog() {
                 to={`/blog/${featured.slug.current}`}
                 className="group block mb-14 bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow"
               >
-                <div className={`h-52 bg-gradient-to-br ${featured.coverColor} relative flex items-end p-8`}>
-                  <span className="absolute top-5 left-5 bg-white/20 backdrop-blur text-white text-xs font-semibold px-3 py-1 rounded-full">
+                <div className="h-52 relative flex items-end p-8 overflow-hidden bg-slate-100">
+                  {featured.coverImage ? (
+                    <img 
+                      src={urlForImage(featured.coverImage)} 
+                      alt={featured.title} 
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className={`absolute inset-0 bg-gradient-to-br ${featured.coverColor}`} />
+                  )}
+                  {featured.coverImage && <div className="absolute inset-0 bg-slate-900/35" />}
+                  
+                  <span className="absolute top-5 left-5 bg-white/20 backdrop-blur text-white text-xs font-semibold px-3 py-1 rounded-full z-10">
                     Featured
                   </span>
-                  <span className={`text-xs font-semibold px-3 py-1 rounded-full bg-white/90 ${CATEGORY_COLORS[featured.category] || 'text-slate-600'}`}>
+                  <span className={`text-xs font-semibold px-3 py-1 rounded-full bg-white/90 z-10 ${CATEGORY_COLORS[featured.category] || 'text-slate-600'}`}>
                     {featured.category}
                   </span>
                 </div>
                 <div className="p-8">
-                  <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors mb-3">
+                  <h2 className="text-base md:text-2xl sm:text-3xl font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors mb-3">
                     {featured.title}
                   </h2>
-                  <p className="text-slate-500 text-base leading-relaxed mb-5 max-w-2xl">
+                  <p className="text-slate-500 md:text-base text-sm leading-relaxed mb-5 max-w-2xl">
                     {featured.excerpt}
                   </p>
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col md:flex-row md:items-center  justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white font-bold text-sm">
                         {featured.author.avatar}
@@ -92,7 +103,7 @@ export default function Blog() {
                         </div>
                       </div>
                     </div>
-                    <span className="flex items-center gap-1.5 text-sm font-semibold text-indigo-600 group-hover:gap-2.5 transition-all">
+                    <span className="flex item-center justify-center  pt-4 md:pt-0 gap-1.5 text-sm font-semibold text-indigo-600 group-hover:gap-2.5 transition-all">
                       Read article <ArrowRight size={15} />
                     </span>
                   </div>
@@ -125,7 +136,17 @@ export default function Blog() {
                   to={`/blog/${post.slug.current}`}
                   className="group bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col"
                 >
-                  <div className={`h-32 bg-gradient-to-br ${post.coverColor}`} />
+                  <div className="h-32 relative overflow-hidden bg-slate-100">
+                    {post.coverImage ? (
+                      <img 
+                        src={urlForImage(post.coverImage)} 
+                        alt={post.title} 
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className={`absolute inset-0 bg-gradient-to-br ${post.coverColor}`} />
+                    )}
+                  </div>
                   <div className="p-6 flex flex-col flex-1">
                     <div className="flex items-center gap-2 mb-3">
                       <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${CATEGORY_COLORS[post.category] || 'bg-slate-100 text-slate-600'}`}>
@@ -164,7 +185,7 @@ export default function Blog() {
       </div>
 
       <footer className="border-t border-slate-100 py-8 px-6 text-center text-slate-400 text-sm">
-        © {new Date().getFullYear()} Brevly. Built with ♥ for the web.
+        © {new Date().getFullYear()} Brevly. 
       </footer>
     </div>
   )

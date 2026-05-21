@@ -2,8 +2,9 @@ import { useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Zap, Eye, EyeOff, Mail, Lock, User, ShieldCheck } from 'lucide-react'
 import { useGoogleLogin } from "@react-oauth/google"
+import { syncPendingUrl } from '../lib/sync'
 
-const API = 'http://localhost:6090/api/auth'
+const API = `${import.meta.env.VITE_API_BASE_URL}/auth`;
 
 export default function Register() {
   const navigate = useNavigate()
@@ -34,6 +35,7 @@ export default function Register() {
         } else {
           localStorage.setItem("apiToken", data.apiToken);
           localStorage.setItem("LoginUser", JSON.stringify(data.LoginUser));
+          await syncPendingUrl(data.apiToken);
           navigate("/dashboard");
         }
       } catch {
@@ -117,6 +119,7 @@ export default function Register() {
       } else {
         localStorage.setItem('apiToken', data.apiToken)
         localStorage.setItem('LoginUser', JSON.stringify(data.LoginUser))
+        await syncPendingUrl(data.apiToken)
         navigate('/dashboard')
       }
     } catch {

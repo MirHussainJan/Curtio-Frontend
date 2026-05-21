@@ -55,7 +55,8 @@ export default function Analytics() {
   useEffect(() => {
     async function fetchAnalytics() {
       try {
-        const res = await fetch('http://localhost:6090/api/urls', {
+          const baseUrl = import.meta.env.VITE_API_BASE_URL;
+      const res = await fetch(`${baseUrl}/urls`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { ArrowLeft, Clock, Calendar, ArrowRight } from 'lucide-react'
 import Navbar from '../components/Navbar'
-import { sanityClient } from '../lib/sanity'
+import { sanityClient, urlForImage } from '../lib/sanity'
 import { PortableText } from '@portabletext/react'
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const CATEGORY_COLORS_MAP = {
   Marketing: 'bg-indigo-50 text-indigo-600',
@@ -14,22 +16,22 @@ const CATEGORY_COLORS_MAP = {
 
 const portableTextComponents = {
   block: {
-    h2: ({children}) => <h2 className="text-2xl font-extrabold text-slate-900 mt-10 mb-4">{children}</h2>,
-    h3: ({children}) => <h3 className="text-lg font-bold text-slate-800 mt-6 mb-2">{children}</h3>,
-    normal: ({children}) => <p className="text-slate-600 leading-relaxed my-3">{children}</p>,
+    h2: ({ children }) => <h2 className="text-2xl font-extrabold text-slate-900 mt-10 mb-4">{children}</h2>,
+    h3: ({ children }) => <h3 className="text-lg font-bold text-slate-800 mt-6 mb-2">{children}</h3>,
+    normal: ({ children }) => <p className="text-slate-600 leading-relaxed my-3">{children}</p>,
   },
   list: {
-    bullet: ({children}) => <ul className="my-4 pl-5 space-y-2 list-disc">{children}</ul>,
-    number: ({children}) => <ol className="my-4 pl-5 space-y-2 list-decimal">{children}</ol>,
+    bullet: ({ children }) => <ul className="my-4 pl-5 space-y-2 list-disc">{children}</ul>,
+    number: ({ children }) => <ol className="my-4 pl-5 space-y-2 list-decimal">{children}</ol>,
   },
   listItem: {
-    bullet: ({children}) => <li className="text-slate-600 leading-relaxed">{children}</li>,
-    number: ({children}) => <li className="text-slate-600 leading-relaxed">{children}</li>,
+    bullet: ({ children }) => <li className="text-slate-600 leading-relaxed">{children}</li>,
+    number: ({ children }) => <li className="text-slate-600 leading-relaxed">{children}</li>,
   },
   marks: {
-    strong: ({children}) => <strong className="font-semibold text-slate-800">{children}</strong>,
-    em: ({children}) => <em>{children}</em>,
-    code: ({children}) => <code className="bg-slate-100 text-indigo-700 px-1.5 py-0.5 rounded text-sm font-mono">{children}</code>,
+    strong: ({ children }) => <strong className="font-semibold text-slate-800">{children}</strong>,
+    em: ({ children }) => <em>{children}</em>,
+    code: ({ children }) => <code className="bg-slate-100 text-indigo-700 px-1.5 py-0.5 rounded text-sm font-mono">{children}</code>,
   },
 }
 
@@ -48,12 +50,12 @@ export default function BlogPost() {
       }`,
       { slug }
     )
-    .then(({ post, others }) => {
-      setPost(post)
-      setOthers(others)
-      setIsLoading(false)
-    })
-    .catch(console.error)
+      .then(({ post, others }) => {
+        setPost(post)
+        setOthers(others)
+        setIsLoading(false)
+      })
+      .catch(console.error)
   }, [slug])
 
   if (isLoading) {
@@ -72,8 +74,19 @@ export default function BlogPost() {
       <Navbar />
 
       {/* Cover */}
-      <div className={`pt-16 bg-gradient-to-br ${post.coverColor} h-64 flex items-end`}>
-        <div className="max-w-3xl mx-auto w-full px-6 pb-8">
+      <div className="pt-16 h-64 relative flex items-end overflow-hidden bg-slate-100">
+        {post.coverImage ? (
+          <img
+            src={urlForImage(post.coverImage)}
+            alt={post.title}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div className={`absolute inset-0 bg-gradient-to-br ${post.coverColor}`} />
+        )}
+        {post.coverImage && <div className="absolute inset-0 bg-slate-900/35" />}
+
+        <div className="max-w-3xl mx-auto w-full px-6 pb-8 z-10">
           <span className={`text-xs font-semibold px-3 py-1 rounded-full bg-white/90 ${CATEGORY_COLORS_MAP[post.category] || 'text-slate-700'}`}>
             {post.category}
           </span>
@@ -90,20 +103,22 @@ export default function BlogPost() {
           <ArrowLeft size={15} /> Back to Blog
         </Link>
 
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-6">
+        <h1 className="text-2xl md:text-4xl font-extrabold text-slate-900 leading-tight mb-6">
           {post.title}
         </h1>
 
         {/* Meta */}
-        <div className="flex items-center gap-4 pb-8 border-b border-slate-100 mb-2">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white font-bold">
-            {post.author?.avatar}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-slate-100 mb-2">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white font-bold">
+              {post.author?.avatar}
+            </div>
+            <div>
+              <div className="font-semibold text-slate-800 text-sm">{post.author?.name}</div>
+              <div className="text-xs text-slate-400">{post.author?.role}</div>
+            </div>
           </div>
-          <div>
-            <div className="font-semibold text-slate-800 text-sm">{post.author?.name}</div>
-            <div className="text-xs text-slate-400">{post.author?.role}</div>
-          </div>
-          <div className="ml-auto text-xs text-slate-400 flex items-center gap-3">
+          <div className="text-xs text-slate-400 flex md:gap-10 gap-4 text-center justify-center">
             <span className="flex items-center gap-1"><Calendar size={12} /> {post.date}</span>
             <span className="flex items-center gap-1"><Clock size={12} /> {post.readTime}</span>
           </div>
@@ -114,7 +129,29 @@ export default function BlogPost() {
           {Array.isArray(post.content) ? (
             <PortableText value={post.content} components={portableTextComponents} />
           ) : (
-            <div className="whitespace-pre-wrap text-slate-600">{post.content}</div>
+            // Render markdown content for better formatting of symbols like **, #, etc.
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                h1: ({ node, ...props }) => <h1 className="text-3xl font-extrabold text-slate-900 mt-6" {...props} />,
+                h2: ({ node, ...props }) => <h2 className="text-2xl font-bold text-slate-800 mt-5" {...props} />,
+                h3: ({ node, ...props }) => <h3 className="text-xl font-semibold text-slate-700 mt-4" {...props} />,
+                p: ({ node, ...props }) => <p className="text-slate-600 leading-relaxed my-3" {...props} />,
+                strong: ({ node, ...props }) => <strong className="font-semibold text-slate-800" {...props} />,
+                em: ({ node, ...props }) => <em className="italic" {...props} />,
+                ul: ({ node, ...props }) => <ul className="list-disc pl-5 space-y-2" {...props} />,
+                ol: ({ node, ...props }) => <ol className="list-decimal pl-5 space-y-2" {...props} />,
+                li: ({ node, ...props }) => <li className="text-slate-600 leading-relaxed" {...props} />,
+                code: ({ node, inline, ...props }) =>
+                  inline ? (
+                    <code className="bg-slate-100 text-indigo-700 px-1.5 py-0.5 rounded text-sm font-mono" {...props} />
+                  ) : (
+                    <pre className="bg-slate-100 p-4 rounded overflow-x-auto"><code className="text-indigo-700" {...props} /></pre>
+                  ),
+              }}
+            >
+              {post.content}
+            </ReactMarkdown>
           )}
         </div>
 
@@ -143,7 +180,17 @@ export default function BlogPost() {
                   to={`/blog/${p.slug.current}`}
                   className="group bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col"
                 >
-                  <div className={`h-24 bg-gradient-to-br ${p.coverColor}`} />
+                  <div className="h-24 relative overflow-hidden bg-slate-100">
+                    {p.coverImage ? (
+                      <img
+                        src={urlForImage(p.coverImage)}
+                        alt={p.title}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className={`absolute inset-0 bg-gradient-to-br ${p.coverColor}`} />
+                    )}
+                  </div>
                   <div className="p-5 flex-1">
                     <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${CATEGORY_COLORS_MAP[p.category] || 'bg-slate-100 text-slate-600'}`}>
                       {p.category}
@@ -161,7 +208,7 @@ export default function BlogPost() {
       )}
 
       <footer className="border-t border-slate-100 py-8 px-6 text-center text-slate-400 text-sm">
-        © {new Date().getFullYear()} Brevly. Built with ♥ for the web.
+        © {new Date().getFullYear()} Brevly.
       </footer>
     </div>
   )
