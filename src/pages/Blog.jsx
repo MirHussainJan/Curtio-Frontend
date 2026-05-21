@@ -67,16 +67,16 @@ export default function Blog() {
               >
                 <div className="h-52 relative flex items-end p-8 overflow-hidden bg-slate-100">
                   {featured.coverImage ? (
-                    <img 
-                      src={urlForImage(featured.coverImage)} 
-                      alt={featured.title} 
+                    <img
+                      src={urlForImage(featured.coverImage)}
+                      alt={featured.title}
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
                     <div className={`absolute inset-0 bg-gradient-to-br ${featured.coverColor}`} />
                   )}
                   {featured.coverImage && <div className="absolute inset-0 bg-slate-900/35" />}
-                  
+
                   <span className="absolute top-5 left-5 bg-white/20 backdrop-blur text-white text-xs font-semibold px-3 py-1 rounded-full z-10">
                     Featured
                   </span>
@@ -117,11 +117,10 @@ export default function Blog() {
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`text-sm font-medium px-4 py-1.5 rounded-full border transition-all ${
-                    activeCategory === cat
+                  className={`text-sm font-medium px-4 py-1.5 rounded-full border transition-all ${activeCategory === cat
                       ? 'bg-indigo-600 text-white border-indigo-600'
                       : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400'
-                  }`}
+                    }`}
                 >
                   {cat}
                 </button>
@@ -138,9 +137,9 @@ export default function Blog() {
                 >
                   <div className="h-32 relative overflow-hidden bg-slate-100">
                     {post.coverImage ? (
-                      <img 
-                        src={urlForImage(post.coverImage)} 
-                        alt={post.title} 
+                      <img
+                        src={urlForImage(post.coverImage)}
+                        alt={post.title}
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
@@ -185,7 +184,7 @@ export default function Blog() {
       </div>
 
       <footer className="border-t border-slate-100 py-8 px-6 text-center text-slate-400 text-sm">
-        © {new Date().getFullYear()} Brevly. 
+        © {new Date().getFullYear()} Brevly.
       </footer>
     </div>
   )
