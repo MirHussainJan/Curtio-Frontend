@@ -4,10 +4,10 @@ import { Zap, Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { useGoogleLogin } from "@react-oauth/google";
 import { syncPendingUrl } from "../lib/sync";
 
-// http://localhost:6090 BackURl for local testing
 
-const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/auth`;
+const baseUrl = `${import.meta.env.VITE_API_URL}/auth`;
 
+console.log('Base URL:', baseUrl);
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");

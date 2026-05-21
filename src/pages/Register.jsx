@@ -6,6 +6,8 @@ import { syncPendingUrl } from '../lib/sync'
 
 const API = `${import.meta.env.VITE_API_BASE_URL}/auth`;
 
+
+
 export default function Register() {
   const navigate = useNavigate()
 
