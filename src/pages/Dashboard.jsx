@@ -29,6 +29,7 @@ import {
 import { SHORTENER_DOMAIN } from "../components/Shortner";
 
 const FREE_LIMIT = 100;
+const baseUrl = import.meta.env.VITE_API_URL;
 
 function StatCard({ icon, label, value, sub }) {
   return (
@@ -302,7 +303,7 @@ export default function Dashboard() {
     setDeleting(true);
     setError("");
     try {
-      const res = await fetch(`http://localhost:6090/api/urls/${slug}`, {
+      const res = await fetch(`${baseUrl}/urls/${slug}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -325,7 +326,7 @@ export default function Dashboard() {
   async function handleToggle(id, slug) {
     setError("");
     try {
-      const res = await fetch(`http://localhost:6090/api/urls/${slug}/toggle`, {
+      const res = await fetch(`${baseUrl}/urls/${slug}/toggle`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -361,7 +362,7 @@ export default function Dashboard() {
     setError("");
     try {
       const finalUrl = buildFinalUrl(url);
-      const res = await fetch("http://localhost:6090/api/urls", {
+      const res = await fetch(`${baseUrl}/urls`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
