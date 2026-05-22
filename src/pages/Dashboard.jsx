@@ -669,7 +669,7 @@ export default function Dashboard() {
                   <button
                     type="submit"
                     disabled={creating}
-                    className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors flex items-center gap-2"
+                    className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors flex items-center gap-2 cursor-pointer"
                   >
                     {creating ? (
                       <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">

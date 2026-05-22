@@ -2,7 +2,7 @@ import { nanoid } from "nanoid";
 import { ArrowRight } from "lucide-react";
 
 // The backend server acts as the redirection gateway
-export const SHORTENER_DOMAIN = "http://localhost:6090";
+export const SHORTENER_DOMAIN = import.meta.env.VITE_REDIRECT_URI; 
 
 export const generateSlug = () => nanoid(7);
 
