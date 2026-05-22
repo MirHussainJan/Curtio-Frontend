@@ -372,6 +372,7 @@ export default function Campaigns() {
   let clickHistory = [];
   let finalDeviceData = [];
   let referrerData = [];
+  let finalGeoData = [];
 
   if (selectedCampaign) {
     selectedCampaignData = campaignsMap[selectedCampaign];
@@ -454,6 +455,50 @@ export default function Campaigns() {
         { source: "Search Engines", visits: organic },
         { source: "Direct / Email", visits: direct || (selectedCampaignData.clicks - social - organic) },
       ].filter(r => r.visits >= 0);
+
+      // Geographic breakdown for selected campaign
+      const geoDataMap = {};
+      campaignLinks.forEach((l) => {
+        if (l.clickLogs) {
+          l.clickLogs.forEach((log) => {
+            const countryName = log.country || "Unknown";
+            const countryCode = log.countryCode || "unknown";
+            if (!geoDataMap[countryName]) {
+              geoDataMap[countryName] = {
+                country: countryName,
+                countryCode: countryCode,
+                clicks: 0,
+              };
+            }
+            geoDataMap[countryName].clicks += 1;
+          });
+        }
+      });
+
+      const getFlagEmoji = (code) => {
+        if (!code || code.toLowerCase() === "unknown") return "🌐";
+        try {
+          const codePoints = code
+            .toUpperCase()
+            .split("")
+            .map((char) => 127397 + char.charCodeAt(0));
+          return String.fromCodePoint(...codePoints);
+        } catch (e) {
+          return "🌐";
+        }
+      };
+
+      const geoData = Object.values(geoDataMap)
+        .sort((a, b) => b.clicks - a.clicks)
+        .map((g) => ({
+          country: g.country,
+          flag: getFlagEmoji(g.countryCode),
+          clicks: g.clicks,
+        }));
+
+      finalGeoData = geoData.length > 0 
+        ? geoData 
+        : [{ country: "Direct Visits", flag: "🌐", clicks: selectedCampaignData.clicks || 0 }];
     }
   }
 
@@ -997,7 +1042,7 @@ export default function Campaigns() {
               </Card>
 
               {/* Referrers + Devices Breakdowns */}
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
                 {/* Referrers */}
                 <Card className="p-6">
                   <h2 className="text-base font-bold text-slate-900 mb-1">Referrers</h2>
@@ -1051,6 +1096,38 @@ export default function Campaigns() {
                         </div>
                       ))}
                     </div>
+                  </div>
+                </Card>
+
+                {/* Geographic Breakdown */}
+                <Card className="p-6">
+                  <h2 className="text-base font-bold text-slate-900 mb-1">Geographic Share</h2>
+                  <p className="text-xs text-slate-400 mb-4">Estimated visitor origins for this campaign</p>
+                  <div className="space-y-3.5">
+                    {finalGeoData.map((geo, i) => {
+                      const max = finalGeoData[0]?.clicks || 1;
+                      const pct = Math.round((geo.clicks / max) * 100);
+                      return (
+                        <div key={geo.country} className="flex items-center gap-3">
+                          <span className="text-xl w-6 text-center shrink-0">{geo.flag}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs text-slate-700 font-semibold truncate">{geo.country}</span>
+                              <span className="text-xs font-bold text-slate-800 ml-2">{geo.clicks.toLocaleString()}</span>
+                            </div>
+                            <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full transition-all"
+                                style={{
+                                  width: `${pct}%`,
+                                  background: i === 0 ? "#4F46E5" : i === 1 ? "#6366F1" : i === 2 ? "#818CF8" : "#A5B4FC"
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </Card>
               </div>

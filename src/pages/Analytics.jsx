@@ -183,13 +183,45 @@ export default function Analytics() {
   if (organic > 0) referrerData.push({ source: 'Search Engines', visits: organic })
   referrerData.push({ source: 'Direct / Email', visits: direct || link.clicks })
 
-  const geoData = [
-    { country: 'United States', flag: '🇺🇸', clicks: Math.round(link.clicks * 0.6) },
-    { country: 'United Kingdom', flag: '🇬🇧', clicks: Math.round(link.clicks * 0.3) },
-    { country: 'Canada', flag: '🇨🇦', clicks: Math.round(link.clicks * 0.1) }
-  ].filter(g => g.clicks > 0)
+  // Aggregate real country data from click logs
+  const geoDataMap = {};
+  if (link.clickLogs) {
+    link.clickLogs.forEach(log => {
+      const countryName = log.country || 'Unknown';
+      const countryCode = log.countryCode || 'unknown';
+      if (!geoDataMap[countryName]) {
+        geoDataMap[countryName] = {
+          country: countryName,
+          countryCode: countryCode,
+          clicks: 0
+        };
+      }
+      geoDataMap[countryName].clicks += 1;
+    });
+  }
 
-  const finalGeoData = geoData.length > 0 ? geoData : [{ country: 'Direct Visits', flag: '🌐', clicks: link.clicks }]
+  const getFlagEmoji = (code) => {
+    if (!code || code.toLowerCase() === 'unknown') return '🌐';
+    try {
+      const codePoints = code
+        .toUpperCase()
+        .split('')
+        .map(char => 127397 + char.charCodeAt(0));
+      return String.fromCodePoint(...codePoints);
+    } catch (e) {
+      return '🌐';
+    }
+  };
+
+  const geoData = Object.values(geoDataMap)
+    .sort((a, b) => b.clicks - a.clicks)
+    .map(g => ({
+      country: g.country,
+      flag: getFlagEmoji(g.countryCode),
+      clicks: g.clicks
+    }));
+
+  const finalGeoData = geoData.length > 0 ? geoData : [{ country: 'Direct Visits', flag: '🌐', clicks: link.clicks || 0 }];
 
   return (
     <div className="min-h-screen bg-slate-50">
