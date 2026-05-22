@@ -451,22 +451,24 @@ export default function Dashboard() {
           </Link>
 
           <nav className="flex flex-col gap-1 flex-1">
-            {[
-              { icon: <LinkIcon size={16} />, label: "My Links", active: true },
-              { icon: <BarChart2 size={16} />, label: "Analytics", active: false },
-              { icon: <TrendingUp size={16} />, label: "Campaigns", active: false },
-            ].map((item) => (
-              <button
-                key={item.label}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left ${
-                  item.active
-                    ? "bg-indigo-50 text-indigo-700"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-                }`}
-              >
-                {item.icon} {item.label}
-              </button>
-            ))}
+            <Link
+              to="/dashboard"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors text-left bg-indigo-50 text-indigo-700"
+            >
+              <LinkIcon size={16} /> My Links
+            </Link>
+            <Link
+              to="/dashboard/analytics"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+            >
+              <BarChart2 size={16} /> Analytics
+            </Link>
+            <Link
+              to="/dashboard/campaigns"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+            >
+              <TrendingUp size={16} /> Campaigns
+            </Link>
           </nav>
 
           {/* Free plan badge */}
