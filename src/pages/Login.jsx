@@ -17,6 +17,7 @@ export default function Login() {
   const [error, setError] = useState("");
 
   const handleGoogleLogin = useGoogleLogin({
+    flow: "auth-code",
     onSuccess: async (tokenResponse) => {
       setLoading(true);
       setError("");

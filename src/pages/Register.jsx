@@ -29,7 +29,7 @@ export default function Register() {
         const res = await fetch(`${API}/google`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token: tokenResponse.access_token }),
+          body: JSON.stringify({ code: tokenResponse.code }),
         });
         const data = await res.json();
         if (!data.success) {
