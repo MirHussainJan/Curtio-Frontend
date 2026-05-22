@@ -4,6 +4,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Analytics from "./pages/Analytics";
+import AnalytcsDashboard from "./pages/AnalytcsDashboard";
+import Campaigns from "./pages/Campaigns";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -32,6 +34,23 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/analytics"
+          element={
+            <ProtectedRoute>
+              <AnalytcsDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard/campaigns"
+          element={
+            <ProtectedRoute>
+              <Campaigns />
             </ProtectedRoute>
           }
         />
