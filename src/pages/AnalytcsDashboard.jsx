@@ -430,7 +430,7 @@ export default function AnalytcsDashboard() {
     { name: "Tablet", value: Math.round((tablet / divider) * 100) },
   ].filter((d) => d.value > 0);
 
-  const finalDeviceData = deviceData.length > 0 ? deviceData : [{ name: "Desktop", value: 100 }];
+  const finalDeviceData = deviceData;
 
   // Referrers Breakdown
   let direct = 0, social = 0, organic = 0;
@@ -452,8 +452,8 @@ export default function AnalytcsDashboard() {
   const referrerData = [
     { source: "Social Media", visits: social },
     { source: "Search Engines", visits: organic },
-    { source: "Direct / Email", visits: direct || (totalClicks - social - organic) },
-  ].filter(r => r.visits >= 0);
+    { source: "Direct / Email", visits: direct },
+  ].filter(r => r.visits > 0);
 
   // Aggregate real country data across all links
   const geoDataMap = {};
@@ -495,9 +495,7 @@ export default function AnalytcsDashboard() {
       clicks: g.clicks,
     }));
 
-  const finalGeoData = geoData.length > 0 
-    ? geoData 
-    : [{ country: "Direct Visits", flag: "🌐", clicks: totalClicks || 0 }];
+  const finalGeoData = geoData;
 
   // Top Clicked Links (Sorted by clicks desc)
   const topLinks = [...links].sort((a, b) => b.clicks - a.clicks).slice(0, 10);
@@ -628,7 +626,7 @@ export default function AnalytcsDashboard() {
           )}
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard
               icon={<LinkIcon size={18} className="text-indigo-600" />}
               label="Total Links"
@@ -692,61 +690,77 @@ export default function AnalytcsDashboard() {
           </Card>
 
           {/* Referrers + Devices Row */}
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid lg:grid-cols-2 gap-6">
             {/* Top Referrers */}
             <Card className="p-6">
               <h2 className="text-base font-bold text-slate-900 mb-1">Referrer Breakdown</h2>
               <p className="text-xs text-slate-400 mb-5">Traffic source classification based on clicking clients</p>
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={referrerData} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" horizontal={false} />
-                  <XAxis type="number" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                  <YAxis type="category" dataKey="source" tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} width={90} />
-                  <Tooltip
-                    formatter={(v) => [v.toLocaleString(), "visits"]}
-                    contentStyle={{ borderRadius: 10, border: "1px solid #E2E8F0", fontSize: 12 }}
-                  />
-                  <Bar dataKey="visits" fill="#4F46E5" radius={[0, 6, 6, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              {referrerData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={referrerData} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" horizontal={false} />
+                    <XAxis type="number" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                    <YAxis type="category" dataKey="source" tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} width={90} />
+                    <Tooltip
+                      formatter={(v) => [v.toLocaleString(), "visits"]}
+                      contentStyle={{ borderRadius: 10, border: "1px solid #E2E8F0", fontSize: 12 }}
+                    />
+                    <Bar dataKey="visits" fill="#4F46E5" radius={[0, 6, 6, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-[200px] text-center">
+                  <Globe size={28} className="text-slate-200 mb-2" />
+                  <p className="text-sm text-slate-400 font-medium">No referrer data yet</p>
+                  <p className="text-xs text-slate-300 mt-1">Data will appear once your links get clicks</p>
+                </div>
+              )}
             </Card>
 
             {/* Device Breakdown */}
             <Card className="p-6">
               <h2 className="text-base font-bold text-slate-900 mb-1">Device Breakdown</h2>
               <p className="text-xs text-slate-400 mb-5">Distribution of user device types across all clicks</p>
-              <div className="flex items-center gap-4">
-                <ResponsiveContainer width="55%" height={180}>
-                  <PieChart>
-                    <Pie
-                      data={finalDeviceData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={70}
-                      paddingAngle={3}
-                      dataKey="value"
-                    >
-                      {finalDeviceData.map((_, i) => (
-                        <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(v) => [`${v}%`, ""]}
-                      contentStyle={{ borderRadius: 10, border: "1px solid #E2E8F0", fontSize: 12 }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="space-y-2 flex-1">
-                  {finalDeviceData.map((d, i) => (
-                    <div key={d.name} className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-sm shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                      <span className="text-xs text-slate-600 truncate">{d.name}</span>
-                      <span className="text-xs font-bold text-slate-800 ml-auto pl-2">{d.value}%</span>
-                    </div>
-                  ))}
+              {finalDeviceData.length > 0 ? (
+                <div className="flex items-center gap-4">
+                  <ResponsiveContainer width="55%" height={180}>
+                    <PieChart>
+                      <Pie
+                        data={finalDeviceData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={70}
+                        paddingAngle={3}
+                        dataKey="value"
+                      >
+                        {finalDeviceData.map((_, i) => (
+                          <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(v) => [`${v}%`, ""]}
+                        contentStyle={{ borderRadius: 10, border: "1px solid #E2E8F0", fontSize: 12 }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="space-y-2 flex-1">
+                    {finalDeviceData.map((d, i) => (
+                      <div key={d.name} className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-sm shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                        <span className="text-xs text-slate-600 truncate">{d.name}</span>
+                        <span className="text-xs font-bold text-slate-800 ml-auto pl-2">{d.value}%</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-[180px] text-center">
+                  <Smartphone size={28} className="text-slate-200 mb-2" />
+                  <p className="text-sm text-slate-400 font-medium">No device data yet</p>
+                  <p className="text-xs text-slate-300 mt-1">Device stats will show once your links get clicks</p>
+                </div>
+              )}
             </Card>
           </div>
 
@@ -756,36 +770,44 @@ export default function AnalytcsDashboard() {
             <Card className="p-6 lg:col-span-1">
               <h2 className="text-base font-bold text-slate-900 mb-1">Geographic Share</h2>
               <p className="text-xs text-slate-400 mb-4">Estimated visitor origins based on click patterns</p>
-              <div className="space-y-3.5">
-                {finalGeoData.map((geo, i) => {
-                  const max = finalGeoData[0]?.clicks || 1;
-                  const pct = Math.round((geo.clicks / max) * 100);
-                  return (
-                    <div key={geo.country} className="flex items-center gap-3">
-                      <span className="text-xl w-6 text-center shrink-0">{geo.flag}</span>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-slate-700 font-semibold truncate">{geo.country}</span>
-                          <span className="text-xs font-bold text-slate-800 ml-2">{geo.clicks.toLocaleString()}</span>
-                        </div>
-                        <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                          <div
-                            className="h-full rounded-full transition-all"
-                            style={{
-                              width: `${pct}%`,
-                              background: i === 0 ? "#4F46E5" : i === 1 ? "#6366F1" : i === 2 ? "#818CF8" : "#A5B4FC"
-                            }}
-                          />
+              {finalGeoData.length > 0 ? (
+                <div className="space-y-3.5">
+                  {finalGeoData.map((geo, i) => {
+                    const max = finalGeoData[0]?.clicks || 1;
+                    const pct = Math.round((geo.clicks / max) * 100);
+                    return (
+                      <div key={geo.country} className="flex items-center gap-3">
+                        <span className="text-xl w-6 text-center shrink-0">{geo.flag}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs text-slate-700 font-semibold truncate">{geo.country}</span>
+                            <span className="text-xs font-bold text-slate-800 ml-2">{geo.clicks.toLocaleString()}</span>
+                          </div>
+                          <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all"
+                              style={{
+                                width: `${pct}%`,
+                                background: i === 0 ? "#4F46E5" : i === 1 ? "#6366F1" : i === 2 ? "#818CF8" : "#A5B4FC"
+                              }}
+                            />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <Globe size={28} className="text-slate-200 mb-2" />
+                  <p className="text-sm text-slate-400 font-medium">No geographic data yet</p>
+                  <p className="text-xs text-slate-300 mt-1">Country stats appear after clicks</p>
+                </div>
+              )}
             </Card>
 
             {/* Top Performing Links */}
-            <Card className="p-6 lg:col-span-2">
+            <Card className="p-6 lg:col-span-2 overflow-hidden min-w-0">
               <div className="flex items-center justify-between mb-1">
                 <h2 className="text-base font-bold text-slate-900">Top Performing Links</h2>
                 <div className="text-xs font-medium text-slate-400">Sorted by clicks</div>
@@ -793,7 +815,7 @@ export default function AnalytcsDashboard() {
               <p className="text-xs text-slate-400 mb-4">Your most popular shortened URLs and their settings</p>
 
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+                <table className="w-full text-left border-collapse" style={{ minWidth: "600px" }}>
                   <thead>
                     <tr className="border-b border-slate-100 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
                       <th className="py-2.5 pr-3">Short Link</th>

@@ -245,6 +245,34 @@ export default function Dashboard() {
   const activeLinks = links.filter((l) => l.active).length;
   const atLimit = false;
 
+  const calculateReturningUsers = () => {
+    const deviceCounts = {};
+    
+    links.forEach(l => {
+      if (l.clickLogs) {
+        l.clickLogs.forEach(log => {
+          const diffTime = Math.abs(new Date() - new Date(log.clickedAt));
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          if (diffDays <= 30) {
+            const deviceId = `${log.ip}-${log.userAgent}`;
+            deviceCounts[deviceId] = (deviceCounts[deviceId] || 0) + 1;
+          }
+        });
+      }
+    });
+
+    let returningCount = 0;
+    let uniqueDevices = 0;
+    Object.values(deviceCounts).forEach(count => {
+      uniqueDevices++;
+      if (count > 1) returningCount++;
+    });
+
+    if (uniqueDevices === 0) return "0%";
+    return Math.round((returningCount / uniqueDevices) * 100) + "%";
+  };
+  const returningUsersPercentage = calculateReturningUsers();
+
   useEffect(() => {
     if (token) {
       fetchLinks();
@@ -275,6 +303,7 @@ export default function Dashboard() {
           expiresAt: u.expiresAt
             ? new Date(u.expiresAt).toISOString().slice(0, 16)
             : null,
+          clickLogs: u.clickLogs || [],
         }));
         setLinks(mapped);
       } else {
@@ -495,7 +524,7 @@ export default function Dashboard() {
                 <div className="text-xs text-slate-400 truncate">{userEmail}</div>
               </div>
             </div>
-            <Link to="/dashboard/editprofile" className="flex items-center justify-center gap-2 w-full bg-indigo-700 text-white text-sm font-medium px-3 py-2 rounded-xl text-center mt-2 cursor-pointer hover:bg-indigo-800 transition-colors"><Pencil size={15}/> Edit Profile</Link>
+            <Link to="/dashboard/editprofile" className="flex items-center justify-center gap-2 w-full bg-indigo-700 text-white text-sm font-medium px-3 py-2 rounded-xl text-center mt-2 cursor-pointer hover:bg-indigo-800 transition-colors"><Pencil size={15} /> Edit Profile</Link>
             <button
               onClick={handleLogout}
               className="bg-indigo-700 text-white text-sm font-medium px-3 py-2 rounded-xl text-center mt-2 cursor-pointer hover:bg-indigo-800 transition-colors mt-2 cursor-pointer flex w-full items-center justify-center gap-2"
@@ -710,8 +739,8 @@ export default function Dashboard() {
             />
             <StatCard
               icon={<TrendingUp size={16} className="text-indigo-600" />}
-              label="Avg. CTR"
-              value="3.4%"
+              label="Returning Users"
+              value={returningUsersPercentage}
               sub="Last 30 days"
             />
           </div>
@@ -772,9 +801,8 @@ export default function Dashboard() {
                     {filtered.map((link, i) => (
                       <tr
                         key={link.id}
-                        className={`border-b border-slate-50 hover:bg-slate-50/50 transition-colors ${
-                          i === filtered.length - 1 ? "border-b-0" : ""
-                        }`}
+                        className={`border-b border-slate-50 hover:bg-slate-50/50 transition-colors ${i === filtered.length - 1 ? "border-b-0" : ""
+                          }`}
                       >
                         {/* Short link */}
                         <td className="px-5 py-4" style={{ minWidth: "180px" }}>

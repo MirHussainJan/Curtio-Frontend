@@ -431,7 +431,7 @@ export default function Campaigns() {
         { name: "Tablet", value: Math.round((tablet / divider) * 100) },
       ].filter((d) => d.value > 0);
 
-      finalDeviceData = deviceData.length > 0 ? deviceData : [{ name: "Desktop", value: 100 }];
+      finalDeviceData = deviceData;
 
       // Referrers for selected campaign
       let direct = 0, social = 0, organic = 0;
@@ -496,9 +496,7 @@ export default function Campaigns() {
           clicks: g.clicks,
         }));
 
-      finalGeoData = geoData.length > 0 
-        ? geoData 
-        : [{ country: "Direct Visits", flag: "🌐", clicks: selectedCampaignData.clicks || 0 }];
+      finalGeoData = geoData;
     }
   }
 
