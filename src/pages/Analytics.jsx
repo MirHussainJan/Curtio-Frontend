@@ -5,6 +5,46 @@ import {
   PieChart, Pie, Cell, Legend, BarChart, Bar
 } from 'recharts'
 import { ArrowLeft, Copy, Check, ExternalLink, MousePointerClick, TrendingUp, Globe, Smartphone, Zap } from 'lucide-react'
+import {
+  FaBots,
+  FaConfluence,
+  FaMountainSun,
+  FaSignalMessenger,
+  FaSlack,
+  FaTrello,
+  FaTwitch,
+  FaYahoo,
+} from "react-icons/fa6";
+import {
+  FaDiscord,
+  FaFacebook,
+  FaInstagram,
+  FaLine,
+  FaLinkedin,
+  FaPinterest,
+  FaReddit,
+  FaSignal,
+  FaSnapchat,
+  FaTelegramPlane,
+  FaTiktok,
+  FaTwitter,
+  FaViber,
+  FaWhatsapp,
+  FaYoutube,
+} from "react-icons/fa";
+import { IoLogoWechat } from "react-icons/io5";
+import { IoIosMail } from "react-icons/io";
+import { PiMicrosoftOutlookLogoDuotone } from "react-icons/pi";
+import { BiLogoMicrosoftTeams } from "react-icons/bi";
+import {
+  SiAsana,
+  SiGmail,
+  SiGooglemeet,
+  SiKik,
+  SiNotion,
+  SiThunderbird,
+  SiZoom,
+} from "react-icons/si";
 import { SHORTENER_DOMAIN } from '../components/Shortner'
 
 const COLORS = ['#4F46E5', '#F97316', '#22C55E', '#EAB308', '#EC4899']
@@ -55,8 +95,8 @@ export default function Analytics() {
   useEffect(() => {
     async function fetchAnalytics() {
       try {
-          const baseUrl = import.meta.env.VITE_API_BASE_URL;
-      const res = await fetch(`${baseUrl}/urls`, {
+        const baseUrl = import.meta.env.VITE_API_BASE_URL;
+        const res = await fetch(`${baseUrl}/urls`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -165,23 +205,78 @@ export default function Analytics() {
 
   const finalDeviceData = deviceData.length > 0 ? deviceData : [{ name: 'Desktop', value: 100 }]
 
-  let direct = 0, social = 0, organic = 0
+  const PLATFORM_RULES = [
+    { source: "WhatsApp", pattern: /WhatsApp/i, icon: FaWhatsapp },
+    { source: "Telegram", pattern: /Telegram/i, icon: FaTelegramPlane },
+    { source: "Instagram", pattern: /Instagram/i, icon: FaInstagram },
+    { source: "Facebook", pattern: /FBAV|FBAN|FB_IAB|facebookexternalhit/i, icon: FaFacebook },
+    { source: "TikTok", pattern: /TikTok|musical_ly/i, icon: FaTiktok },
+    { source: "Twitter/X", pattern: /Twitter/i, icon: FaTwitter },
+    { source: "LinkedIn", pattern: /LinkedInApp/i, icon: FaLinkedin },
+    { source: "Snapchat", pattern: /Snapchat/i, icon: FaSnapchat },
+    { source: "Pinterest", pattern: /Pinterest/i, icon: FaPinterest },
+    { source: "Reddit", pattern: /Reddit/i, icon: FaReddit },
+    { source: "Discord", pattern: /Discord/i, icon: FaDiscord },
+    { source: "YouTube", pattern: /YouTube/i, icon: FaYoutube },
+    { source: "WeChat", pattern: /MicroMessenger|WeChat/i, icon: IoLogoWechat },
+    { source: "Viber", pattern: /Viber/i, icon: FaViber },
+    { source: "Line", pattern: /Line\//i, icon: FaLine },
+    { source: "Signal", pattern: /Signal/i, icon: FaSignalMessenger },
+    { source: "Kik", pattern: /Kik\//i, icon: SiKik },
+    { source: "Twitch", pattern: /Twitch/i, icon: FaTwitch },
+    { source: "MS Teams", pattern: /Teams|SkypeTeams|Skype/i, icon: BiLogoMicrosoftTeams },
+    { source: "Outlook", pattern: /Outlook/i, icon: PiMicrosoftOutlookLogoDuotone },
+    { source: "Zoom", pattern: /ZoomWebKit|ZoomPhoneOSClient|zoom\.us/i, icon: SiZoom },
+    { source: "Google Meet", pattern: /GoogleMeet|meet\.google/i, icon: SiGooglemeet },
+    { source: "Gmail", pattern: /Gmail|GoogleImageProxy/i, icon: SiGmail },
+    { source: "Thunderbird", pattern: /Thunderbird/i, icon: SiThunderbird },
+    { source: "Apple Mail", pattern: /Apple.*Mail/i, icon: IoIosMail },
+    { source: "Yahoo Mail", pattern: /YahooMail/i, icon: FaYahoo },
+    { source: "Slack", pattern: /Slack/i, icon: FaSlack },
+    { source: "Notion", pattern: /Notion/i, icon: SiNotion },
+    { source: "Trello", pattern: /Trello/i, icon: FaTrello },
+    { source: "Jira", pattern: /Jira/i, icon: FaMountainSun },
+    { source: "Asana", pattern: /Asana/i, icon: SiAsana },
+    { source: "Confluence", pattern: /Confluence/i, icon: FaConfluence },
+    { source: "Mattermost", pattern: /Mattermost/i, icon: FaBots },
+    { source: "Rocket.Chat", pattern: /Rocket\.Chat/i, icon: FaBots },
+    { source: "Bots", pattern: /bot|crawler|spider|curl|wget|python|axios|node-fetch|Go-http|okhttp|PostmanRuntime/i, icon: FaBots },
+  ];
+
+  const platformIconMap = Object.fromEntries(
+    PLATFORM_RULES.map((r) => [r.source, r.icon]),
+  );
+
+  const platformCounts = {};
+  let directCount = 0;
+
   if (link.clickLogs) {
-    link.clickLogs.forEach(log => {
-      const ua = log.userAgent.toLowerCase()
-      if (/twitter|t.co|x.com|facebook|fb|instagram|linkedin/i.test(ua)) {
-        social++
-      } else if (/google|yahoo|bing|duckduckgo/i.test(ua)) {
-        organic++
-      } else {
-        direct++
+    link.clickLogs.forEach((log) => {
+      const ua = log.userAgent || "";
+      let matched = false;
+      for (const rule of PLATFORM_RULES) {
+        if (rule.pattern.test(ua)) {
+          platformCounts[rule.source] = (platformCounts[rule.source] || 0) + 1;
+          matched = true;
+          break;
+        }
       }
-    })
+      if (!matched) directCount++;
+    });
   }
-  const referrerData = []
-  if (social > 0) referrerData.push({ source: 'Social Media', visits: social })
-  if (organic > 0) referrerData.push({ source: 'Search Engines', visits: organic })
-  referrerData.push({ source: 'Direct / Email', visits: direct || link.clicks })
+
+  const referrerData = [
+    ...PLATFORM_RULES.map((r) => ({
+      source: r.source,
+      visits: platformCounts[r.source] || 0,
+      icon: r.icon,
+    })).filter((d) => d.visits > 0),
+    ...(directCount > 0 ? [{ source: "Direct", visits: directCount, icon: Globe }] : []),
+  ].sort((a, b) => b.visits - a.visits);
+
+  if (referrerData.length === 0 && link.clicks > 0) {
+    referrerData.push({ source: "Direct", visits: link.clicks, icon: Globe });
+  }
 
   // Aggregate real country data from click logs
   const geoDataMap = {};
@@ -327,15 +422,29 @@ export default function Analytics() {
           <Card className="p-6">
             <h2 className="text-base font-bold text-slate-900 mb-5">Top Referrers</h2>
             <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={referrerData} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="source" tick={{ fontSize: 11, fill: '#64748B' }} axisLine={false} tickLine={false} width={80} />
+              <BarChart data={referrerData} margin={{ top: 4, right: 4, left: -20, bottom: 24 }} barCategoryGap="30%">
+                <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                <XAxis 
+                  dataKey="source" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  interval={0}
+                  tick={({ x, y, payload }) => {
+                    const Icon = platformIconMap[payload.value] || Globe;
+                    return (
+                      <g transform={`translate(${x},${y})`}>
+                        <Icon x={-8} y={8} size={16} color="#94A3B8" />
+                      </g>
+                    );
+                  }}
+                />
+                <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} allowDecimals={false} />
                 <Tooltip
                   formatter={(v) => [v.toLocaleString(), 'visits']}
                   contentStyle={{ borderRadius: 10, border: '1px solid #E2E8F0', fontSize: 12 }}
+                  cursor={{ fill: '#F1F5F9' }}
                 />
-                <Bar dataKey="visits" fill="#4F46E5" radius={[0, 6, 6, 0]} />
+                <Bar dataKey="visits" fill="#4F46E5" radius={[6, 6, 0, 0]} maxBarSize={40} />
               </BarChart>
             </ResponsiveContainer>
           </Card>

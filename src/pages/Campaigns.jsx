@@ -30,12 +30,94 @@ import {
   Target
 } from "lucide-react";
 import {
+  FaBots,
+  FaConfluence,
+  FaMountainSun,
+  FaSignalMessenger,
+  FaSlack,
+  FaTrello,
+  FaTwitch,
+  FaYahoo,
+} from "react-icons/fa6";
+import {
+  FaDiscord,
+  FaFacebook,
+  FaInstagram,
+  FaLine,
+  FaLinkedin,
+  FaPinterest,
+  FaReddit,
+  FaSignal,
+  FaSnapchat,
+  FaTelegramPlane,
+  FaTiktok,
+  FaTwitter,
+  FaViber,
+  FaWhatsapp,
+  FaYoutube,
+} from "react-icons/fa";
+import { IoLogoWechat } from "react-icons/io5";
+import { IoIosMail } from "react-icons/io";
+import { PiMicrosoftOutlookLogoDuotone } from "react-icons/pi";
+import { BiLogoMicrosoftTeams } from "react-icons/bi";
+import {
+  SiAsana,
+  SiGmail,
+  SiGooglemeet,
+  SiKik,
+  SiNotion,
+  SiThunderbird,
+  SiZoom,
+} from "react-icons/si";
+import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, BarChart, Bar
 } from "recharts";
 import { SHORTENER_DOMAIN } from "../components/Shortner";
 
 const COLORS = ["#4F46E5", "#F97316", "#22C55E", "#EAB308", "#EC4899"];
+
+const PLATFORM_RULES = [
+  { source: "WhatsApp", pattern: /WhatsApp/i, icon: FaWhatsapp },
+  { source: "Telegram", pattern: /Telegram/i, icon: FaTelegramPlane },
+  { source: "Instagram", pattern: /Instagram/i, icon: FaInstagram },
+  { source: "Facebook", pattern: /FBAV|FBAN|FB_IAB|facebookexternalhit/i, icon: FaFacebook },
+  { source: "TikTok", pattern: /TikTok|musical_ly/i, icon: FaTiktok },
+  { source: "Twitter/X", pattern: /Twitter/i, icon: FaTwitter },
+  { source: "LinkedIn", pattern: /LinkedInApp/i, icon: FaLinkedin },
+  { source: "Snapchat", pattern: /Snapchat/i, icon: FaSnapchat },
+  { source: "Pinterest", pattern: /Pinterest/i, icon: FaPinterest },
+  { source: "Reddit", pattern: /Reddit/i, icon: FaReddit },
+  { source: "Discord", pattern: /Discord/i, icon: FaDiscord },
+  { source: "YouTube", pattern: /YouTube/i, icon: FaYoutube },
+  { source: "WeChat", pattern: /MicroMessenger|WeChat/i, icon: IoLogoWechat },
+  { source: "Viber", pattern: /Viber/i, icon: FaViber },
+  { source: "Line", pattern: /Line\//i, icon: FaLine },
+  { source: "Signal", pattern: /Signal/i, icon: FaSignalMessenger },
+  { source: "Kik", pattern: /Kik\//i, icon: SiKik },
+  { source: "Twitch", pattern: /Twitch/i, icon: FaTwitch },
+  { source: "MS Teams", pattern: /Teams|SkypeTeams|Skype/i, icon: BiLogoMicrosoftTeams },
+  { source: "Outlook", pattern: /Outlook/i, icon: PiMicrosoftOutlookLogoDuotone },
+  { source: "Zoom", pattern: /ZoomWebKit|ZoomPhoneOSClient|zoom\.us/i, icon: SiZoom },
+  { source: "Google Meet", pattern: /GoogleMeet|meet\.google/i, icon: SiGooglemeet },
+  { source: "Gmail", pattern: /Gmail|GoogleImageProxy/i, icon: SiGmail },
+  { source: "Thunderbird", pattern: /Thunderbird/i, icon: SiThunderbird },
+  { source: "Apple Mail", pattern: /Apple.*Mail/i, icon: IoIosMail },
+  { source: "Yahoo Mail", pattern: /YahooMail/i, icon: FaYahoo },
+  { source: "Slack", pattern: /Slack/i, icon: FaSlack },
+  { source: "Notion", pattern: /Notion/i, icon: SiNotion },
+  { source: "Trello", pattern: /Trello/i, icon: FaTrello },
+  { source: "Jira", pattern: /Jira/i, icon: FaMountainSun },
+  { source: "Asana", pattern: /Asana/i, icon: SiAsana },
+  { source: "Confluence", pattern: /Confluence/i, icon: FaConfluence },
+  { source: "Mattermost", pattern: /Mattermost/i, icon: FaBots },
+  { source: "Rocket.Chat", pattern: /Rocket\.Chat/i, icon: FaBots },
+  { source: "Bots", pattern: /bot|crawler|spider|curl|wget|python|axios|node-fetch|Go-http|okhttp|PostmanRuntime/i, icon: FaBots },
+];
+
+const platformIconMap = Object.fromEntries(
+  PLATFORM_RULES.map((r) => [r.source, r.icon]),
+);
 
 function StatCard({ icon, label, value, sub, className = "" }) {
   return (
@@ -433,28 +515,31 @@ export default function Campaigns() {
 
       finalDeviceData = deviceData;
 
-      // Referrers for selected campaign
-      let direct = 0, social = 0, organic = 0;
+
+      const platformCounts = {};
+      let campDirectCount = 0;
       campaignLinks.forEach((l) => {
         if (l.clickLogs) {
           l.clickLogs.forEach((log) => {
-            const ua = log.userAgent.toLowerCase();
-            if (/twitter|t.co|x.com|facebook|fb|instagram|linkedin/i.test(ua)) {
-              social++;
-            } else if (/google|yahoo|bing|duckduckgo/i.test(ua)) {
-              organic++;
-            } else {
-              direct++;
+            const ua = log.userAgent || "";
+            let matched = false;
+            for (const rule of PLATFORM_RULES) {
+              if (rule.pattern.test(ua)) {
+                platformCounts[rule.source] = (platformCounts[rule.source] || 0) + 1;
+                matched = true;
+                break;
+              }
             }
+            if (!matched) campDirectCount++;
           });
         }
       });
-
       referrerData = [
-        { source: "Social Media", visits: social },
-        { source: "Search Engines", visits: organic },
-        { source: "Direct / Email", visits: direct || (selectedCampaignData.clicks - social - organic) },
-      ].filter(r => r.visits >= 0);
+        ...PLATFORM_RULES
+          .map(r => ({ source: r.source, visits: platformCounts[r.source] || 0, color: "#4F46E5" }))
+          .filter(d => d.visits > 0),
+        ...(campDirectCount > 0 ? [{ source: "Direct", visits: campDirectCount, color: "#4F46E5" }] : []),
+      ].sort((a, b) => b.visits - a.visits);
 
       // Geographic breakdown for selected campaign
       const geoDataMap = {};
@@ -766,7 +851,7 @@ export default function Campaigns() {
               className="flex items-center gap-2 font-semibold text-sm px-3 sm:px-4 py-2.5 rounded-xl transition-colors shadow-sm bg-indigo-600 hover:bg-indigo-700 text-white shrink-0 cursor-pointer"
             >
               <Plus size={16} />
-              <span className="hidden sm:inline">New Campaign Link</span>
+              <span className="hidden sm:inline">{selectedCampaign ? "New Link" : "New Campaign"}</span>
             </button>
           </div>
 
@@ -1007,129 +1092,6 @@ export default function Campaigns() {
                   sub="Click channels"
                 />
               </div>
-
-              {/* Traffic trend over time */}
-              <Card className="p-6">
-                <div>
-                  <h2 className="text-base font-bold text-slate-900">Campaign Clicks Trend</h2>
-                  <p className="text-xs text-slate-400 mb-5">Aggregated weekly traffic specifically for campaign "{selectedCampaign}"</p>
-                </div>
-                <ResponsiveContainer width="100%" height={220}>
-                  <AreaChart data={clickHistory} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="campClickGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.15} />
-                        <stop offset="95%" stopColor="#4F46E5" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
-                    <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Area
-                      type="monotone"
-                      dataKey="clicks"
-                      stroke="#4F46E5"
-                      strokeWidth={2.5}
-                      fill="url(#campClickGrad)"
-                      dot={{ r: 4, fill: "#4F46E5", strokeWidth: 0 }}
-                      activeDot={{ r: 6 }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </Card>
-
-              {/* Referrers + Devices Breakdowns */}
-              <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
-                {/* Referrers */}
-                <Card className="p-6">
-                  <h2 className="text-base font-bold text-slate-900 mb-1">Referrers</h2>
-                  <p className="text-xs text-slate-400 mb-4">Top channels driving visits to this campaign</p>
-                  <ResponsiveContainer width="100%" height={180}>
-                    <BarChart data={referrerData} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" horizontal={false} />
-                      <XAxis type="number" tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                      <YAxis type="category" dataKey="source" tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} width={80} />
-                      <Tooltip
-                        formatter={(v) => [v.toLocaleString(), "visits"]}
-                        contentStyle={{ borderRadius: 10, border: "1px solid #E2E8F0", fontSize: 11 }}
-                      />
-                      <Bar dataKey="visits" fill="#4F46E5" radius={[0, 6, 6, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </Card>
-
-                {/* Device type breakdown */}
-                <Card className="p-6">
-                  <h2 className="text-base font-bold text-slate-900 mb-1">Devices Breakdown</h2>
-                  <p className="text-xs text-slate-400 mb-4">Platforms used by campaign visitors</p>
-                  <div className="flex items-center gap-4">
-                    <ResponsiveContainer width="55%" height={160}>
-                      <PieChart>
-                        <Pie
-                          data={finalDeviceData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={45}
-                          outerRadius={65}
-                          paddingAngle={3}
-                          dataKey="value"
-                        >
-                          {finalDeviceData.map((_, i) => (
-                            <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          formatter={(v) => [`${v}%`, ""]}
-                          contentStyle={{ borderRadius: 10, border: "1px solid #E2E8F0", fontSize: 11 }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="space-y-2 flex-1">
-                      {finalDeviceData.map((d, i) => (
-                        <div key={d.name} className="flex items-center gap-2 text-xs">
-                          <div className="w-3 h-3 rounded-sm shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                          <span className="text-slate-600 truncate">{d.name}</span>
-                          <span className="font-bold text-slate-800 ml-auto pl-2">{d.value}%</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </Card>
-
-                {/* Geographic Breakdown */}
-                <Card className="p-6">
-                  <h2 className="text-base font-bold text-slate-900 mb-1">Geographic Share</h2>
-                  <p className="text-xs text-slate-400 mb-4">Estimated visitor origins for this campaign</p>
-                  <div className="space-y-3.5">
-                    {finalGeoData.map((geo, i) => {
-                      const max = finalGeoData[0]?.clicks || 1;
-                      const pct = Math.round((geo.clicks / max) * 100);
-                      return (
-                        <div key={geo.country} className="flex items-center gap-3">
-                          <span className="text-xl w-6 text-center shrink-0">{geo.flag}</span>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs text-slate-700 font-semibold truncate">{geo.country}</span>
-                              <span className="text-xs font-bold text-slate-800 ml-2">{geo.clicks.toLocaleString()}</span>
-                            </div>
-                            <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                              <div
-                                className="h-full rounded-full transition-all"
-                                style={{
-                                  width: `${pct}%`,
-                                  background: i === 0 ? "#4F46E5" : i === 1 ? "#6366F1" : i === 2 ? "#818CF8" : "#A5B4FC"
-                                }}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </Card>
-              </div>
-
               {/* Campaign Links List */}
               <Card className="p-6">
                 <h2 className="text-base font-bold text-slate-900 mb-1">URLs Tagged in Campaign</h2>
@@ -1233,6 +1195,164 @@ export default function Campaigns() {
                   </table>
                 </div>
               </Card>
+              {/* Traffic trend over time */}
+              <Card className="p-6">
+                <div>
+                  <h2 className="text-base font-bold text-slate-900">Campaign Clicks Trend</h2>
+                  <p className="text-xs text-slate-400 mb-5">Aggregated weekly traffic specifically for campaign "{selectedCampaign}"</p>
+                </div>
+                <ResponsiveContainer width="100%" height={220}>
+                  <AreaChart data={clickHistory} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="campClickGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.15} />
+                        <stop offset="95%" stopColor="#4F46E5" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
+                    <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Area
+                      type="monotone"
+                      dataKey="clicks"
+                      stroke="#4F46E5"
+                      strokeWidth={2.5}
+                      fill="url(#campClickGrad)"
+                      dot={{ r: 4, fill: "#4F46E5", strokeWidth: 0 }}
+                      activeDot={{ r: 6 }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </Card>
+
+              {/* Referrers + Devices Breakdowns */}
+              <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
+                {/* Referrers */}
+                <Card className="p-6">
+                  <h2 className="text-base font-bold text-slate-900 mb-1">Referrers</h2>
+                  <p className="text-xs text-slate-400 mb-4">Hits per platform — WhatsApp, TikTok, Direct and more</p>
+                  {referrerData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <BarChart
+                        data={referrerData}
+                        margin={{ top: 4, right: 4, left: -20, bottom: 24 }}
+                        barCategoryGap="30%"
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                        <XAxis
+                          dataKey="source"
+                          axisLine={false}
+                          tickLine={false}
+                          interval={0}
+                          tick={({ x, y, payload }) => {
+                            const Icon = platformIconMap[payload.value] || Globe;
+                            return (
+                              <g transform={`translate(${x},${y})`}>
+                                <Icon x={-8} y={8} size={16} color="#94A3B8" />
+                              </g>
+                            );
+                          }}
+                        />
+                        <YAxis
+                          tick={{ fontSize: 10, fill: "#94A3B8" }}
+                          axisLine={false}
+                          tickLine={false}
+                          allowDecimals={false}
+                        />
+                        <Tooltip
+                          formatter={(v, name, props) => [v.toLocaleString() + " hits", props.payload.source]}
+                          contentStyle={{ borderRadius: 10, border: "1px solid #E2E8F0", fontSize: 11 }}
+                          cursor={{ fill: "#F1F5F9" }}
+                        />
+                        <Bar dataKey="visits" radius={[6, 6, 0, 0]} maxBarSize={36}>
+                          {referrerData.map((entry, i) => (
+                            <Cell key={i} fill={entry.color} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-[180px] text-center">
+                      <Globe size={24} className="text-slate-200 mb-2" />
+                      <p className="text-sm text-slate-400 font-medium">No referrer data yet</p>
+                      <p className="text-xs text-slate-300 mt-1">Data will appear once links get clicks</p>
+                    </div>
+                  )}
+                </Card>
+
+                {/* Device type breakdown */}
+                <Card className="p-6">
+                  <h2 className="text-base font-bold text-slate-900 mb-1">Devices Breakdown</h2>
+                  <p className="text-xs text-slate-400 mb-4">Platforms used by campaign visitors</p>
+                  <div className="flex items-center gap-4">
+                    <ResponsiveContainer width="55%" height={160}>
+                      <PieChart>
+                        <Pie
+                          data={finalDeviceData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={45}
+                          outerRadius={65}
+                          paddingAngle={3}
+                          dataKey="value"
+                        >
+                          {finalDeviceData.map((_, i) => (
+                            <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          formatter={(v) => [`${v}%`, ""]}
+                          contentStyle={{ borderRadius: 10, border: "1px solid #E2E8F0", fontSize: 11 }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="space-y-2 flex-1">
+                      {finalDeviceData.map((d, i) => (
+                        <div key={d.name} className="flex items-center gap-2 text-xs">
+                          <div className="w-3 h-3 rounded-sm shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                          <span className="text-slate-600 truncate">{d.name}</span>
+                          <span className="font-bold text-slate-800 ml-auto pl-2">{d.value}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Geographic Breakdown */}
+                <Card className="p-6">
+                  <h2 className="text-base font-bold text-slate-900 mb-1">Geographic Share</h2>
+                  <p className="text-xs text-slate-400 mb-4">Estimated visitor origins for this campaign</p>
+                  <div className="space-y-3.5">
+                    {finalGeoData.map((geo, i) => {
+                      const max = finalGeoData[0]?.clicks || 1;
+                      const pct = Math.round((geo.clicks / max) * 100);
+                      return (
+                        <div key={geo.country} className="flex items-center gap-3">
+                          <span className="text-xl w-6 text-center shrink-0">{geo.flag}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs text-slate-700 font-semibold truncate">{geo.country}</span>
+                              <span className="text-xs font-bold text-slate-800 ml-2">{geo.clicks.toLocaleString()}</span>
+                            </div>
+                            <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full transition-all"
+                                style={{
+                                  width: `${pct}%`,
+                                  background: i === 0 ? "#4F46E5" : i === 1 ? "#6366F1" : i === 2 ? "#818CF8" : "#A5B4FC"
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </Card>
+              </div>
+
+
             </>
           )}
         </main>

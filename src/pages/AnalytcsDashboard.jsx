@@ -23,19 +23,70 @@ import {
   AlertCircle,
   Smartphone,
   Globe,
-  Activity
+  Activity,
 } from "lucide-react";
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, BarChart, Bar
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
 } from "recharts";
 import { SHORTENER_DOMAIN } from "../components/Shortner";
-
+import {
+  FaBots,
+  FaConfluence,
+  FaMountainSun,
+  FaSignalMessenger,
+  FaSlack,
+  FaTrello,
+  FaTwitch,
+  FaYahoo,
+} from "react-icons/fa6";
+import {
+  FaDiscord,
+  FaFacebook,
+  FaInstagram,
+  FaLine,
+  FaLinkedin,
+  FaPinterest,
+  FaReddit,
+  FaSignal,
+  FaSnapchat,
+  FaTelegramPlane,
+  FaTiktok,
+  FaTwitter,
+  FaViber,
+  FaWhatsapp,
+  FaYoutube,
+} from "react-icons/fa";
+import { IoLogoWechat } from "react-icons/io5";
+import { IoIosMail } from "react-icons/io";
+import { PiMicrosoftOutlookLogoDuotone } from "react-icons/pi";
+import { BiLogoMicrosoftTeams } from "react-icons/bi";
+import {
+  SiAsana,
+  SiGmail,
+  SiGooglemeet,
+  SiKik,
+  SiNotion,
+  SiThunderbird,
+  SiZoom,
+} from "react-icons/si";
 const COLORS = ["#4F46E5", "#F97316", "#22C55E", "#EAB308", "#EC4899"];
 
 function StatCard({ icon, label, value, sub, className = "" }) {
   return (
-    <div className={`bg-white border border-slate-100 rounded-2xl p-5 shadow-sm ${className}`}>
+    <div
+      className={`bg-white border border-slate-100 rounded-2xl p-5 shadow-sm ${className}`}
+    >
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm font-medium text-slate-500">{label}</span>
         <div className="w-9 h-9 bg-indigo-50 rounded-xl flex items-center justify-center">
@@ -50,7 +101,9 @@ function StatCard({ icon, label, value, sub, className = "" }) {
 
 function Card({ children, className = "" }) {
   return (
-    <div className={`bg-white border border-slate-100 rounded-2xl shadow-sm ${className}`}>
+    <div
+      className={`bg-white border border-slate-100 rounded-2xl shadow-sm ${className}`}
+    >
       {children}
     </div>
   );
@@ -78,30 +131,34 @@ function QrModal({ link, onClose }) {
     setQrReady(false);
     setQrError("");
 
-    import("qrcode").then((QRCode) => {
-      if (cancelled || !canvasRef.current) return;
-      QRCode.toCanvas(
-        canvasRef.current,
-        link.short,
-        {
-          width: 200,
-          margin: 2,
-          color: { dark: "#4F46E5", light: "#F8FAFC" },
-        },
-        (err) => {
-          if (cancelled) return;
-          if (err) {
-            setQrError("Failed to generate QR code.");
-          } else {
-            setQrReady(true);
-          }
-        }
-      );
-    }).catch(() => {
-      if (!cancelled) setQrError("Could not load QR library.");
-    });
+    import("qrcode")
+      .then((QRCode) => {
+        if (cancelled || !canvasRef.current) return;
+        QRCode.toCanvas(
+          canvasRef.current,
+          link.short,
+          {
+            width: 200,
+            margin: 2,
+            color: { dark: "#4F46E5", light: "#F8FAFC" },
+          },
+          (err) => {
+            if (cancelled) return;
+            if (err) {
+              setQrError("Failed to generate QR code.");
+            } else {
+              setQrReady(true);
+            }
+          },
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setQrError("Could not load QR library.");
+      });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [link.short]);
 
   function handleDownload() {
@@ -197,9 +254,24 @@ function DeleteModal({ onConfirm, onCancel, deleting }) {
             className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {deleting ? (
-              <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+              <svg
+                className="animate-spin w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8z"
+                />
               </svg>
             ) : (
               <>
@@ -344,13 +416,13 @@ export default function AnalytcsDashboard() {
       if (data.success) {
         setLinks((prev) =>
           prev.map((l) =>
-            l.id === id ? { ...l, active: data.url.active } : l
-          )
+            l.id === id ? { ...l, active: data.url.active } : l,
+          ),
         );
         setRawUrls((prev) =>
           prev.map((u) =>
-            u._id === id ? { ...u, active: data.url.active } : u
-          )
+            u._id === id ? { ...u, active: data.url.active } : u,
+          ),
         );
       } else {
         setError(data.message || "Failed to update link status.");
@@ -364,7 +436,9 @@ export default function AnalytcsDashboard() {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center">
         <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent mb-4"></div>
-        <p className="text-slate-500 font-semibold text-sm">Loading user analytics...</p>
+        <p className="text-slate-500 font-semibold text-sm">
+          Loading user analytics...
+        </p>
       </div>
     );
   }
@@ -381,7 +455,10 @@ export default function AnalytcsDashboard() {
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    const dateStr = d.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+    });
     daysMap[dateStr] = 0;
   }
 
@@ -404,7 +481,9 @@ export default function AnalytcsDashboard() {
   });
 
   // Devices Breakdown
-  let mobile = 0, desktop = 0, tablet = 0;
+  let mobile = 0,
+    desktop = 0,
+    tablet = 0;
   let loggedClicks = 0;
 
   links.forEach((l) => {
@@ -432,28 +511,115 @@ export default function AnalytcsDashboard() {
 
   const finalDeviceData = deviceData;
 
-  // Referrers Breakdown
-  let direct = 0, social = 0, organic = 0;
+  // Per-platform detection from User-Agent fingerprints
+  const PLATFORM_RULES = [
+    // Social Media — each app leaves its own UA token
+    { source: "WhatsApp", pattern: /WhatsApp/i, color: "#4F46E5", icon: FaWhatsapp },
+    { source: "Telegram", pattern: /Telegram/i, color: "#4F46E5", icon: FaTelegramPlane },
+    { source: "Instagram", pattern: /Instagram/i, color: "#4F46E5", icon: FaInstagram },
+    {
+      source: "Facebook",
+      pattern: /FBAV|FBAN|FB_IAB|facebookexternalhit/i,
+      color: "#4F46E5",
+      icon: FaFacebook,
+    },
+    { source: "TikTok", pattern: /TikTok|musical_ly/i, color: "#4F46E5", icon: FaTiktok },
+    { source: "Twitter/X", pattern: /Twitter/i, color: "#4F46E5", icon: FaTwitter },
+    { source: "LinkedIn", pattern: /LinkedInApp/i, color: "#4F46E5", icon: FaLinkedin },
+    { source: "Snapchat", pattern: /Snapchat/i, color: "#4F46E5", icon: FaSnapchat },
+    { source: "Pinterest", pattern: /Pinterest/i, color: "#4F46E5", icon: FaPinterest },
+    { source: "Reddit", pattern: /Reddit/i, color: "#4F46E5", icon: FaReddit },
+    { source: "Discord", pattern: /Discord/i, color: "#4F46E5", icon: FaDiscord },
+    { source: "YouTube", pattern: /YouTube/i, color: "#4F46E5", icon: FaYoutube },
+    { source: "WeChat", pattern: /MicroMessenger|WeChat/i, color: "#4F46E5", icon: IoLogoWechat },
+    { source: "Viber", pattern: /Viber/i, color: "#4F46E5", icon: FaViber },
+    { source: "Line", pattern: /Line\//i, color: "#4F46E5", icon: FaLine },
+    { source: "Signal", pattern: /Signal/i, color: "#4F46E5", icon: FaSignalMessenger },
+    { source: "Kik", pattern: /Kik\//i, color: "#4F46E5", icon: SiKik },
+    { source: "Twitch", pattern: /Twitch/i, color: "#4F46E5", icon: FaTwitch },
+    // Microsoft suite
+    {
+      source: "MS Teams",
+      pattern: /Teams|SkypeTeams|Skype/i,
+      color: "#4F46E5",
+      icon: BiLogoMicrosoftTeams,
+    },
+    { source: "Outlook", pattern: /Outlook/i, color: "#4F46E5", icon: PiMicrosoftOutlookLogoDuotone },
+    // Video / Meetings
+    {
+      source: "Zoom",
+      pattern: /ZoomWebKit|ZoomPhoneOSClient|zoom\.us/i,
+      color: "#4F46E5",
+      icon: SiZoom,
+    },
+    {
+      source: "Google Meet",
+      pattern: /GoogleMeet|meet\.google/i,
+      color: "#4F46E5",
+      icon: SiGooglemeet,
+    },
+    // Email clients
+    { source: "Gmail", pattern: /Gmail|GoogleImageProxy/i, color: "#4F46E5", icon: SiGmail },
+    { source: "Thunderbird", pattern: /Thunderbird/i, color: "#4F46E5", icon: SiThunderbird },
+    { source: "Apple Mail", pattern: /Apple.*Mail/i, color: "#4F46E5", icon: IoIosMail },
+    { source: "Yahoo Mail", pattern: /YahooMail/i, color: "#4F46E5", icon: FaYahoo },
+    // Collaboration & project tools
+    { source: "Slack", pattern: /Slack/i, color: "#4F46E5", icon: FaSlack },
+    { source: "Notion", pattern: /Notion/i, color: "#4F46E5", icon: SiNotion },
+    { source: "Trello", pattern: /Trello/i, color: "#4F46E5", icon: FaTrello },
+    { source: "Jira", pattern: /Jira/i, color: "#4F46E5", icon: FaMountainSun },
+    { source: "Asana", pattern: /Asana/i, color: "#4F46E5", icon: SiAsana },
+    { source: "Confluence", pattern: /Confluence/i, color: "#4F46E5", icon: FaConfluence },
+    // Bots & automation
+    {
+      source: "Bots",
+      pattern:
+        /bot|crawler|spider|curl|wget|python|axios|node-fetch|Go-http|okhttp|PostmanRuntime/i,
+      color: "#4F46E5",
+      icon: FaBots,
+    },
+  ];
+
+  const platformIconMap = Object.fromEntries(
+    PLATFORM_RULES.map((r) => [r.source, r.icon]),
+  );
+
+  // Count per-platform hits
+  const platformCounts = {};
+  let directCount = 0;
+
   links.forEach((l) => {
     if (l.clickLogs) {
       l.clickLogs.forEach((log) => {
-        const ua = log.userAgent.toLowerCase();
-        if (/twitter|t.co|x.com|facebook|fb|instagram|linkedin/i.test(ua)) {
-          social++;
-        } else if (/google|yahoo|bing|duckduckgo/i.test(ua)) {
-          organic++;
-        } else {
-          direct++;
+        const ua = log.userAgent || "";
+        let matched = false;
+        for (const rule of PLATFORM_RULES) {
+          if (rule.pattern.test(ua)) {
+            platformCounts[rule.source] =
+              (platformCounts[rule.source] || 0) + 1;
+            matched = true;
+            break;
+          }
         }
+        if (!matched) directCount++;
       });
     }
   });
 
+  // Build chart data: each known platform + Direct, sorted by visits desc, only non-zero
+  const platformColorMap = Object.fromEntries(
+    PLATFORM_RULES.map((r) => [r.source, r.color]),
+  );
   const referrerData = [
-    { source: "Social Media", visits: social },
-    { source: "Search Engines", visits: organic },
-    { source: "Direct / Email", visits: direct },
-  ].filter(r => r.visits > 0);
+    ...PLATFORM_RULES.map((r) => ({
+      source: r.source,
+      visits: platformCounts[r.source] || 0,
+      color: r.color,
+    })).filter((d) => d.visits > 0),
+    ...(directCount > 0
+      ? [{ source: "Direct", visits: directCount, color: "#4F46E5" }]
+      : []),
+  ].sort((a, b) => b.visits - a.visits);
 
   // Aggregate real country data across all links
   const geoDataMap = {};
@@ -498,7 +664,7 @@ export default function AnalytcsDashboard() {
   const finalGeoData = geoData;
 
   // Top Clicked Links (Sorted by clicks desc)
-  const topLinks = [...links].sort((a, b) => b.clicks - a.clicks).slice(0, 10);
+  const topLinks = [...links].sort((a, b) => b.clicks - a.clicks).slice(0, 5);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -544,7 +710,9 @@ export default function AnalytcsDashboard() {
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
               <Zap size={15} className="text-white" fill="white" />
             </div>
-            <span className="text-lg font-extrabold text-slate-900">Brevly</span>
+            <span className="text-lg font-extrabold text-slate-900">
+              Brevly
+            </span>
           </Link>
 
           <nav className="flex flex-col gap-1 flex-1">
@@ -574,8 +742,12 @@ export default function AnalytcsDashboard() {
                 {userInitial}
               </div>
               <div className="min-w-0">
-                <div className="text-sm font-semibold text-slate-800 truncate">{userName}</div>
-                <div className="text-xs text-slate-400 truncate">{userEmail}</div>
+                <div className="text-sm font-semibold text-slate-800 truncate">
+                  {userName}
+                </div>
+                <div className="text-xs text-slate-400 truncate">
+                  {userEmail}
+                </div>
               </div>
             </div>
             <Link
@@ -620,7 +792,9 @@ export default function AnalytcsDashboard() {
               <AlertCircle size={17} className="text-red-500 shrink-0 mt-0.5" />
               <div className="min-w-0">
                 <div className="text-sm font-semibold text-red-800">Error</div>
-                <div className="text-xs text-red-700 mt-0.5 break-words">{error}</div>
+                <div className="text-xs text-red-700 mt-0.5 break-words">
+                  {error}
+                </div>
               </div>
             </div>
           )}
@@ -657,24 +831,46 @@ export default function AnalytcsDashboard() {
           <Card className="p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
               <div>
-                <h2 className="text-base font-bold text-slate-900">Aggregate Traffic Trend</h2>
-                <p className="text-xs text-slate-400">Total clicks recorded across all links in the last 7 days</p>
+                <h2 className="text-base font-bold text-slate-900">
+                  Aggregate Traffic Trend
+                </h2>
+                <p className="text-xs text-slate-400">
+                  Total clicks recorded across all links in the last 7 days
+                </p>
               </div>
               <div className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full w-max">
                 Last 7 Days
               </div>
             </div>
             <ResponsiveContainer width="100%" height={260}>
-              <AreaChart data={clickHistory} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
+              <AreaChart
+                data={clickHistory}
+                margin={{ top: 4, right: 0, left: -20, bottom: 0 }}
+              >
                 <defs>
-                  <linearGradient id="globalClickGrad" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient
+                    id="globalClickGrad"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
                     <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.15} />
                     <stop offset="95%" stopColor="#4F46E5" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
-                <XAxis dataKey="date" tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontSize: 12, fill: "#94A3B8" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  tick={{ fontSize: 12, fill: "#94A3B8" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
                 <Tooltip content={<CustomTooltip />} />
                 <Area
                   type="monotone"
@@ -691,36 +887,86 @@ export default function AnalytcsDashboard() {
 
           {/* Referrers + Devices Row */}
           <div className="grid lg:grid-cols-2 gap-6">
-            {/* Top Referrers */}
+            {/* Referrer Breakdown — per platform vertical bars */}
             <Card className="p-6">
-              <h2 className="text-base font-bold text-slate-900 mb-1">Referrer Breakdown</h2>
-              <p className="text-xs text-slate-400 mb-5">Traffic source classification based on clicking clients</p>
+              <h2 className="text-base font-bold text-slate-900 mb-1">
+                Referrer Breakdown
+              </h2>
+              <p className="text-xs text-slate-400 mb-5">
+                Hits per platform — WhatsApp, TikTok, Direct and more
+              </p>
               {referrerData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={200}>
-                  <BarChart data={referrerData} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" horizontal={false} />
-                    <XAxis type="number" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                    <YAxis type="category" dataKey="source" tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} width={90} />
-                    <Tooltip
-                      formatter={(v) => [v.toLocaleString(), "visits"]}
-                      contentStyle={{ borderRadius: 10, border: "1px solid #E2E8F0", fontSize: 12 }}
+                <ResponsiveContainer width="100%" height={220}>
+                  <BarChart
+                    data={referrerData}
+                    margin={{ top: 4, right: 4, left: -20, bottom: 24 }}
+                    barCategoryGap="30%"
+                  >
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#F1F5F9"
+                      vertical={false}
                     />
-                    <Bar dataKey="visits" fill="#4F46E5" radius={[0, 6, 6, 0]} />
+                    <XAxis
+                      dataKey="source"
+                      axisLine={false}
+                      tickLine={false}
+                      interval={0}
+                      tick={({ x, y, payload }) => {
+                        const Icon = platformIconMap[payload.value] || Globe;
+                        return (
+                          <g transform={`translate(${x},${y})`}>
+                            <Icon x={-8} y={8} size={16} color="#94A3B8" />
+                          </g>
+                        );
+                      }}
+                    />
+                    <YAxis
+                      tick={{ fontSize: 11, fill: "#94A3B8" }}
+                      axisLine={false}
+                      tickLine={false}
+                      allowDecimals={false}
+                    />
+                    <Tooltip
+                      formatter={(v, name, props) => [
+                        v.toLocaleString() + " hits",
+                        props.payload.source,
+                      ]}
+                      contentStyle={{
+                        borderRadius: 10,
+                        border: "1px solid #E2E8F0",
+                        fontSize: 12,
+                      }}
+                      cursor={{ fill: "#F1F5F9" }}
+                    />
+                    <Bar dataKey="visits" radius={[6, 6, 0, 0]} maxBarSize={40}>
+                      {referrerData.map((entry, i) => (
+                        <Cell key={i} fill={entry.color} />
+                      ))}
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
                 <div className="flex flex-col items-center justify-center h-[200px] text-center">
                   <Globe size={28} className="text-slate-200 mb-2" />
-                  <p className="text-sm text-slate-400 font-medium">No referrer data yet</p>
-                  <p className="text-xs text-slate-300 mt-1">Data will appear once your links get clicks</p>
+                  <p className="text-sm text-slate-400 font-medium">
+                    No referrer data yet
+                  </p>
+                  <p className="text-xs text-slate-300 mt-1">
+                    Data will appear once your links get clicks
+                  </p>
                 </div>
               )}
             </Card>
 
             {/* Device Breakdown */}
             <Card className="p-6">
-              <h2 className="text-base font-bold text-slate-900 mb-1">Device Breakdown</h2>
-              <p className="text-xs text-slate-400 mb-5">Distribution of user device types across all clicks</p>
+              <h2 className="text-base font-bold text-slate-900 mb-1">
+                Device Breakdown
+              </h2>
+              <p className="text-xs text-slate-400 mb-5">
+                Distribution of user device types across all clicks
+              </p>
               {finalDeviceData.length > 0 ? (
                 <div className="flex items-center gap-4">
                   <ResponsiveContainer width="55%" height={180}>
@@ -740,16 +986,27 @@ export default function AnalytcsDashboard() {
                       </Pie>
                       <Tooltip
                         formatter={(v) => [`${v}%`, ""]}
-                        contentStyle={{ borderRadius: 10, border: "1px solid #E2E8F0", fontSize: 12 }}
+                        contentStyle={{
+                          borderRadius: 10,
+                          border: "1px solid #E2E8F0",
+                          fontSize: 12,
+                        }}
                       />
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="space-y-2 flex-1">
                     {finalDeviceData.map((d, i) => (
                       <div key={d.name} className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-sm shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                        <span className="text-xs text-slate-600 truncate">{d.name}</span>
-                        <span className="text-xs font-bold text-slate-800 ml-auto pl-2">{d.value}%</span>
+                        <div
+                          className="w-3 h-3 rounded-sm shrink-0"
+                          style={{ backgroundColor: COLORS[i % COLORS.length] }}
+                        />
+                        <span className="text-xs text-slate-600 truncate">
+                          {d.name}
+                        </span>
+                        <span className="text-xs font-bold text-slate-800 ml-auto pl-2">
+                          {d.value}%
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -757,8 +1014,12 @@ export default function AnalytcsDashboard() {
               ) : (
                 <div className="flex flex-col items-center justify-center h-[180px] text-center">
                   <Smartphone size={28} className="text-slate-200 mb-2" />
-                  <p className="text-sm text-slate-400 font-medium">No device data yet</p>
-                  <p className="text-xs text-slate-300 mt-1">Device stats will show once your links get clicks</p>
+                  <p className="text-sm text-slate-400 font-medium">
+                    No device data yet
+                  </p>
+                  <p className="text-xs text-slate-300 mt-1">
+                    Device stats will show once your links get clicks
+                  </p>
                 </div>
               )}
             </Card>
@@ -768,27 +1029,47 @@ export default function AnalytcsDashboard() {
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Country Share */}
             <Card className="p-6 lg:col-span-1">
-              <h2 className="text-base font-bold text-slate-900 mb-1">Geographic Share</h2>
-              <p className="text-xs text-slate-400 mb-4">Estimated visitor origins based on click patterns</p>
+              <h2 className="text-base font-bold text-slate-900 mb-1">
+                Geographic Share
+              </h2>
+              <p className="text-xs text-slate-400 mb-4">
+                Estimated visitor origins based on click patterns
+              </p>
               {finalGeoData.length > 0 ? (
                 <div className="space-y-3.5">
                   {finalGeoData.map((geo, i) => {
                     const max = finalGeoData[0]?.clicks || 1;
                     const pct = Math.round((geo.clicks / max) * 100);
                     return (
-                      <div key={geo.country} className="flex items-center gap-3">
-                        <span className="text-xl w-6 text-center shrink-0">{geo.flag}</span>
+                      <div
+                        key={geo.country}
+                        className="flex items-center gap-3"
+                      >
+                        <span className="text-xl w-6 text-center shrink-0">
+                          {geo.flag}
+                        </span>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs text-slate-700 font-semibold truncate">{geo.country}</span>
-                            <span className="text-xs font-bold text-slate-800 ml-2">{geo.clicks.toLocaleString()}</span>
+                            <span className="text-xs text-slate-700 font-semibold truncate">
+                              {geo.country}
+                            </span>
+                            <span className="text-xs font-bold text-slate-800 ml-2">
+                              {geo.clicks.toLocaleString()}
+                            </span>
                           </div>
                           <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
                             <div
                               className="h-full rounded-full transition-all"
                               style={{
                                 width: `${pct}%`,
-                                background: i === 0 ? "#4F46E5" : i === 1 ? "#6366F1" : i === 2 ? "#818CF8" : "#A5B4FC"
+                                background:
+                                  i === 0
+                                    ? "#4F46E5"
+                                    : i === 1
+                                      ? "#6366F1"
+                                      : i === 2
+                                        ? "#818CF8"
+                                        : "#A5B4FC",
                               }}
                             />
                           </div>
@@ -800,8 +1081,12 @@ export default function AnalytcsDashboard() {
               ) : (
                 <div className="flex flex-col items-center justify-center py-8 text-center">
                   <Globe size={28} className="text-slate-200 mb-2" />
-                  <p className="text-sm text-slate-400 font-medium">No geographic data yet</p>
-                  <p className="text-xs text-slate-300 mt-1">Country stats appear after clicks</p>
+                  <p className="text-sm text-slate-400 font-medium">
+                    No geographic data yet
+                  </p>
+                  <p className="text-xs text-slate-300 mt-1">
+                    Country stats appear after clicks
+                  </p>
                 </div>
               )}
             </Card>
@@ -809,13 +1094,22 @@ export default function AnalytcsDashboard() {
             {/* Top Performing Links */}
             <Card className="p-6 lg:col-span-2 overflow-hidden min-w-0">
               <div className="flex items-center justify-between mb-1">
-                <h2 className="text-base font-bold text-slate-900">Top Performing Links</h2>
-                <div className="text-xs font-medium text-slate-400">Sorted by clicks</div>
+                <h2 className="text-base font-bold text-slate-900">
+                  Top Performing Links
+                </h2>
+                <div className="text-xs font-medium text-slate-400">
+                  Sorted by clicks
+                </div>
               </div>
-              <p className="text-xs text-slate-400 mb-4">Your most popular shortened URLs and their settings</p>
+              <p className="text-xs text-slate-400 mb-4">
+                Your most popular shortened URLs and their settings
+              </p>
 
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse" style={{ minWidth: "600px" }}>
+                <table
+                  className="w-full text-left border-collapse"
+                  style={{ minWidth: "600px" }}
+                >
                   <thead>
                     <tr className="border-b border-slate-100 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
                       <th className="py-2.5 pr-3">Short Link</th>
@@ -827,13 +1121,19 @@ export default function AnalytcsDashboard() {
                   <tbody>
                     {topLinks.length === 0 ? (
                       <tr>
-                        <td colSpan={4} className="text-center py-8 text-slate-400 text-sm">
+                        <td
+                          colSpan={4}
+                          className="text-center py-8 text-slate-400 text-sm"
+                        >
                           No links created yet.
                         </td>
                       </tr>
                     ) : (
                       topLinks.map((link) => (
-                        <tr key={link.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors text-sm">
+                        <tr
+                          key={link.id}
+                          className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors text-sm"
+                        >
                           <td className="py-3 pr-3 font-semibold text-indigo-600 max-w-[200px] truncate">
                             <div>
                               <div className="truncate">{link.short}</div>
@@ -851,9 +1151,15 @@ export default function AnalytcsDashboard() {
                               className="focus:outline-none inline-flex items-center justify-center cursor-pointer"
                             >
                               {link.active ? (
-                                <ToggleRight size={20} className="text-indigo-500" />
+                                <ToggleRight
+                                  size={20}
+                                  className="text-indigo-500"
+                                />
                               ) : (
-                                <ToggleLeft size={20} className="text-slate-300" />
+                                <ToggleLeft
+                                  size={20}
+                                  className="text-slate-300"
+                                />
                               )}
                             </button>
                           </td>
@@ -901,6 +1207,7 @@ export default function AnalytcsDashboard() {
               </div>
             </Card>
           </div>
+
         </main>
       </div>
     </div>
