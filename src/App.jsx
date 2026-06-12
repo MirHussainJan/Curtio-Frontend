@@ -67,7 +67,7 @@ export default function App() {
 
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
-        <Route path="/c/:shortCode" element={<CaptchaVerify />} />
+        <Route path="/captcha/:shortCode" element={<CaptchaVerify />} />
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
