@@ -31,6 +31,12 @@ import {
   FaViber,
   FaWhatsapp,
   FaYoutube,
+  FaChrome,
+  FaFirefox,
+  FaSafari,
+  FaEdge,
+  FaOpera,
+  FaInternetExplorer,
 } from "react-icons/fa";
 import { IoLogoWechat } from "react-icons/io5";
 import { IoIosMail } from "react-icons/io";
@@ -44,6 +50,8 @@ import {
   SiNotion,
   SiThunderbird,
   SiZoom,
+  SiTorbrowser,
+  SiBrave,
 } from "react-icons/si";
 import { SHORTENER_DOMAIN } from '../components/Shortner'
 
@@ -93,8 +101,9 @@ export default function Analytics() {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
-    async function fetchAnalytics() {
+    async function fetchAnalytics(background = false) {
       try {
+        if (!background) setLoading(true)
         const baseUrl = import.meta.env.VITE_API_BASE_URL;
         const res = await fetch(`${baseUrl}/urls`, {
           headers: {
@@ -111,23 +120,32 @@ export default function Analytics() {
               original: match.originalUrl
             })
           } else {
-            setError('Link not found or not owned by you.')
+            if (!background) setError('Link not found or not owned by you.')
           }
         } else {
-          setError(data.message || 'Failed to fetch analytics.')
+          if (!background) setError(data.message || 'Failed to fetch analytics.')
         }
       } catch (err) {
-        setError('Network error. Could not connect to server.')
+        if (!background) setError('Network error. Could not connect to server.')
       } finally {
-        setLoading(false)
+        if (!background) setLoading(false)
       }
     }
-    if (token && id) {
-      fetchAnalytics()
-    } else {
+
+    if (!token || !id) {
       setLoading(false)
       setError('Authentication token is missing. Please log in.')
+      return
     }
+
+    fetchAnalytics()
+
+    // Poll for real-time analytics updates every 3 seconds
+    const interval = setInterval(() => {
+      fetchAnalytics(true)
+    }, 3000)
+
+    return () => clearInterval(interval)
   }, [token, id])
 
   function handleCopy() {
@@ -240,6 +258,14 @@ export default function Analytics() {
     { source: "Confluence", pattern: /Confluence/i, icon: FaConfluence },
     { source: "Mattermost", pattern: /Mattermost/i, icon: FaBots },
     { source: "Rocket.Chat", pattern: /Rocket\.Chat/i, icon: FaBots },
+    { source: "Opera", pattern: /Opera|OPR\//i, icon: FaOpera },
+    { source: "Edge", pattern: /Edg\//i, icon: FaEdge },
+    { source: "Brave", pattern: /Brave/i, icon: SiBrave },
+    { source: "Tor", pattern: /TorBrowser/i, icon: SiTorbrowser },
+    { source: "Chrome", pattern: /Chrome|CriOS/i, icon: FaChrome },
+    { source: "Firefox", pattern: /Firefox|FxiOS/i, icon: FaFirefox },
+    { source: "Safari", pattern: /Safari/i, icon: FaSafari },
+    { source: "Internet Explorer", pattern: /Trident|MSIE/i, icon: FaInternetExplorer },
     { source: "Bots", pattern: /bot|crawler|spider|curl|wget|python|axios|node-fetch|Go-http|okhttp|PostmanRuntime/i, icon: FaBots },
   ];
 
@@ -424,10 +450,10 @@ export default function Analytics() {
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={referrerData} margin={{ top: 4, right: 4, left: -20, bottom: 24 }} barCategoryGap="30%">
                 <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                <XAxis 
-                  dataKey="source" 
-                  axisLine={false} 
-                  tickLine={false} 
+                <XAxis
+                  dataKey="source"
+                  axisLine={false}
+                  tickLine={false}
                   interval={0}
                   tick={({ x, y, payload }) => {
                     const Icon = platformIconMap[payload.value] || Globe;

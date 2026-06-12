@@ -66,6 +66,12 @@ import {
   FaViber,
   FaWhatsapp,
   FaYoutube,
+  FaChrome,
+  FaFirefox,
+  FaSafari,
+  FaEdge,
+  FaOpera,
+  FaInternetExplorer,
 } from "react-icons/fa";
 import { IoLogoWechat } from "react-icons/io5";
 import { IoIosMail } from "react-icons/io";
@@ -79,6 +85,8 @@ import {
   SiNotion,
   SiThunderbird,
   SiZoom,
+  SiTorbrowser,
+  SiBrave,
 } from "react-icons/si";
 const COLORS = ["#4F46E5", "#F97316", "#22C55E", "#EAB308", "#EC4899"];
 
@@ -323,16 +331,24 @@ export default function AnalytcsDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    if (token) {
-      fetchUrls();
-    } else {
+    if (!token) {
       setLoading(false);
+      return;
     }
+
+    fetchUrls();
+
+    // Poll for real-time updates every 3 seconds
+    const interval = setInterval(() => {
+      fetchUrls(true);
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, [token]);
 
-  async function fetchUrls() {
-    setLoading(true);
-    setError("");
+  async function fetchUrls(background = false) {
+    if (!background) setLoading(true);
+    if (!background) setError("");
     try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL;
       const res = await fetch(`${baseUrl}/urls`, {
@@ -357,12 +373,12 @@ export default function AnalytcsDashboard() {
         }));
         setLinks(mapped);
       } else {
-        setError(data.message || "Failed to fetch URLs.");
+        if (!background) setError(data.message || "Failed to fetch URLs.");
       }
     } catch (err) {
-      setError("Network error. Could not retrieve link statistics.");
+      if (!background) setError("Network error. Could not retrieve link statistics.");
     } finally {
-      setLoading(false);
+      if (!background) setLoading(false);
     }
   }
 
@@ -578,6 +594,14 @@ export default function AnalytcsDashboard() {
       color: "#4F46E5",
       icon: FaBots,
     },
+    { source: "Opera", pattern: /Opera|OPR\//i, color: "#4F46E5", icon: FaOpera },
+    { source: "Edge", pattern: /Edg\//i, color: "#4F46E5", icon: FaEdge },
+    { source: "Brave", pattern: /Brave/i, color: "#4F46E5", icon: SiBrave },
+    { source: "Tor", pattern: /TorBrowser/i, color: "#4F46E5", icon: SiTorbrowser },
+    { source: "Chrome", pattern: /Chrome|CriOS/i, color: "#4F46E5", icon: FaChrome },
+    { source: "Firefox", pattern: /Firefox|FxiOS/i, color: "#4F46E5", icon: FaFirefox },
+    { source: "Safari", pattern: /Safari/i, color: "#4F46E5", icon: FaSafari },
+    { source: "Internet Explorer", pattern: /Trident|MSIE/i, color: "#4F46E5", icon: FaInternetExplorer },
   ];
 
   const platformIconMap = Object.fromEntries(

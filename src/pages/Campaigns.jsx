@@ -55,6 +55,12 @@ import {
   FaViber,
   FaWhatsapp,
   FaYoutube,
+  FaChrome,
+  FaFirefox,
+  FaSafari,
+  FaEdge,
+  FaOpera,
+  FaInternetExplorer,
 } from "react-icons/fa";
 import { IoLogoWechat } from "react-icons/io5";
 import { IoIosMail } from "react-icons/io";
@@ -68,6 +74,8 @@ import {
   SiNotion,
   SiThunderbird,
   SiZoom,
+  SiTorbrowser,
+  SiBrave,
 } from "react-icons/si";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -112,6 +120,14 @@ const PLATFORM_RULES = [
   { source: "Confluence", pattern: /Confluence/i, icon: FaConfluence },
   { source: "Mattermost", pattern: /Mattermost/i, icon: FaBots },
   { source: "Rocket.Chat", pattern: /Rocket\.Chat/i, icon: FaBots },
+  { source: "Opera", pattern: /Opera|OPR\//i, icon: FaOpera },
+  { source: "Edge", pattern: /Edg\//i, icon: FaEdge },
+  { source: "Brave", pattern: /Brave/i, icon: SiBrave },
+  { source: "Tor", pattern: /TorBrowser/i, icon: SiTorbrowser },
+  { source: "Chrome", pattern: /Chrome|CriOS/i, icon: FaChrome },
+  { source: "Firefox", pattern: /Firefox|FxiOS/i, icon: FaFirefox },
+  { source: "Safari", pattern: /Safari/i, icon: FaSafari },
+  { source: "Internet Explorer", pattern: /Trident|MSIE/i, icon: FaInternetExplorer },
   { source: "Bots", pattern: /bot|crawler|spider|curl|wget|python|axios|node-fetch|Go-http|okhttp|PostmanRuntime/i, icon: FaBots },
 ];
 
@@ -350,16 +366,24 @@ export default function Campaigns() {
   const [expiresAt, setExpiresAt] = useState("");
 
   useEffect(() => {
-    if (token) {
-      fetchUrls();
-    } else {
+    if (!token) {
       setLoading(false);
+      return;
     }
+    
+    fetchUrls();
+
+    // Poll for real-time updates every 3 seconds
+    const interval = setInterval(() => {
+      fetchUrls(true);
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, [token]);
 
-  async function fetchUrls() {
-    setLoading(true);
-    setError("");
+  async function fetchUrls(background = false) {
+    if (!background) setLoading(true);
+    if (!background) setError("");
     try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL;
       const res = await fetch(`${baseUrl}/urls`, {
@@ -383,12 +407,12 @@ export default function Campaigns() {
         }));
         setLinks(mapped);
       } else {
-        setError(data.message || "Failed to fetch URLs.");
+        if (!background) setError(data.message || "Failed to fetch URLs.");
       }
     } catch (err) {
-      setError("Network error. Could not retrieve link statistics.");
+      if (!background) setError("Network error. Could not retrieve link statistics.");
     } finally {
-      setLoading(false);
+      if (!background) setLoading(false);
     }
   }
 

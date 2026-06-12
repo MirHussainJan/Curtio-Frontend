@@ -274,16 +274,24 @@ export default function Dashboard() {
   const returningUsersPercentage = calculateReturningUsers();
 
   useEffect(() => {
-    if (token) {
-      fetchLinks();
-    } else {
+    if (!token) {
       setLoadingLinks(false);
+      return;
     }
+    
+    fetchLinks();
+    
+    // Poll for real-time updates every 3 seconds
+    const interval = setInterval(() => {
+      fetchLinks(true);
+    }, 3000);
+    
+    return () => clearInterval(interval);
   }, [token]);
 
-  async function fetchLinks() {
-    setLoadingLinks(true);
-    setError("");
+  async function fetchLinks(background = false) {
+    if (!background) setLoadingLinks(true);
+    if (!background) setError("");
     try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL;
       const res = await fetch(`${baseUrl}/urls`, {
@@ -307,12 +315,12 @@ export default function Dashboard() {
         }));
         setLinks(mapped);
       } else {
-        setError(data.message || "Failed to fetch short links.");
+        if (!background) setError(data.message || "Failed to fetch short links.");
       }
     } catch (err) {
-      setError("Network error. Could not connect to server.");
+      if (!background) setError("Network error. Could not connect to server.");
     } finally {
-      setLoadingLinks(false);
+      if (!background) setLoadingLinks(false);
     }
   }
 
