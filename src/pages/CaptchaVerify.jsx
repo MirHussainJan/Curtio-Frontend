@@ -16,7 +16,7 @@ export default function CaptchaVerify() {
   const fetchCaptcha = async () => {
     try {
       setFetchingCaptcha(true);
-      const res = await fetch("http://localhost:6090/api/public/captcha");
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/public/captcha`);
       const data = await res.json();
       if (data.success) {
         setCaptchaSvg(data.svg);
@@ -45,7 +45,7 @@ export default function CaptchaVerify() {
     setError("");
 
     try {
-      const res = await fetch(`http://localhost:6090/api/public/verify/${shortCode}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/public/verify/${shortCode}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
