@@ -342,6 +342,36 @@ function DeleteModal({ onConfirm, onCancel, deleting }) {
   );
 }
 
+function LimitModal({ onClose }) {
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl p-6 sm:p-8 max-w-sm w-full shadow-2xl text-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Zap size={22} className="text-indigo-600" fill="currentColor" />
+        </div>
+        <h3 className="font-extrabold text-slate-900 text-lg mb-1">
+          Plan Limit Reached
+        </h3>
+        <p className="text-slate-500 text-sm mb-6">
+          You have reached the maximum number of active links for your current plan. Please upgrade to create more tracked links.
+        </p>
+        <button
+          onClick={onClose}
+          className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors cursor-pointer"
+        >
+          Understood
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Campaigns() {
   const navigate = useNavigate();
 
@@ -371,9 +401,6 @@ export default function Campaigns() {
 
   const isPremium = PREMIUM_USERS.includes(userEmail);
   const FREE_LIMIT = isPremium ? Infinity : 1;
-  // Calculate total links across all campaigns to determine if atLimit
-  // The state 'links' holds all urls.
-  const atLimit = !isPremium && links.length >= FREE_LIMIT;
 
   // Helper function to format date as YYYY-MM-DD
   const formatDateToString = (date) => {
@@ -395,12 +422,16 @@ export default function Campaigns() {
   const defaultStartDate = formatDateToString(sevenDaysAgo);
 
   const [links, setLinks] = useState([]);
+  
+  // Calculate total links across all campaigns to determine if atLimit
+  const atLimit = !isPremium && links.length >= FREE_LIMIT;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(null);
   const [qrLink, setQrLink] = useState(null);
   const [deleteModal, setDeleteModal] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [showLimitModal, setShowLimitModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [startDate, setStartDate] = useState(defaultStartDate);
@@ -891,6 +922,7 @@ export default function Campaigns() {
           deleting={deleting}
         />
       )}
+      {showLimitModal && <LimitModal onClose={() => setShowLimitModal(false)} />}
 
       <div className="flex min-h-screen">
         <Sidebar
@@ -940,12 +972,13 @@ export default function Campaigns() {
             <div className="flex items-center gap-1">
               <button
                 onClick={() => {
-                  if (atLimit) return;
-                  setShowCreateForm(!showCreateForm);
+                  if (atLimit) {
+                    setShowLimitModal(true);
+                  } else {
+                    setShowCreateForm(!showCreateForm);
+                  }
                 }}
-                disabled={atLimit}
-                className={`flex items-center gap-2 font-semibold text-sm px-3 sm:px-4 py-2.5 rounded-xl transition-colors shadow-sm shrink-0 ${atLimit ? "bg-slate-300 text-slate-500 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer"}`}
-                title={atLimit ? "Free plan limit reached" : ""}
+                className="flex items-center gap-2 font-semibold text-sm px-3 sm:px-4 py-2.5 rounded-xl transition-colors shadow-sm bg-indigo-600 hover:bg-indigo-700 text-white shrink-0 cursor-pointer"
               >
                 <Plus size={16} />
                 <span className="hidden sm:inline">

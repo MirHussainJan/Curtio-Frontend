@@ -753,7 +753,7 @@ export default function AnalytcsDashboard() {
 
   const finalGeoData = geoData;
 
-  console.log(finalGeoData);
+
 
   const topLinks = [...links].sort((a, b) => b.clicks - a.clicks).slice(0, 5);
 

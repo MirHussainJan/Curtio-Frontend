@@ -192,6 +192,36 @@ function DeleteModal({ onConfirm, onCancel, deleting }) {
   );
 }
 
+function LimitModal({ onClose }) {
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl p-6 sm:p-8 max-w-sm w-full shadow-2xl text-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Zap size={22} className="text-indigo-600" fill="currentColor" />
+        </div>
+        <h3 className="font-extrabold text-slate-900 text-lg mb-1">
+          Plan Limit Reached
+        </h3>
+        <p className="text-slate-500 text-sm mb-6">
+          You have reached the maximum number of active links for your current plan. Please upgrade to create more tracked links.
+        </p>
+        <button
+          onClick={onClose}
+          className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors cursor-pointer"
+        >
+          Understood
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const navigate = useNavigate();
 
@@ -241,6 +271,7 @@ export default function Dashboard() {
   // Delete modal state
   const [deleteModal, setDeleteModal] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [showLimitModal, setShowLimitModal] = useState(false);
 
   const totalClicks = links.reduce((sum, l) => sum + l.clicks, 0);
   const activeLinks = links.filter((l) => l.active).length;
@@ -454,6 +485,7 @@ export default function Dashboard() {
           deleting={deleting}
         />
       )}
+      {showLimitModal && <LimitModal onClose={() => setShowLimitModal(false)} />}
 
       <div className="flex min-h-screen">
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} linksCount={links.length} FREE_LIMIT={FREE_LIMIT} isPremium={isPremium} />
@@ -481,7 +513,13 @@ export default function Dashboard() {
             </div>
 
             <button
-              onClick={() => setShowForm(!showForm)}
+              onClick={() => {
+                if (atLimit) {
+                  setShowLimitModal(true);
+                } else {
+                  setShowForm(!showForm);
+                }
+              }}
               className="flex items-center gap-2 font-semibold text-sm px-3 sm:px-4 py-2.5 rounded-xl transition-colors shadow-sm bg-indigo-600 hover:bg-indigo-700 text-white shrink-0 cursor-pointer"
             >
               <Plus size={16} />
