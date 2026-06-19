@@ -86,84 +86,8 @@ const COLORS = ["#4F46E5", "#F97316", "#22C55E", "#EAB308", "#EC4899"];
  * us WHERE the click originated from. Bot preview hits are already filtered
  * on the backend, so only real human clicks reach the analytics.
  */
-const REFERER_RULES = [
-  { source: "WhatsApp", pattern: /whatsapp\.com|wa\.me/i, icon: FaWhatsapp },
-  {
-    source: "Telegram",
-    pattern: /t\.me|telegram\.org|telegram\.me/i,
-    icon: FaTelegramPlane,
-  },
-  {
-    source: "Instagram",
-    pattern: /instagram\.com|l\.instagram\.com/i,
-    icon: FaInstagram,
-  },
-  {
-    source: "Facebook",
-    pattern:
-      /facebook\.com|l\.facebook\.com|lm\.facebook\.com|m\.facebook\.com|fb\.com/i,
-    icon: FaFacebook,
-  },
-  { source: "TikTok", pattern: /tiktok\.com/i, icon: FaTiktok },
-  {
-    source: "Twitter/X",
-    pattern: /twitter\.com|t\.co|x\.com/i,
-    icon: FaTwitter,
-  },
-  { source: "LinkedIn", pattern: /linkedin\.com|lnkd\.in/i, icon: FaLinkedin },
-  { source: "Snapchat", pattern: /snapchat\.com/i, icon: FaSnapchat },
-  {
-    source: "Pinterest",
-    pattern: /pinterest\.com|pin\.it/i,
-    icon: FaPinterest,
-  },
-  { source: "Reddit", pattern: /reddit\.com|redd\.it/i, icon: FaReddit },
-  {
-    source: "Discord",
-    pattern: /discord\.com|discordapp\.com/i,
-    icon: FaDiscord,
-  },
-  { source: "YouTube", pattern: /youtube\.com|youtu\.be/i, icon: FaYoutube },
-  {
-    source: "WeChat",
-    pattern: /wechat\.com|weixin\.qq\.com/i,
-    icon: IoLogoWechat,
-  },
-  { source: "Viber", pattern: /viber\.com/i, icon: FaViber },
-  { source: "Line", pattern: /line\.me/i, icon: FaLine },
-  { source: "Signal", pattern: /signal\.org/i, icon: FaSignalMessenger },
-  { source: "Twitch", pattern: /twitch\.tv/i, icon: FaTwitch },
-  {
-    source: "MS Teams",
-    pattern: /teams\.microsoft\.com|teams\.live\.com/i,
-    icon: BiLogoMicrosoftTeams,
-  },
-  {
-    source: "Outlook",
-    pattern: /outlook\.live\.com|outlook\.office\.com/i,
-    icon: PiMicrosoftOutlookLogoDuotone,
-  },
-  { source: "Zoom", pattern: /zoom\.us/i, icon: SiZoom },
-  { source: "Google Meet", pattern: /meet\.google\.com/i, icon: SiGooglemeet },
-  { source: "Gmail", pattern: /mail\.google\.com/i, icon: SiGmail },
-  { source: "Yahoo Mail", pattern: /mail\.yahoo\.com/i, icon: FaYahoo },
-  { source: "Slack", pattern: /slack\.com/i, icon: FaSlack },
-  { source: "Notion", pattern: /notion\.so/i, icon: SiNotion },
-  { source: "Trello", pattern: /trello\.com/i, icon: FaTrello },
-  { source: "Jira", pattern: /atlassian\.net.*jira/i, icon: FaMountainSun },
-  { source: "Asana", pattern: /asana\.com/i, icon: SiAsana },
-  {
-    source: "Confluence",
-    pattern: /atlassian\.net.*wiki/i,
-    icon: FaConfluence,
-  },
-  {
-    source: "Google",
-    pattern: /google\.\w+\/search|google\.\w+\/url/i,
-    icon: Globe,
-  },
-  { source: "Bing", pattern: /bing\.com/i, icon: Globe },
-];
+// We only track browsers now.
+const REFERER_RULES = [];
 
 /**
  * Browser detection from user-agent (fallback when no referer match).
@@ -437,7 +361,6 @@ export default function Analytics() {
       : null;
     if (startDate && clickedAt && clickedAt < startDate) return false;
     if (endDate && clickedAt && clickedAt > endDate) return false;
-    if (log.classification && log.classification !== "Human Browser") return false;
     const ua = (log.userAgent || "").toLowerCase();
     const detectDevice = () => {
       if (/mobile|android|iphone|phone/i.test(ua)) return "Mobile";
@@ -759,7 +682,7 @@ export default function Analytics() {
           {/* Referrers bar chart */}
           <Card className="p-6">
             <h2 className="text-base font-bold text-slate-900 mb-5">
-              Top Referrers
+              Top Browsers
             </h2>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart

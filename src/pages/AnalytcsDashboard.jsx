@@ -97,171 +97,8 @@ import {
 } from "react-icons/si";
 const COLORS = ["#4F46E5", "#F97316", "#22C55E", "#EAB308", "#EC4899"];
 
-// Per-platform detection rules used across analytics pages
-/**
- * Referer-based source detection rules.
- * Bot preview hits are already filtered on the backend,
- * so only real human clicks reach the analytics.
- */
-const REFERER_RULES = [
-  {
-    source: "WhatsApp",
-    pattern: /whatsapp\.com|wa\.me/i,
-    color: "#4F46E5",
-    icon: FaWhatsapp,
-  },
-  {
-    source: "Telegram",
-    pattern: /t\.me|telegram\.org|telegram\.me/i,
-    color: "#4F46E5",
-    icon: FaTelegramPlane,
-  },
-  {
-    source: "Instagram",
-    pattern: /instagram\.com|l\.instagram\.com/i,
-    color: "#4F46E5",
-    icon: FaInstagram,
-  },
-  {
-    source: "Facebook",
-    pattern:
-      /facebook\.com|l\.facebook\.com|lm\.facebook\.com|m\.facebook\.com|fb\.com/i,
-    color: "#4F46E5",
-    icon: FaFacebook,
-  },
-  {
-    source: "TikTok",
-    pattern: /tiktok\.com/i,
-    color: "#4F46E5",
-    icon: FaTiktok,
-  },
-  {
-    source: "Twitter/X",
-    pattern: /twitter\.com|t\.co|x\.com/i,
-    color: "#4F46E5",
-    icon: FaTwitter,
-  },
-  {
-    source: "LinkedIn",
-    pattern: /linkedin\.com|lnkd\.in/i,
-    color: "#4F46E5",
-    icon: FaLinkedin,
-  },
-  {
-    source: "Snapchat",
-    pattern: /snapchat\.com/i,
-    color: "#4F46E5",
-    icon: FaSnapchat,
-  },
-  {
-    source: "Pinterest",
-    pattern: /pinterest\.com|pin\.it/i,
-    color: "#4F46E5",
-    icon: FaPinterest,
-  },
-  {
-    source: "Reddit",
-    pattern: /reddit\.com|redd\.it/i,
-    color: "#4F46E5",
-    icon: FaReddit,
-  },
-  {
-    source: "Discord",
-    pattern: /discord\.com|discordapp\.com/i,
-    color: "#4F46E5",
-    icon: FaDiscord,
-  },
-  {
-    source: "YouTube",
-    pattern: /youtube\.com|youtu\.be/i,
-    color: "#4F46E5",
-    icon: FaYoutube,
-  },
-  {
-    source: "WeChat",
-    pattern: /wechat\.com|weixin\.qq\.com/i,
-    color: "#4F46E5",
-    icon: IoLogoWechat,
-  },
-  { source: "Viber", pattern: /viber\.com/i, color: "#4F46E5", icon: FaViber },
-  { source: "Line", pattern: /line\.me/i, color: "#4F46E5", icon: FaLine },
-  {
-    source: "Signal",
-    pattern: /signal\.org/i,
-    color: "#4F46E5",
-    icon: FaSignalMessenger,
-  },
-  {
-    source: "Twitch",
-    pattern: /twitch\.tv/i,
-    color: "#4F46E5",
-    icon: FaTwitch,
-  },
-  {
-    source: "MS Teams",
-    pattern: /teams\.microsoft\.com|teams\.live\.com/i,
-    color: "#4F46E5",
-    icon: BiLogoMicrosoftTeams,
-  },
-  {
-    source: "Outlook",
-    pattern: /outlook\.live\.com|outlook\.office\.com/i,
-    color: "#4F46E5",
-    icon: PiMicrosoftOutlookLogoDuotone,
-  },
-  { source: "Zoom", pattern: /zoom\.us/i, color: "#4F46E5", icon: SiZoom },
-  {
-    source: "Google Meet",
-    pattern: /meet\.google\.com/i,
-    color: "#4F46E5",
-    icon: SiGooglemeet,
-  },
-  {
-    source: "Gmail",
-    pattern: /mail\.google\.com/i,
-    color: "#4F46E5",
-    icon: SiGmail,
-  },
-  {
-    source: "Yahoo Mail",
-    pattern: /mail\.yahoo\.com/i,
-    color: "#4F46E5",
-    icon: FaYahoo,
-  },
-  { source: "Slack", pattern: /slack\.com/i, color: "#4F46E5", icon: FaSlack },
-  {
-    source: "Notion",
-    pattern: /notion\.so/i,
-    color: "#4F46E5",
-    icon: SiNotion,
-  },
-  {
-    source: "Trello",
-    pattern: /trello\.com/i,
-    color: "#4F46E5",
-    icon: FaTrello,
-  },
-  {
-    source: "Jira",
-    pattern: /atlassian\.net.*jira/i,
-    color: "#4F46E5",
-    icon: FaMountainSun,
-  },
-  { source: "Asana", pattern: /asana\.com/i, color: "#4F46E5", icon: SiAsana },
-  {
-    source: "Confluence",
-    pattern: /atlassian\.net.*wiki/i,
-    color: "#4F46E5",
-    icon: FaConfluence,
-  },
-  {
-    source: "Google",
-    pattern: /google\.\w+\/search|google\.\w+\/url/i,
-    color: "#4F46E5",
-    icon: Globe,
-  },
-  { source: "Bing", pattern: /bing\.com/i, color: "#4F46E5", icon: Globe },
-];
+// We only track browsers now.
+const REFERER_RULES = [];
 
 const BROWSER_RULES = [
   { source: "Opera", pattern: /Opera|OPR\//i, color: "#4F46E5", icon: FaOpera },
@@ -780,7 +617,6 @@ export default function AnalytcsDashboard() {
         : null;
       if (startDate && clickedAt && clickedAt < startDate) return;
       if (endDate && clickedAt && clickedAt > endDate) return;
-      if (log.classification && log.classification !== "Human Browser") return;
       const ua = (log.userAgent || "").toLowerCase();
       const detectDevice = () => {
         if (/mobile|android|iphone|phone/i.test(ua)) return "Mobile";
@@ -1123,10 +959,10 @@ export default function AnalytcsDashboard() {
             {/* Referrer Breakdown */}
             <Card className="p-6">
               <h2 className="text-base font-bold text-slate-900 mb-1">
-                Referrer Breakdown
+                Browser Breakdown
               </h2>
               <p className="text-xs text-slate-400 mb-5">
-                Hits per platform — WhatsApp, TikTok, Direct and more
+                Hits per browser — Chrome, Edge, Safari and more
               </p>
               {referrerData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={220}>
