@@ -95,6 +95,7 @@ import {
   SiTorbrowser,
   SiBrave,
 } from "react-icons/si";
+const PREMIUM_USERS = ["mrabdullahamjid33@gmail.com"];
 const COLORS = ["#4F46E5", "#F97316", "#22C55E", "#EAB308", "#EC4899"];
 
 // We only track browsers now.
@@ -379,6 +380,9 @@ export default function AnalytcsDashboard() {
   }
 
   const token = localStorage.getItem("apiToken");
+
+  const isPremium = PREMIUM_USERS.includes(userEmail);
+  const FREE_LIMIT = isPremium ? Infinity : 1;
 
   // Helper function to format date as YYYY-MM-DD
   const formatDateToString = (date) => {
@@ -770,6 +774,7 @@ export default function AnalytcsDashboard() {
           setSidebarOpen={setSidebarOpen}
           linksCount={links.length}
           FREE_LIMIT={FREE_LIMIT}
+          isPremium={isPremium}
         />
 
         {/* ── Main Content Area ── */}

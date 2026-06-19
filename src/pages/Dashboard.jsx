@@ -29,7 +29,7 @@ import {
 import { SHORTENER_DOMAIN } from "../components/Shortner";
 import Sidebar from "../components/Sidebar";
 
-const FREE_LIMIT = 100;
+const PREMIUM_USERS = ["mrabdullahamjid33@gmail.com"];
 const baseUrl = import.meta.env.VITE_API_URL;
 
 function StatCard({ icon, label, value, sub }) {
@@ -244,7 +244,10 @@ export default function Dashboard() {
 
   const totalClicks = links.reduce((sum, l) => sum + l.clicks, 0);
   const activeLinks = links.filter((l) => l.active).length;
-  const atLimit = false;
+
+  const isPremium = PREMIUM_USERS.includes(userEmail);
+  const FREE_LIMIT = isPremium ? Infinity : 1;
+  const atLimit = !isPremium && links.length >= FREE_LIMIT;
 
   const calculateReturningUsers = () => {
     const deviceCounts = {};
@@ -453,7 +456,7 @@ export default function Dashboard() {
       )}
 
       <div className="flex min-h-screen">
-        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} linksCount={links.length} FREE_LIMIT={FREE_LIMIT} />
+        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} linksCount={links.length} FREE_LIMIT={FREE_LIMIT} isPremium={isPremium} />
 
         {/* ── Main ── */}
         <main className="flex-1 min-w-0 md:ml-64 px-4 sm:px-6 md:px-8 py-6 md:py-8">

@@ -14,6 +14,7 @@ export default function Sidebar({
   setSidebarOpen,
   linksCount,
   FREE_LIMIT = 100,
+  isPremium = false,
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -114,7 +115,7 @@ export default function Sidebar({
         </nav>
 
         {/* Free plan badge */}
-        {linksCount !== undefined && (
+        {linksCount !== undefined && !isPremium && (
           <div className="border border-indigo-100 bg-indigo-50 rounded-xl p-4 mb-4">
             <div className="text-xs font-bold text-indigo-700 mb-1">
               Free Plan

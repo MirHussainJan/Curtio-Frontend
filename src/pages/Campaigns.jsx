@@ -95,7 +95,7 @@ import { SHORTENER_DOMAIN } from "../components/Shortner";
 import Sidebar from "../components/Sidebar";
 import Filter from "../components/filter";
 
-const FREE_LIMIT = 100;
+const PREMIUM_USERS = ["mrabdullahamjid33@gmail.com"];
 const COLORS = ["#4F46E5", "#F97316", "#22C55E", "#EAB308", "#EC4899"];
 
 /**
@@ -368,6 +368,12 @@ export default function Campaigns() {
   }
 
   const token = localStorage.getItem("apiToken");
+
+  const isPremium = PREMIUM_USERS.includes(userEmail);
+  const FREE_LIMIT = isPremium ? Infinity : 1;
+  // Calculate total links across all campaigns to determine if atLimit
+  // The state 'links' holds all urls.
+  const atLimit = !isPremium && links.length >= FREE_LIMIT;
 
   // Helper function to format date as YYYY-MM-DD
   const formatDateToString = (date) => {
@@ -892,6 +898,7 @@ export default function Campaigns() {
           setSidebarOpen={setSidebarOpen}
           linksCount={links.length}
           FREE_LIMIT={FREE_LIMIT}
+          isPremium={isPremium}
         />
 
         {/* ── Main Content ── */}
@@ -932,8 +939,13 @@ export default function Campaigns() {
 
             <div className="flex items-center gap-1">
               <button
-                onClick={() => setShowCreateForm(!showCreateForm)}
-                className="flex items-center gap-2 font-semibold text-sm px-3 sm:px-4 py-2.5 rounded-xl transition-colors shadow-sm bg-indigo-600 hover:bg-indigo-700 text-white shrink-0 cursor-pointer"
+                onClick={() => {
+                  if (atLimit) return;
+                  setShowCreateForm(!showCreateForm);
+                }}
+                disabled={atLimit}
+                className={`flex items-center gap-2 font-semibold text-sm px-3 sm:px-4 py-2.5 rounded-xl transition-colors shadow-sm shrink-0 ${atLimit ? "bg-slate-300 text-slate-500 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer"}`}
+                title={atLimit ? "Free plan limit reached" : ""}
               >
                 <Plus size={16} />
                 <span className="hidden sm:inline">
