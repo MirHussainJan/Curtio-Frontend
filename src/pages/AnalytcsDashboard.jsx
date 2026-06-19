@@ -24,6 +24,9 @@ import {
   Smartphone,
   Globe,
   Activity,
+  Funnel,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import {
   AreaChart,
@@ -40,6 +43,10 @@ import {
   Bar,
 } from "recharts";
 import { SHORTENER_DOMAIN } from "../components/Shortner";
+import Sidebar from "../components/Sidebar";
+import Filter from "../components/filter";
+
+const FREE_LIMIT = 100;
 import {
   FaBots,
   FaConfluence,
@@ -89,6 +96,222 @@ import {
   SiBrave,
 } from "react-icons/si";
 const COLORS = ["#4F46E5", "#F97316", "#22C55E", "#EAB308", "#EC4899"];
+
+// Per-platform detection rules used across analytics pages
+/**
+ * Referer-based source detection rules.
+ * Bot preview hits are already filtered on the backend,
+ * so only real human clicks reach the analytics.
+ */
+const REFERER_RULES = [
+  {
+    source: "WhatsApp",
+    pattern: /whatsapp\.com|wa\.me/i,
+    color: "#4F46E5",
+    icon: FaWhatsapp,
+  },
+  {
+    source: "Telegram",
+    pattern: /t\.me|telegram\.org|telegram\.me/i,
+    color: "#4F46E5",
+    icon: FaTelegramPlane,
+  },
+  {
+    source: "Instagram",
+    pattern: /instagram\.com|l\.instagram\.com/i,
+    color: "#4F46E5",
+    icon: FaInstagram,
+  },
+  {
+    source: "Facebook",
+    pattern:
+      /facebook\.com|l\.facebook\.com|lm\.facebook\.com|m\.facebook\.com|fb\.com/i,
+    color: "#4F46E5",
+    icon: FaFacebook,
+  },
+  {
+    source: "TikTok",
+    pattern: /tiktok\.com/i,
+    color: "#4F46E5",
+    icon: FaTiktok,
+  },
+  {
+    source: "Twitter/X",
+    pattern: /twitter\.com|t\.co|x\.com/i,
+    color: "#4F46E5",
+    icon: FaTwitter,
+  },
+  {
+    source: "LinkedIn",
+    pattern: /linkedin\.com|lnkd\.in/i,
+    color: "#4F46E5",
+    icon: FaLinkedin,
+  },
+  {
+    source: "Snapchat",
+    pattern: /snapchat\.com/i,
+    color: "#4F46E5",
+    icon: FaSnapchat,
+  },
+  {
+    source: "Pinterest",
+    pattern: /pinterest\.com|pin\.it/i,
+    color: "#4F46E5",
+    icon: FaPinterest,
+  },
+  {
+    source: "Reddit",
+    pattern: /reddit\.com|redd\.it/i,
+    color: "#4F46E5",
+    icon: FaReddit,
+  },
+  {
+    source: "Discord",
+    pattern: /discord\.com|discordapp\.com/i,
+    color: "#4F46E5",
+    icon: FaDiscord,
+  },
+  {
+    source: "YouTube",
+    pattern: /youtube\.com|youtu\.be/i,
+    color: "#4F46E5",
+    icon: FaYoutube,
+  },
+  {
+    source: "WeChat",
+    pattern: /wechat\.com|weixin\.qq\.com/i,
+    color: "#4F46E5",
+    icon: IoLogoWechat,
+  },
+  { source: "Viber", pattern: /viber\.com/i, color: "#4F46E5", icon: FaViber },
+  { source: "Line", pattern: /line\.me/i, color: "#4F46E5", icon: FaLine },
+  {
+    source: "Signal",
+    pattern: /signal\.org/i,
+    color: "#4F46E5",
+    icon: FaSignalMessenger,
+  },
+  {
+    source: "Twitch",
+    pattern: /twitch\.tv/i,
+    color: "#4F46E5",
+    icon: FaTwitch,
+  },
+  {
+    source: "MS Teams",
+    pattern: /teams\.microsoft\.com|teams\.live\.com/i,
+    color: "#4F46E5",
+    icon: BiLogoMicrosoftTeams,
+  },
+  {
+    source: "Outlook",
+    pattern: /outlook\.live\.com|outlook\.office\.com/i,
+    color: "#4F46E5",
+    icon: PiMicrosoftOutlookLogoDuotone,
+  },
+  { source: "Zoom", pattern: /zoom\.us/i, color: "#4F46E5", icon: SiZoom },
+  {
+    source: "Google Meet",
+    pattern: /meet\.google\.com/i,
+    color: "#4F46E5",
+    icon: SiGooglemeet,
+  },
+  {
+    source: "Gmail",
+    pattern: /mail\.google\.com/i,
+    color: "#4F46E5",
+    icon: SiGmail,
+  },
+  {
+    source: "Yahoo Mail",
+    pattern: /mail\.yahoo\.com/i,
+    color: "#4F46E5",
+    icon: FaYahoo,
+  },
+  { source: "Slack", pattern: /slack\.com/i, color: "#4F46E5", icon: FaSlack },
+  {
+    source: "Notion",
+    pattern: /notion\.so/i,
+    color: "#4F46E5",
+    icon: SiNotion,
+  },
+  {
+    source: "Trello",
+    pattern: /trello\.com/i,
+    color: "#4F46E5",
+    icon: FaTrello,
+  },
+  {
+    source: "Jira",
+    pattern: /atlassian\.net.*jira/i,
+    color: "#4F46E5",
+    icon: FaMountainSun,
+  },
+  { source: "Asana", pattern: /asana\.com/i, color: "#4F46E5", icon: SiAsana },
+  {
+    source: "Confluence",
+    pattern: /atlassian\.net.*wiki/i,
+    color: "#4F46E5",
+    icon: FaConfluence,
+  },
+  {
+    source: "Google",
+    pattern: /google\.\w+\/search|google\.\w+\/url/i,
+    color: "#4F46E5",
+    icon: Globe,
+  },
+  { source: "Bing", pattern: /bing\.com/i, color: "#4F46E5", icon: Globe },
+];
+
+const BROWSER_RULES = [
+  { source: "Opera", pattern: /Opera|OPR\//i, color: "#4F46E5", icon: FaOpera },
+  { source: "Edge", pattern: /Edg\//i, color: "#4F46E5", icon: FaEdge },
+  { source: "Brave", pattern: /Brave/i, color: "#4F46E5", icon: SiBrave },
+  {
+    source: "Tor",
+    pattern: /TorBrowser/i,
+    color: "#4F46E5",
+    icon: SiTorbrowser,
+  },
+  {
+    source: "Chrome",
+    pattern: /Chrome|CriOS/i,
+    color: "#4F46E5",
+    icon: FaChrome,
+  },
+  {
+    source: "Firefox",
+    pattern: /Firefox|FxiOS/i,
+    color: "#4F46E5",
+    icon: FaFirefox,
+  },
+  { source: "Safari", pattern: /Safari/i, color: "#4F46E5", icon: FaSafari },
+  {
+    source: "Internet Explorer",
+    pattern: /Trident|MSIE/i,
+    color: "#4F46E5",
+    icon: FaInternetExplorer,
+  },
+];
+
+function detectSource(log) {
+  const ref = log.referer || "";
+  if (ref) {
+    for (const rule of REFERER_RULES) {
+      if (rule.pattern.test(ref)) return rule.source;
+    }
+  }
+  const ua = log.userAgent || "";
+  for (const rule of BROWSER_RULES) {
+    if (rule.pattern.test(ua)) return rule.source;
+  }
+  return "Direct";
+}
+
+const ALL_RULES = [...REFERER_RULES, ...BROWSER_RULES];
+const platformIconMap = Object.fromEntries(
+  ALL_RULES.map((r) => [r.source, r.icon]),
+);
 
 function StatCard({ icon, label, value, sub, className = "" }) {
   return (
@@ -320,6 +543,25 @@ export default function AnalytcsDashboard() {
 
   const token = localStorage.getItem("apiToken");
 
+  // Helper function to format date as YYYY-MM-DD
+  const formatDateToString = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  // Calculate date range: today to 7 days ago
+  const today = new Date();
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const defaultEndDate = formatDateToString(tomorrow);
+  const defaultStartDate = formatDateToString(sevenDaysAgo);
+
   const [rawUrls, setRawUrls] = useState([]);
   const [links, setLinks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -329,6 +571,73 @@ export default function AnalytcsDashboard() {
   const [deleteModal, setDeleteModal] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [startDate, setStartDate] = useState(defaultStartDate);
+  const [endDate, setEndDate] = useState(defaultEndDate);
+  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedDevice, setSelectedDevice] = useState("");
+  const [selectedSource, setSelectedSource] = useState("");
+  const [pendingStartDate, setPendingStartDate] = useState(defaultStartDate);
+  const [pendingEndDate, setPendingEndDate] = useState(defaultEndDate);
+  const [pendingCountry, setPendingCountry] = useState(selectedCountry);
+  const [pendingDevice, setPendingDevice] = useState(selectedDevice);
+  const [pendingSource, setPendingSource] = useState(selectedSource);
+
+  useEffect(() => {
+    if (filterOpen) {
+      setPendingStartDate(startDate);
+      setPendingEndDate(endDate);
+      setPendingCountry(selectedCountry);
+      setPendingDevice(selectedDevice);
+      setPendingSource(selectedSource);
+    }
+  }, [
+    filterOpen,
+    startDate,
+    endDate,
+    selectedCountry,
+    selectedDevice,
+    selectedSource,
+  ]);
+
+  // Real calendar state — initialized to current month/year
+  const [calendarYear, setCalendarYear] = useState(today.getFullYear());
+  const [calendarMonth, setCalendarMonth] = useState(today.getMonth()); // 0-indexed
+
+  const handleDateClick = (dateStr) => {
+    if (!pendingStartDate || (pendingStartDate && pendingEndDate)) {
+      setPendingStartDate(dateStr);
+      setPendingEndDate("");
+    } else if (dateStr < pendingStartDate) {
+      setPendingEndDate(pendingStartDate);
+      setPendingStartDate(dateStr);
+    } else {
+      setPendingEndDate(dateStr);
+    }
+  };
+
+  function prevMonth() {
+    if (calendarMonth === 0) {
+      setCalendarMonth(11);
+      setCalendarYear((y) => y - 1);
+    } else {
+      setCalendarMonth((m) => m - 1);
+    }
+  }
+
+  function nextMonth() {
+    if (calendarMonth === 11) {
+      setCalendarMonth(0);
+      setCalendarYear((y) => y + 1);
+    } else {
+      setCalendarMonth((m) => m + 1);
+    }
+  }
+
+  // Number of days in the current calendar month
+  const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+  // Day-of-week the 1st falls on (0 = Sun)
+  const firstDayOfWeek = new Date(calendarYear, calendarMonth, 1).getDay();
 
   useEffect(() => {
     if (!token) {
@@ -376,7 +685,8 @@ export default function AnalytcsDashboard() {
         if (!background) setError(data.message || "Failed to fetch URLs.");
       }
     } catch (err) {
-      if (!background) setError("Network error. Could not retrieve link statistics.");
+      if (!background)
+        setError("Network error. Could not retrieve link statistics.");
     } finally {
       if (!background) setLoading(false);
     }
@@ -459,209 +769,124 @@ export default function AnalytcsDashboard() {
     );
   }
 
-  // ── Aggregated Stats Calculations ──
+  // ── Aggregated Stats Calculations (filtered) ──
+  // Build filtered logs across all links according to selected filters
+  const allFilteredLogs = [];
+  const perLinkCounts = {};
+  links.forEach((l) => {
+    (l.clickLogs || []).forEach((log) => {
+      const clickedAt = log.clickedAt
+        ? new Date(log.clickedAt).toISOString().slice(0, 10)
+        : null;
+      if (startDate && clickedAt && clickedAt < startDate) return;
+      if (endDate && clickedAt && clickedAt > endDate) return;
+      const ua = (log.userAgent || "").toLowerCase();
+      const detectDevice = () => {
+        if (/mobile|android|iphone|phone/i.test(ua)) return "Mobile";
+        if (/tablet|ipad|playbook|silk/i.test(ua)) return "Tablet";
+        return "Desktop";
+      };
+      if (selectedDevice && detectDevice() !== selectedDevice) return;
+      if (selectedCountry && (log.country || "") !== selectedCountry) return;
+      // platform/source
+      const matchedSource = detectSource(log);
+      if (selectedSource && matchedSource !== selectedSource) return;
+
+      allFilteredLogs.push({ ...log, linkId: l.id, short: l.short });
+      perLinkCounts[l.id] = (perLinkCounts[l.id] || 0) + 1;
+    });
+  });
+
   const totalUrls = links.length;
-  const totalClicks = links.reduce((sum, l) => sum + l.clicks, 0);
+  const totalClicks = allFilteredLogs.length;
   const activeLinks = links.filter((l) => l.active).length;
   const inactiveLinks = totalUrls - activeLinks;
 
-  // Clicks Over Time (Last 7 Days)
+  const parseDate = (value) => {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+  };
+
+  const chartStart = parseDate(startDate);
+  const chartEnd = parseDate(endDate);
   const clickHistory = [];
   const daysMap = {};
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    const dateStr = d.toLocaleDateString(undefined, {
+
+  const rangeStart =
+    chartStart || new Date(new Date().setDate(new Date().getDate() - 6));
+  const rangeEnd = chartEnd || chartStart || new Date();
+
+  const iterator = new Date(rangeStart);
+  while (iterator <= rangeEnd) {
+    const dateStr = iterator.toLocaleDateString(undefined, {
       month: "short",
       day: "numeric",
     });
     daysMap[dateStr] = 0;
+    iterator.setDate(iterator.getDate() + 1);
   }
 
-  links.forEach((l) => {
-    if (l.clickLogs) {
-      l.clickLogs.forEach((log) => {
-        const dateStr = new Date(log.clickedAt).toLocaleDateString(undefined, {
-          month: "short",
-          day: "numeric",
-        });
-        if (daysMap[dateStr] !== undefined) {
-          daysMap[dateStr] += 1;
-        }
-      });
-    }
+  allFilteredLogs.forEach((log) => {
+    const clickedAt = log.clickedAt ? new Date(log.clickedAt) : null;
+    if (!clickedAt) return;
+    if (chartStart && clickedAt < chartStart) return;
+    if (chartEnd && clickedAt > chartEnd) return;
+    const dateStr = clickedAt.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+    });
+    if (daysMap[dateStr] !== undefined) daysMap[dateStr]++;
   });
 
-  Object.keys(daysMap).forEach((date) => {
-    clickHistory.push({ date, clicks: daysMap[date] });
-  });
+  Object.keys(daysMap).forEach((date) =>
+    clickHistory.push({ date, clicks: daysMap[date] }),
+  );
 
   // Devices Breakdown
   let mobile = 0,
     desktop = 0,
     tablet = 0;
-  let loggedClicks = 0;
-
-  links.forEach((l) => {
-    if (l.clickLogs) {
-      l.clickLogs.forEach((log) => {
-        loggedClicks++;
-        const ua = log.userAgent.toLowerCase();
-        if (/mobile|android|iphone|ipad|phone/i.test(ua)) {
-          mobile++;
-        } else if (/tablet|ipad|playbook|silk/i.test(ua)) {
-          tablet++;
-        } else {
-          desktop++;
-        }
-      });
-    }
+  allFilteredLogs.forEach((log) => {
+    const ua = (log.userAgent || "").toLowerCase();
+    if (/mobile|android|iphone|phone/i.test(ua)) mobile++;
+    else if (/tablet|ipad|playbook|silk/i.test(ua)) tablet++;
+    else desktop++;
   });
-
-  const divider = loggedClicks || 1;
+  const divider = allFilteredLogs.length || 1;
   const deviceData = [
     { name: "Desktop", value: Math.round((desktop / divider) * 100) },
     { name: "Mobile", value: Math.round((mobile / divider) * 100) },
     { name: "Tablet", value: Math.round((tablet / divider) * 100) },
   ].filter((d) => d.value > 0);
-
   const finalDeviceData = deviceData;
 
-  // Per-platform detection from User-Agent fingerprints
-  const PLATFORM_RULES = [
-    // Social Media — each app leaves its own UA token
-    { source: "WhatsApp", pattern: /WhatsApp/i, color: "#4F46E5", icon: FaWhatsapp },
-    { source: "Telegram", pattern: /Telegram/i, color: "#4F46E5", icon: FaTelegramPlane },
-    { source: "Instagram", pattern: /Instagram/i, color: "#4F46E5", icon: FaInstagram },
-    {
-      source: "Facebook",
-      pattern: /FBAV|FBAN|FB_IAB|facebookexternalhit/i,
-      color: "#4F46E5",
-      icon: FaFacebook,
-    },
-    { source: "TikTok", pattern: /TikTok|musical_ly/i, color: "#4F46E5", icon: FaTiktok },
-    { source: "Twitter/X", pattern: /Twitter/i, color: "#4F46E5", icon: FaTwitter },
-    { source: "LinkedIn", pattern: /LinkedInApp/i, color: "#4F46E5", icon: FaLinkedin },
-    { source: "Snapchat", pattern: /Snapchat/i, color: "#4F46E5", icon: FaSnapchat },
-    { source: "Pinterest", pattern: /Pinterest/i, color: "#4F46E5", icon: FaPinterest },
-    { source: "Reddit", pattern: /Reddit/i, color: "#4F46E5", icon: FaReddit },
-    { source: "Discord", pattern: /Discord/i, color: "#4F46E5", icon: FaDiscord },
-    { source: "YouTube", pattern: /YouTube/i, color: "#4F46E5", icon: FaYoutube },
-    { source: "WeChat", pattern: /MicroMessenger|WeChat/i, color: "#4F46E5", icon: IoLogoWechat },
-    { source: "Viber", pattern: /Viber/i, color: "#4F46E5", icon: FaViber },
-    { source: "Line", pattern: /Line\//i, color: "#4F46E5", icon: FaLine },
-    { source: "Signal", pattern: /Signal/i, color: "#4F46E5", icon: FaSignalMessenger },
-    { source: "Kik", pattern: /Kik\//i, color: "#4F46E5", icon: SiKik },
-    { source: "Twitch", pattern: /Twitch/i, color: "#4F46E5", icon: FaTwitch },
-    // Microsoft suite
-    {
-      source: "MS Teams",
-      pattern: /Teams|SkypeTeams|Skype/i,
-      color: "#4F46E5",
-      icon: BiLogoMicrosoftTeams,
-    },
-    { source: "Outlook", pattern: /Outlook/i, color: "#4F46E5", icon: PiMicrosoftOutlookLogoDuotone },
-    // Video / Meetings
-    {
-      source: "Zoom",
-      pattern: /ZoomWebKit|ZoomPhoneOSClient|zoom\.us/i,
-      color: "#4F46E5",
-      icon: SiZoom,
-    },
-    {
-      source: "Google Meet",
-      pattern: /GoogleMeet|meet\.google/i,
-      color: "#4F46E5",
-      icon: SiGooglemeet,
-    },
-    // Email clients
-    { source: "Gmail", pattern: /Gmail|GoogleImageProxy/i, color: "#4F46E5", icon: SiGmail },
-    { source: "Thunderbird", pattern: /Thunderbird/i, color: "#4F46E5", icon: SiThunderbird },
-    { source: "Apple Mail", pattern: /Apple.*Mail/i, color: "#4F46E5", icon: IoIosMail },
-    { source: "Yahoo Mail", pattern: /YahooMail/i, color: "#4F46E5", icon: FaYahoo },
-    // Collaboration & project tools
-    { source: "Slack", pattern: /Slack/i, color: "#4F46E5", icon: FaSlack },
-    { source: "Notion", pattern: /Notion/i, color: "#4F46E5", icon: SiNotion },
-    { source: "Trello", pattern: /Trello/i, color: "#4F46E5", icon: FaTrello },
-    { source: "Jira", pattern: /Jira/i, color: "#4F46E5", icon: FaMountainSun },
-    { source: "Asana", pattern: /Asana/i, color: "#4F46E5", icon: SiAsana },
-    { source: "Confluence", pattern: /Confluence/i, color: "#4F46E5", icon: FaConfluence },
-    // Bots & automation
-    {
-      source: "Bots",
-      pattern:
-        /bot|crawler|spider|curl|wget|python|axios|node-fetch|Go-http|okhttp|PostmanRuntime/i,
-      color: "#4F46E5",
-      icon: FaBots,
-    },
-    { source: "Opera", pattern: /Opera|OPR\//i, color: "#4F46E5", icon: FaOpera },
-    { source: "Edge", pattern: /Edg\//i, color: "#4F46E5", icon: FaEdge },
-    { source: "Brave", pattern: /Brave/i, color: "#4F46E5", icon: SiBrave },
-    { source: "Tor", pattern: /TorBrowser/i, color: "#4F46E5", icon: SiTorbrowser },
-    { source: "Chrome", pattern: /Chrome|CriOS/i, color: "#4F46E5", icon: FaChrome },
-    { source: "Firefox", pattern: /Firefox|FxiOS/i, color: "#4F46E5", icon: FaFirefox },
-    { source: "Safari", pattern: /Safari/i, color: "#4F46E5", icon: FaSafari },
-    { source: "Internet Explorer", pattern: /Trident|MSIE/i, color: "#4F46E5", icon: FaInternetExplorer },
-  ];
-
-  const platformIconMap = Object.fromEntries(
-    PLATFORM_RULES.map((r) => [r.source, r.icon]),
-  );
-
-  // Count per-platform hits
-  const platformCounts = {};
-  let directCount = 0;
-
-  links.forEach((l) => {
-    if (l.clickLogs) {
-      l.clickLogs.forEach((log) => {
-        const ua = log.userAgent || "";
-        let matched = false;
-        for (const rule of PLATFORM_RULES) {
-          if (rule.pattern.test(ua)) {
-            platformCounts[rule.source] =
-              (platformCounts[rule.source] || 0) + 1;
-            matched = true;
-            break;
-          }
-        }
-        if (!matched) directCount++;
-      });
-    }
+  // Referrer/source counts using detectSource
+  const sourceCounts = {};
+  allFilteredLogs.forEach((log) => {
+    const src = detectSource(log);
+    sourceCounts[src] = (sourceCounts[src] || 0) + 1;
   });
 
-  // Build chart data: each known platform + Direct, sorted by visits desc, only non-zero
-  const platformColorMap = Object.fromEntries(
-    PLATFORM_RULES.map((r) => [r.source, r.color]),
-  );
-  const referrerData = [
-    ...PLATFORM_RULES.map((r) => ({
-      source: r.source,
-      visits: platformCounts[r.source] || 0,
-      color: r.color,
-    })).filter((d) => d.visits > 0),
-    ...(directCount > 0
-      ? [{ source: "Direct", visits: directCount, color: "#4F46E5" }]
-      : []),
-  ].sort((a, b) => b.visits - a.visits);
+  const referrerData = Object.entries(sourceCounts)
+    .map(([source, visits]) => ({
+      source,
+      visits,
+      color: "#4F46E5",
+    }))
+    .sort((a, b) => b.visits - a.visits);
 
-  // Aggregate real country data across all links
   const geoDataMap = {};
-  links.forEach((l) => {
-    if (l.clickLogs) {
-      l.clickLogs.forEach((log) => {
-        const countryName = log.country || "Unknown";
-        const countryCode = log.countryCode || "unknown";
-        if (!geoDataMap[countryName]) {
-          geoDataMap[countryName] = {
-            country: countryName,
-            countryCode: countryCode,
-            clicks: 0,
-          };
-        }
-        geoDataMap[countryName].clicks += 1;
-      });
+  allFilteredLogs.forEach((log) => {
+    const countryName = log.country || "Unknown";
+    const countryCode = log.countryCode || "unknown";
+    if (!geoDataMap[countryName]) {
+      geoDataMap[countryName] = {
+        country: countryName,
+        countryCode,
+        clicks: 0,
+      };
     }
+    geoDataMap[countryName].clicks += 1;
   });
 
   const getFlagEmoji = (code) => {
@@ -687,7 +912,8 @@ export default function AnalytcsDashboard() {
 
   const finalGeoData = geoData;
 
-  // Top Clicked Links (Sorted by clicks desc)
+  console.log(finalGeoData);
+
   const topLinks = [...links].sort((a, b) => b.clicks - a.clicks).slice(0, 5);
 
   return (
@@ -701,114 +927,96 @@ export default function AnalytcsDashboard() {
         />
       )}
 
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-20 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
       <div className="flex min-h-screen">
-        {/* ── Sidebar ── */}
-        <aside
-          className={`
-            fixed top-0 left-0 bottom-0 z-30 w-64 bg-white border-r border-slate-100
-            flex flex-col py-6 px-4
-            transition-transform duration-300 ease-in-out
-            ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-            md:translate-x-0
-          `}
-        >
-          {/* Close button — mobile only */}
-          <div className="flex justify-end mb-2 md:hidden">
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500"
-            >
-              <X size={20} />
-            </button>
-          </div>
-
-          <Link to="/" className="flex items-center gap-2 px-2 mb-8">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
-              <Zap size={15} className="text-white" fill="white" />
-            </div>
-            <span className="text-lg font-extrabold text-slate-900">
-              Brevly
-            </span>
-          </Link>
-
-          <nav className="flex flex-col gap-1 flex-1">
-            <Link
-              to="/dashboard"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-            >
-              <LinkIcon size={16} /> My Links
-            </Link>
-            <Link
-              to="/dashboard/analytics"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left bg-indigo-50 text-indigo-700 font-semibold"
-            >
-              <BarChart2 size={16} /> Analytics
-            </Link>
-            <Link
-              to="/dashboard/campaigns"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-            >
-              <TrendingUp size={16} /> Campaigns
-            </Link>
-          </nav>
-
-          <div className="border-t border-gray-400 pt-4">
-            <div className="flex items-center gap-3 px-2 mb-3 min-w-0">
-              <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0">
-                {userInitial}
-              </div>
-              <div className="min-w-0">
-                <div className="text-sm font-semibold text-slate-800 truncate">
-                  {userName}
-                </div>
-                <div className="text-xs text-slate-400 truncate">
-                  {userEmail}
-                </div>
-              </div>
-            </div>
-            <Link
-              to="/dashboard/editprofile"
-              className="flex items-center justify-center gap-2 w-full bg-indigo-700 text-white text-sm font-medium px-3 py-2 rounded-xl text-center mt-2 cursor-pointer hover:bg-indigo-800 transition-colors"
-            >
-              <Pencil size={15} /> Edit Profile
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="bg-indigo-700 text-white text-sm font-medium px-3 py-2 rounded-xl text-center mt-2 cursor-pointer hover:bg-indigo-800 transition-colors flex w-full items-center justify-center gap-2"
-            >
-              <LogOut size={15} /> Logout
-            </button>
-          </div>
-        </aside>
+        <Sidebar
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          linksCount={links.length}
+          FREE_LIMIT={FREE_LIMIT}
+        />
 
         {/* ── Main Content Area ── */}
         <main className="flex-1 min-w-0 md:ml-64 px-4 sm:px-6 md:px-8 py-6 md:py-8 space-y-6">
           {/* Top Header */}
-          <div className="flex items-center justify-between gap-3">
-            <button
-              className="md:hidden p-2 rounded-xl border border-slate-200 bg-white shadow-sm text-slate-600 hover:bg-slate-50 shrink-0"
-              onClick={() => setSidebarOpen(true)}
-            >
-              <Menu size={18} />
-            </button>
+          <main className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center justify-between gap-3">
+                <button
+                  className="md:hidden p-2 rounded-xl border border-slate-200 bg-white shadow-sm text-slate-600 hover:bg-slate-50 shrink-0"
+                  onClick={() => setSidebarOpen(true)}
+                >
+                  <Menu size={18} />
+                </button>
 
-            <div className="min-w-0">
-              <h1 className="text-lg sm:text-xl md:text-2xl font-extrabold text-slate-900 truncate">
-                Analytics Dashboard
-              </h1>
-              <p className="text-slate-500 text-xs sm:text-sm mt-0.5">
-                Understand user engagement and link performance globally.
-              </p>
+                <div className="min-w-0">
+                  <h1 className="text-lg sm:text-xl md:text-2xl font-extrabold text-slate-900 truncate">
+                    Analytics Dashboard
+                  </h1>
+                  <p className="text-slate-500 text-xs sm:text-sm mt-0.5">
+                    Understand user engagement and link performance globally.
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
+            <div>
+              <button
+                onClick={() => setFilterOpen(!filterOpen)}
+                className={`px-3 py-2 border rounded-xl shadow-sm cursor-pointer flex items-center gap-2 transition-colors ${filterOpen ? "bg-indigo-50 border-indigo-200 text-indigo-600" : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"}`}
+              >
+                <Funnel size={18} />
+                <span className="text-sm font-medium hidden sm:inline">
+                  Filters
+                </span>
+              </button>
+            </div>
+          </main>
+
+          {/* Filters Card */}
+          {filterOpen && (
+            <Filter
+              startDate={pendingStartDate}
+              endDate={pendingEndDate}
+              setStartDate={setPendingStartDate}
+              setEndDate={setPendingEndDate}
+              calendarYear={calendarYear}
+              calendarMonth={calendarMonth}
+              prevMonth={prevMonth}
+              nextMonth={nextMonth}
+              firstDayOfWeek={firstDayOfWeek}
+              daysInMonth={daysInMonth}
+              handleDateClick={handleDateClick}
+              finalGeoData={finalGeoData}
+              finalDeviceData={finalDeviceData}
+              referrerData={referrerData}
+              selectedCountry={pendingCountry}
+              setSelectedCountry={setPendingCountry}
+              selectedDevice={pendingDevice}
+              setSelectedDevice={setPendingDevice}
+              selectedSource={pendingSource}
+              setSelectedSource={setPendingSource}
+              onClear={() => {
+                setPendingStartDate("");
+                setPendingEndDate("");
+                setPendingCountry("");
+                setPendingDevice("");
+                setPendingSource("");
+                setStartDate("");
+                setEndDate("");
+                setSelectedCountry("");
+                setSelectedDevice("");
+                setSelectedSource("");
+              }}
+              onApply={() => {
+                setStartDate(pendingStartDate);
+                setEndDate(pendingEndDate);
+                setSelectedCountry(pendingCountry);
+                setSelectedDevice(pendingDevice);
+                setSelectedSource(pendingSource);
+                setFilterOpen(false);
+              }}
+              setFilterOpen={setFilterOpen}
+            />
+          )}
 
           {/* Error Banner */}
           {error && (
@@ -911,7 +1119,7 @@ export default function AnalytcsDashboard() {
 
           {/* Referrers + Devices Row */}
           <div className="grid lg:grid-cols-2 gap-6">
-            {/* Referrer Breakdown — per platform vertical bars */}
+            {/* Referrer Breakdown */}
             <Card className="p-6">
               <h2 className="text-base font-bold text-slate-900 mb-1">
                 Referrer Breakdown
@@ -1077,6 +1285,7 @@ export default function AnalytcsDashboard() {
                             <span className="text-xs text-slate-700 font-semibold truncate">
                               {geo.country}
                             </span>
+
                             <span className="text-xs font-bold text-slate-800 ml-2">
                               {geo.clicks.toLocaleString()}
                             </span>
@@ -1231,7 +1440,6 @@ export default function AnalytcsDashboard() {
               </div>
             </Card>
           </div>
-
         </main>
       </div>
     </div>

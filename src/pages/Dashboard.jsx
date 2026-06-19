@@ -27,6 +27,7 @@ import {
   Pencil,
 } from "lucide-react";
 import { SHORTENER_DOMAIN } from "../components/Shortner";
+import Sidebar from "../components/Sidebar";
 
 const FREE_LIMIT = 100;
 const baseUrl = import.meta.env.VITE_API_URL;
@@ -451,96 +452,8 @@ export default function Dashboard() {
         />
       )}
 
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-20 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
       <div className="flex min-h-screen">
-        {/* ── Sidebar ── */}
-        <aside
-          className={`
-            fixed top-0 left-0 bottom-0 z-30 w-64 bg-white border-r border-slate-100
-            flex flex-col py-6 px-4
-            transition-transform duration-300 ease-in-out
-            ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-            md:translate-x-0
-          `}
-        >
-          {/* Close button — mobile only */}
-          <div className="flex justify-end mb-2 md:hidden">
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500"
-            >
-              <X size={20} />
-            </button>
-          </div>
-
-          <Link to="/" className="flex items-center gap-2 px-2 mb-8">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
-              <Zap size={15} className="text-white" fill="white" />
-            </div>
-            <span className="text-lg font-extrabold text-slate-900">Brevly</span>
-          </Link>
-
-          <nav className="flex flex-col gap-1 flex-1">
-            <Link
-              to="/dashboard"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors text-left bg-indigo-50 text-indigo-700"
-            >
-              <LinkIcon size={16} /> My Links
-            </Link>
-            <Link
-              to="/dashboard/analytics"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-            >
-              <BarChart2 size={16} /> Analytics
-            </Link>
-            <Link
-              to="/dashboard/campaigns"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-            >
-              <TrendingUp size={16} /> Campaigns
-            </Link>
-          </nav>
-
-          {/* Free plan badge */}
-          <div className="border border-indigo-100 bg-indigo-50 rounded-xl p-4 mb-4">
-            <div className="text-xs font-bold text-indigo-700 mb-1">Free Plan</div>
-            <div className="text-xs text-slate-500 mb-2">
-              {links.length}/{FREE_LIMIT} links used
-            </div>
-            <div className="h-1.5 bg-indigo-100 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-indigo-500 rounded-full transition-all"
-                style={{ width: `${(links.length / FREE_LIMIT) * 100}%` }}
-              />
-            </div>
-          </div>
-
-          <div className="border-t border-gray-400 pt-4">
-            <div className="flex items-center gap-3 px-2 mb-3 min-w-0">
-              <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 ">
-                {userInitial}
-              </div>
-              <div className="min-w-0 ">
-                <div className="text-sm font-semibold text-slate-800 truncate">{userName}</div>
-                <div className="text-xs text-slate-400 truncate">{userEmail}</div>
-              </div>
-            </div>
-            <Link to="/dashboard/editprofile" className="flex items-center justify-center gap-2 w-full bg-indigo-700 text-white text-sm font-medium px-3 py-2 rounded-xl text-center mt-2 cursor-pointer hover:bg-indigo-800 transition-colors"><Pencil size={15} /> Edit Profile</Link>
-            <button
-              onClick={handleLogout}
-              className="bg-indigo-700 text-white text-sm font-medium px-3 py-2 rounded-xl text-center mt-2 cursor-pointer hover:bg-indigo-800 transition-colors mt-2 cursor-pointer flex w-full items-center justify-center gap-2"
-            >
-              <LogOut size={15} /> Logout
-            </button>
-          </div>
-        </aside>
+        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} linksCount={links.length} FREE_LIMIT={FREE_LIMIT} />
 
         {/* ── Main ── */}
         <main className="flex-1 min-w-0 md:ml-64 px-4 sm:px-6 md:px-8 py-6 md:py-8">

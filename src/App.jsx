@@ -11,7 +11,7 @@ import BlogPost from "./pages/BlogPost";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/Fpassword";
-import CaptchaVerify from "./pages/CaptchaVerify";
+
 
 export default function App() {
   return (
@@ -67,7 +67,7 @@ export default function App() {
 
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
-        <Route path="/captcha/:shortCode" element={<CaptchaVerify />} />
+
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

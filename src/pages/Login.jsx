@@ -33,7 +33,7 @@ export default function Login() {
             localStorage.setItem("apiToken", data.apiToken);
             localStorage.setItem("LoginUser", JSON.stringify(data.LoginUser));
             await syncPendingUrl(data.apiToken);
-            navigate("/dashboard");
+            navigate("/dashboard/analytics");
           }
         } catch {
           setError("Network error during Google login.");
