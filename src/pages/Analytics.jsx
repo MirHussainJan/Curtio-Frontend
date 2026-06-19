@@ -437,6 +437,7 @@ export default function Analytics() {
       : null;
     if (startDate && clickedAt && clickedAt < startDate) return false;
     if (endDate && clickedAt && clickedAt > endDate) return false;
+    if (log.classification && log.classification !== "Human Browser") return false;
     const ua = (log.userAgent || "").toLowerCase();
     const detectDevice = () => {
       if (/mobile|android|iphone|phone/i.test(ua)) return "Mobile";

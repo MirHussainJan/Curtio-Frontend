@@ -780,6 +780,7 @@ export default function AnalytcsDashboard() {
         : null;
       if (startDate && clickedAt && clickedAt < startDate) return;
       if (endDate && clickedAt && clickedAt > endDate) return;
+      if (log.classification && log.classification !== "Human Browser") return;
       const ua = (log.userAgent || "").toLowerCase();
       const detectDevice = () => {
         if (/mobile|android|iphone|phone/i.test(ua)) return "Mobile";

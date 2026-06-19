@@ -252,6 +252,7 @@ export default function Dashboard() {
     links.forEach(l => {
       if (l.clickLogs) {
         l.clickLogs.forEach(log => {
+          if (log.classification && log.classification !== "Human Browser") return;
           const diffTime = Math.abs(new Date() - new Date(log.clickedAt));
           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
           if (diffDays <= 30) {
