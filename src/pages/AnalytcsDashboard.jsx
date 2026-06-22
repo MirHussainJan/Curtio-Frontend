@@ -98,48 +98,59 @@ import {
 const PREMIUM_USERS = ["mrabdullahamjid33@gmail.com"];
 const COLORS = ["#4F46E5", "#F97316", "#22C55E", "#EAB308", "#EC4899"];
 
-// We only track browsers now.
-const REFERER_RULES = [];
+const REFERER_RULES = [
+  { source: "WhatsApp", pattern: /whatsapp/i, color: "#4F46E5", icon: FaWhatsapp },
+  { source: "Facebook", pattern: /facebook|fbav|fban/i, color: "#4F46E5", icon: FaFacebook },
+  { source: "Instagram", pattern: /instagram/i, color: "#4F46E5", icon: FaInstagram },
+  { source: "TikTok", pattern: /tiktok|bytedance/i, color: "#4F46E5", icon: FaTiktok },
+  { source: "YouTube", pattern: /youtube|youtu\.be/i, color: "#4F46E5", icon: FaYoutube },
+  { source: "LinkedIn", pattern: /linkedin/i, color: "#4F46E5", icon: FaLinkedin },
+  { source: "Twitter", pattern: /twitter|t\.co/i, color: "#4F46E5", icon: FaTwitter },
+  { source: "Reddit", pattern: /reddit/i, color: "#4F46E5", icon: FaReddit },
+  { source: "Pinterest", pattern: /pinterest/i, color: "#4F46E5", icon: FaPinterest },
+  { source: "Snapchat", pattern: /snapchat/i, color: "#4F46E5", icon: FaSnapchat },
+  { source: "Discord", pattern: /discord/i, color: "#4F46E5", icon: FaDiscord },
+  { source: "Telegram", pattern: /telegram|t\.me/i, color: "#4F46E5", icon: FaTelegramPlane },
+  { source: "Teams", pattern: /teams\.microsoft/i, color: "#4F46E5", icon: BiLogoMicrosoftTeams },
+  { source: "Slack", pattern: /slack/i, color: "#4F46E5", icon: FaSlack },
+  { source: "Gmail", pattern: /mail\.google/i, color: "#4F46E5", icon: SiGmail },
+  { source: "Outlook", pattern: /outlook/i, color: "#4F46E5", icon: PiMicrosoftOutlookLogoDuotone },
+  { source: "WeChat", pattern: /wechat|micromessenger/i, color: "#4F46E5", icon: IoLogoWechat },
+  { source: "Line", pattern: /line/i, color: "#4F46E5", icon: FaLine },
+  { source: "Viber", pattern: /viber/i, color: "#4F46E5", icon: FaViber },
+];
 
 const BROWSER_RULES = [
+  { source: "Hola Browser", pattern: /Hola/i, color: "#4F46E5", icon: Globe },
   { source: "Opera", pattern: /Opera|OPR\//i, color: "#4F46E5", icon: FaOpera },
   { source: "Edge", pattern: /Edg\//i, color: "#4F46E5", icon: FaEdge },
   { source: "Brave", pattern: /Brave/i, color: "#4F46E5", icon: SiBrave },
-  {
-    source: "Tor",
-    pattern: /TorBrowser/i,
-    color: "#4F46E5",
-    icon: SiTorbrowser,
-  },
-  {
-    source: "Chrome",
-    pattern: /Chrome|CriOS/i,
-    color: "#4F46E5",
-    icon: FaChrome,
-  },
-  {
-    source: "Firefox",
-    pattern: /Firefox|FxiOS/i,
-    color: "#4F46E5",
-    icon: FaFirefox,
-  },
+  { source: "Tor", pattern: /TorBrowser/i, color: "#4F46E5", icon: SiTorbrowser },
+  { source: "Firefox", pattern: /Firefox|FxiOS/i, color: "#4F46E5", icon: FaFirefox },
+  { source: "Internet Explorer", pattern: /Trident|MSIE/i, color: "#4F46E5", icon: FaInternetExplorer },
+  { source: "Chrome", pattern: /Chrome|CriOS/i, color: "#4F46E5", icon: FaChrome },
+  { source: "iOS Safari", pattern: /Mobile.*Safari/i, color: "#4F46E5", icon: FaSafari },
   { source: "Safari", pattern: /Safari/i, color: "#4F46E5", icon: FaSafari },
-  {
-    source: "Internet Explorer",
-    pattern: /Trident|MSIE/i,
-    color: "#4F46E5",
-    icon: FaInternetExplorer,
-  },
 ];
 
 function detectSource(log) {
+  if (log.source && log.source !== "unknown" && log.source !== "Direct") {
+    return log.source;
+  }
   const ref = log.referer || "";
+  const ua = log.userAgent || "";
+  
   if (ref) {
     for (const rule of REFERER_RULES) {
       if (rule.pattern.test(ref)) return rule.source;
     }
   }
-  const ua = log.userAgent || "";
+  
+  // Some apps leave their signature in User-Agent without referer
+  for (const rule of REFERER_RULES) {
+    if (rule.pattern.test(ua)) return rule.source;
+  }
+  
   for (const rule of BROWSER_RULES) {
     if (rule.pattern.test(ua)) return rule.source;
   }
