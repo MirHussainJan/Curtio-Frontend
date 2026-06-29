@@ -72,6 +72,7 @@ import {
   FaTwitter,
   FaViber,
   FaWhatsapp,
+  FaFacebookMessenger,
   FaYoutube,
   FaChrome,
   FaFirefox,
@@ -95,12 +96,13 @@ import {
   SiTorbrowser,
   SiBrave,
 } from "react-icons/si";
-const PREMIUM_USERS = ["mrabdullahamjid33@gmail.com"];
+const PREMIUM_USERS = ["mrabdullahamjid33@gmail.com", "mirhussainjan10387@gmail.com"];
 const COLORS = ["#4F46E5", "#F97316", "#22C55E", "#EAB308", "#EC4899"];
 
 const REFERER_RULES = [
   { source: "WhatsApp", pattern: /whatsapp/i, color: "#4F46E5", icon: FaWhatsapp },
-  { source: "Facebook", pattern: /facebook|fbav|fban/i, color: "#4F46E5", icon: FaFacebook },
+  { source: "Messenger", pattern: /messenger/i, color: "#4F46E5", icon: FaFacebookMessenger },
+  { source: "Facebook", pattern: /facebook|fbav|fban|fb_iab/i, color: "#4F46E5", icon: FaFacebook },
   { source: "Instagram", pattern: /instagram/i, color: "#4F46E5", icon: FaInstagram },
   { source: "TikTok", pattern: /tiktok|bytedance/i, color: "#4F46E5", icon: FaTiktok },
   { source: "YouTube", pattern: /youtube|youtu\.be/i, color: "#4F46E5", icon: FaYoutube },

@@ -95,7 +95,7 @@ import { SHORTENER_DOMAIN } from "../components/Shortner";
 import Sidebar from "../components/Sidebar";
 import Filter from "../components/filter";
 
-const PREMIUM_USERS = ["mrabdullahamjid33@gmail.com"];
+const PREMIUM_USERS = ["mrabdullahamjid33@gmail.com",  "mirhussainjan10387@gmail.com"];
 const COLORS = ["#4F46E5", "#F97316", "#22C55E", "#EAB308", "#EC4899"];
 
 const REFERER_RULES = [

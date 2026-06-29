@@ -29,7 +29,7 @@ import {
 import { SHORTENER_DOMAIN } from "../components/Shortner";
 import Sidebar from "../components/Sidebar";
 
-const PREMIUM_USERS = ["mrabdullahamjid33@gmail.com"];
+const PREMIUM_USERS = ["mrabdullahamjid33@gmail.com",  "mirhussainjan10387@gmail.com"];
 const baseUrl = import.meta.env.VITE_API_URL;
 
 function StatCard({ icon, label, value, sub }) {
