@@ -25,6 +25,8 @@ import {
   Menu,
   X,
   Pencil,
+  Edit,
+  Share2,
 } from "lucide-react";
 import { SHORTENER_DOMAIN } from "../components/Shortner";
 
@@ -861,6 +863,15 @@ export default function Dashboard() {
                         <td className="px-5 py-4" style={{ minWidth: "150px" }}>
                           <div className="flex items-center justify-end gap-1">
                             <button
+                              onClick={() => handleShare(link.id)}
+                              title="Share link"
+                              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-violet-600 transition-colors cursor-pointer"
+                            >
+                              <Share2 size={14} />
+                            </button>
+                            
+                            
+                            <button
                               onClick={() => handleCopy(link.id, link.short)}
                               title="Copy link"
                               className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
@@ -871,6 +882,7 @@ export default function Dashboard() {
                                 <Copy size={14} />
                               )}
                             </button>
+                            
                             <button
                               onClick={() => setQrLink(link)}
                               title="QR Code"
