@@ -45,10 +45,11 @@ import {
 import { SHORTENER_DOMAIN } from "../components/Shortner";
 import Sidebar from "../components/Sidebar";
 import Filter from "../components/filter";
+import ShareModal from "../components/LinkShareModal";
 
 const FREE_LIMIT = 100;
 import {
-  FaBots,
+  FaUpwork,
   FaConfluence,
   FaMountainSun,
   FaSignalMessenger,
@@ -95,6 +96,7 @@ import {
   SiZoom,
   SiTorbrowser,
   SiBrave,
+  SiClickup,
 } from "react-icons/si";
 const PREMIUM_USERS = ["mrabdullahamjid33@gmail.com", "mirhussainjan10387@gmail.com"];
 const COLORS = ["#4F46E5", "#F97316", "#22C55E", "#EAB308", "#EC4899"];
@@ -113,13 +115,25 @@ const REFERER_RULES = [
   { source: "Snapchat", pattern: /snapchat/i, color: "#4F46E5", icon: FaSnapchat },
   { source: "Discord", pattern: /discord/i, color: "#4F46E5", icon: FaDiscord },
   { source: "Telegram", pattern: /telegram|t\.me/i, color: "#4F46E5", icon: FaTelegramPlane },
-  { source: "Teams", pattern: /teams\.microsoft/i, color: "#4F46E5", icon: BiLogoMicrosoftTeams },
+  { source: "Teams", pattern: /teams\.microsoft|teams\.cdn\.office|onecdn\.static\.microsoft/i, color: "#4F46E5", icon: BiLogoMicrosoftTeams },
   { source: "Slack", pattern: /slack/i, color: "#4F46E5", icon: FaSlack },
   { source: "Gmail", pattern: /mail\.google/i, color: "#4F46E5", icon: SiGmail },
   { source: "Outlook", pattern: /outlook/i, color: "#4F46E5", icon: PiMicrosoftOutlookLogoDuotone },
   { source: "WeChat", pattern: /wechat|micromessenger/i, color: "#4F46E5", icon: IoLogoWechat },
   { source: "Line", pattern: /line/i, color: "#4F46E5", icon: FaLine },
   { source: "Viber", pattern: /viber/i, color: "#4F46E5", icon: FaViber },
+  // ── newly added, matches icons you already imported ──
+  { source: "Asana", pattern: /asana/i, color: "#4F46E5", icon: SiAsana },
+  { source: "Trello", pattern: /trello/i, color: "#4F46E5", icon: FaTrello },
+  { source: "ClickUp", pattern: /clickup/i, color: "#4F46E5", icon: SiClickup },
+  { source: "Confluence", pattern: /atlassian|confluence/i, color: "#4F46E5", icon: FaConfluence },
+  { source: "Upwork", pattern: /upwork/i, color: "#4F46E5", icon: FaUpwork},
+  { source: "Zoom", pattern: /zoom\.us/i, color: "#4F46E5", icon: SiZoom },
+  { source: "Google Meet", pattern: /meet\.google/i, color: "#4F46E5", icon: SiGooglemeet },
+  { source: "Notion", pattern: /notion\.so/i, color: "#4F46E5", icon: SiNotion },
+  { source: "Twitch", pattern: /twitch/i, color: "#4F46E5", icon: FaTwitch },
+  { source: "Yahoo", pattern: /yahoo/i, color: "#4F46E5", icon: FaYahoo },
+  { source: "Signal", pattern: /signal/i, color: "#4F46E5", icon: FaSignal },
 ];
 
 const BROWSER_RULES = [
@@ -131,31 +145,34 @@ const BROWSER_RULES = [
   { source: "Firefox", pattern: /Firefox|FxiOS/i, color: "#4F46E5", icon: FaFirefox },
   { source: "Internet Explorer", pattern: /Trident|MSIE/i, color: "#4F46E5", icon: FaInternetExplorer },
   { source: "Chrome", pattern: /Chrome|CriOS/i, color: "#4F46E5", icon: FaChrome },
-  { source: "iOS Safari", pattern: /Mobile.*Safari/i, color: "#4F46E5", icon: FaSafari },
   { source: "Safari", pattern: /Safari/i, color: "#4F46E5", icon: FaSafari },
 ];
 
 function detectSource(log) {
-  if (log.source && log.source !== "unknown" && log.source !== "Direct") {
-    return log.source;
-  }
   const ref = log.referer || "";
   const ua = log.userAgent || "";
-  
-  if (ref) {
-    for (const rule of REFERER_RULES) {
-      if (rule.pattern.test(ref)) return rule.source;
-    }
+
+  // 1. Try to identify a real platform from referer
+  for (const rule of REFERER_RULES) {
+    if (rule.pattern.test(ref)) return rule.source;
   }
-  
-  // Some apps leave their signature in User-Agent without referer
+
+  // 2. Some apps leave a signature in the User-Agent instead of a referer
   for (const rule of REFERER_RULES) {
     if (rule.pattern.test(ua)) return rule.source;
   }
-  
+
+  // 3. If backend already tagged a real platform (not a browser fallback), trust it
+  const isBrowserLabel = BROWSER_RULES.some((r) => r.source === log.source);
+  if (log.source && log.source !== "unknown" && log.source !== "Direct" && !isBrowserLabel) {
+    return log.source;
+  }
+
+  // 4. Otherwise fall back to browser detection
   for (const rule of BROWSER_RULES) {
     if (rule.pattern.test(ua)) return rule.source;
   }
+
   return "Direct";
 }
 
@@ -422,6 +439,7 @@ export default function AnalytcsDashboard() {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(null);
   const [qrLink, setQrLink] = useState(null);
+  const [shareLink, setShareLink] = useState(null);
   const [deleteModal, setDeleteModal] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -773,6 +791,7 @@ export default function AnalytcsDashboard() {
   return (
     <div className="min-h-screen bg-slate-50">
       {qrLink && <QrModal link={qrLink} onClose={() => setQrLink(null)} />}
+      {shareLink && <ShareModal link={shareLink} onClose={() => setShareLink(null)} />}
       {deleteModal && (
         <DeleteModal
           onConfirm={performDelete}
@@ -1253,6 +1272,13 @@ export default function AnalytcsDashboard() {
                           </td>
                           <td className="py-3 pl-3 text-right">
                             <div className="flex items-center justify-end gap-1">
+                              <button
+                                onClick={() => setShareLink(link)}
+                                title="Share on WhatsApp"
+                                className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-green-600 transition-colors cursor-pointer"
+                              >
+                                <FaWhatsapp size={13} />
+                              </button>
                               <button
                                 onClick={() => handleCopy(link.id, link.short)}
                                 title="Copy Link"

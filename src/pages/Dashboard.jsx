@@ -30,8 +30,10 @@ import {
 } from "lucide-react";
 import { SHORTENER_DOMAIN } from "../components/Shortner";
 import Sidebar from "../components/Sidebar";
+import { FaWhatsapp } from "react-icons/fa6";
+import ShareModal from "../components/LinkShareModal";
 
-const PREMIUM_USERS = ["mrabdullahamjid33@gmail.com",  "mirhussainjan10387@gmail.com"];
+const PREMIUM_USERS = ["mrabdullahamjid33@gmail.com", "mirhussainjan10387@gmail.com"];
 const baseUrl = import.meta.env.VITE_API_URL;
 
 function StatCard({ icon, label, value, sub }) {
@@ -226,6 +228,7 @@ function LimitModal({ onClose }) {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [shareLink, setShareLink] = useState(null);
 
   const getStoredUser = () => {
     const data =
@@ -284,7 +287,7 @@ export default function Dashboard() {
 
   const calculateReturningUsers = () => {
     const deviceCounts = {};
-    
+
     links.forEach(l => {
       if (l.clickLogs) {
         l.clickLogs.forEach(log => {
@@ -315,14 +318,14 @@ export default function Dashboard() {
       setLoadingLinks(false);
       return;
     }
-    
+
     fetchLinks();
-    
+
     // Poll for real-time updates every 3 seconds
     const interval = setInterval(() => {
       fetchLinks(true);
     }, 3000);
-    
+
     return () => clearInterval(interval);
   }, [token]);
 
@@ -480,6 +483,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-slate-50">
       {qrLink && <QrModal link={qrLink} onClose={() => setQrLink(null)} />}
+      {shareLink && <ShareModal link={shareLink} onClose={() => setShareLink(null)} />}
       {deleteModal && (
         <DeleteModal
           onConfirm={performDelete}
@@ -825,14 +829,16 @@ export default function Dashboard() {
                         <td className="px-5 py-4" style={{ minWidth: "150px" }}>
                           <div className="flex items-center justify-end gap-1">
                             <button
-                              onClick={() => handleShare(link.id)}
-                              title="Share link"
+                              onClick={() => setShareLink(link)}
+                              title="Share on WhatsApp"
                               className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-violet-600 transition-colors cursor-pointer"
                             >
-                              <Share2 size={14} />
+                              <FaWhatsapp size={14} />
                             </button>
-                            
-                            
+
+
+
+
                             <button
                               onClick={() => handleCopy(link.id, link.short)}
                               title="Copy link"
@@ -844,7 +850,7 @@ export default function Dashboard() {
                                 <Copy size={14} />
                               )}
                             </button>
-                            
+
                             <button
                               onClick={() => setQrLink(link)}
                               title="QR Code"
