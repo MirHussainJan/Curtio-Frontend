@@ -69,7 +69,7 @@ export default function Landing() {
 
     if (token) {
       try {
-          const baseUrl = import.meta.env.VITE_API_BASE_URL;
+        const baseUrl = import.meta.env.VITE_API_BASE_URL;
         const res = await fetch(`${baseUrl}/urls`, {
           method: 'POST',
           headers: {
@@ -227,8 +227,8 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Free vs Registered */}
-      <section className="py-10 md:py-20 px-6">
+    
+      {/* <section className="py-10 md:py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
@@ -239,7 +239,7 @@ export default function Landing() {
             </p>
           </div>
           <div className="grid sm:grid-cols-2 gap-5">
-            {/* Guest */}
+         
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-7">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-xs font-bold uppercase tracking-widest text-slate-500">Guest</span>
@@ -268,7 +268,6 @@ export default function Landing() {
               </Link>
             </div>
 
-            {/* Free Account */}
             <div className="bg-white border-2 border-indigo-500 rounded-2xl p-7 relative shadow-lg shadow-indigo-100">
               <div className="absolute -top-3 left-6">
                 <span className="bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full">
@@ -298,7 +297,7 @@ export default function Landing() {
             One tracked link is all most people need. Use it for your most important destination — portfolio, landing page, calendar link.
           </p>
         </div>
-      </section>
+      </section> */}
 
       {/* Features grid */}
       <section className="py-10 md:py-20 px-6 bg-slate-50 border-y border-slate-100">

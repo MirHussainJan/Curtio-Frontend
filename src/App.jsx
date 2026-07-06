@@ -12,6 +12,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/Fpassword";
 
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -66,6 +67,7 @@ export default function App() {
 
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
+
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

@@ -7,6 +7,20 @@ export default function Navbar({ dark = false }) {
   const isDashboard = location.pathname === '/dashboard'
   const [mobileOpen, setMobileOpen] = useState(false)
 
+  const getStoredUser = () => {
+    const data = localStorage.getItem("LoginUser") || localStorage.getItem("user");
+    if (!data || data === "undefined") return null;
+    try {
+      return JSON.parse(data);
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const storedUser = getStoredUser();
+  const userInitial = storedUser?.name ? storedUser.name.charAt(0).toUpperCase() : "";
+  const isLoggedIn = !!storedUser;
+
   const base = dark
     ? 'bg-slate-900/80 backdrop-blur-md border-slate-800'
     : 'bg-white/80 backdrop-blur-md border-slate-200'
@@ -29,19 +43,24 @@ export default function Navbar({ dark = false }) {
 
         {/* Desktop nav */}
         <div className="hidden sm:flex items-center gap-5">
-          {!isDashboard && (
+          <Link to="/blog" className={`text-sm font-medium transition-colors ${linkCls}`}>Blog</Link>
+          
+          {isLoggedIn ? (
+            <div className="flex items-center gap-4">
+              <Link to="/dashboard/analytics" className={`text-sm font-medium transition-colors ${linkCls}`}>
+                Dashboard
+              </Link>
+              <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm cursor-pointer hover:opacity-90 transition-opacity">
+                {userInitial}
+              </div>
+            </div>
+          ) : (
             <>
-              <Link to="/blog" className={`text-sm font-medium transition-colors ${linkCls}`}>Blog</Link>
               <Link to="/login" className={`text-sm font-medium transition-colors ${linkCls}`}>Sign In</Link>
               <Link to="/register" className="text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm">
                 Get Started Free
               </Link>
             </>
-          )}
-          {isDashboard && (
-            <button className="text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors">
-              Sign Out
-            </button>
           )}
         </div>
 
@@ -58,10 +77,16 @@ export default function Navbar({ dark = false }) {
       {mobileOpen && (
         <div className={`sm:hidden border-t px-6 py-4 flex flex-col gap-3 ${dark ? 'border-slate-800 bg-slate-900' : 'border-slate-100 bg-white'}`}>
           <Link to="/blog" className={`text-sm font-medium ${linkCls}`} onClick={() => setMobileOpen(false)}>Blog</Link>
-          <Link to="/login" className={`text-sm font-medium ${linkCls}`} onClick={() => setMobileOpen(false)}>Sign In</Link>
-          <Link to="/register" className="text-sm font-semibold bg-indigo-600 text-white px-4 py-2 rounded-lg text-center" onClick={() => setMobileOpen(false)}>
-            Get Started Free
-          </Link>
+          {isLoggedIn ? (
+            <Link to="/dashboard/analytics" className={`text-sm font-medium ${linkCls}`} onClick={() => setMobileOpen(false)}>Dashboard</Link>
+          ) : (
+            <>
+              <Link to="/login" className={`text-sm font-medium ${linkCls}`} onClick={() => setMobileOpen(false)}>Sign In</Link>
+              <Link to="/register" className="text-sm font-semibold bg-indigo-600 text-white px-4 py-2 rounded-lg text-center" onClick={() => setMobileOpen(false)}>
+                Get Started Free
+              </Link>
+            </>
+          )}
         </div>
       )}
     </nav>

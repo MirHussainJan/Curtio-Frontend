@@ -27,19 +27,145 @@ import {
   FolderOpen,
   ChevronRight,
   ArrowLeft,
-  Target
+  Target,
 } from "lucide-react";
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, BarChart, Bar
+  FaBots,
+  FaConfluence,
+  FaMountainSun,
+  FaSignalMessenger,
+  FaSlack,
+  FaTrello,
+  FaTwitch,
+  FaYahoo,
+} from "react-icons/fa6";
+import {
+  FaDiscord,
+  FaFacebook,
+  FaInstagram,
+  FaLine,
+  FaLinkedin,
+  FaPinterest,
+  FaReddit,
+  FaSignal,
+  FaSnapchat,
+  FaTelegramPlane,
+  FaTiktok,
+  FaTwitter,
+  FaViber,
+  FaWhatsapp,
+  FaYoutube,
+  FaChrome,
+  FaFirefox,
+  FaSafari,
+  FaEdge,
+  FaOpera,
+  FaInternetExplorer,
+} from "react-icons/fa";
+import { IoLogoWechat } from "react-icons/io5";
+import { IoIosMail } from "react-icons/io";
+import { PiMicrosoftOutlookLogoDuotone } from "react-icons/pi";
+import { BiLogoMicrosoftTeams } from "react-icons/bi";
+import {
+  SiAsana,
+  SiGmail,
+  SiGooglemeet,
+  SiKik,
+  SiNotion,
+  SiThunderbird,
+  SiZoom,
+  SiTorbrowser,
+  SiBrave,
+} from "react-icons/si";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
 } from "recharts";
 import { SHORTENER_DOMAIN } from "../components/Shortner";
+import Sidebar from "../components/Sidebar";
+import Filter from "../components/filter";
 
+const PREMIUM_USERS = ["mrabdullahamjid33@gmail.com",  "mirhussainjan10387@gmail.com"];
 const COLORS = ["#4F46E5", "#F97316", "#22C55E", "#EAB308", "#EC4899"];
+
+const REFERER_RULES = [
+  { source: "WhatsApp", pattern: /whatsapp/i, color: "#4F46E5", icon: FaWhatsapp },
+  { source: "Facebook", pattern: /facebook|fbav|fban/i, color: "#4F46E5", icon: FaFacebook },
+  { source: "Instagram", pattern: /instagram/i, color: "#4F46E5", icon: FaInstagram },
+  { source: "TikTok", pattern: /tiktok|bytedance/i, color: "#4F46E5", icon: FaTiktok },
+  { source: "YouTube", pattern: /youtube|youtu\.be/i, color: "#4F46E5", icon: FaYoutube },
+  { source: "LinkedIn", pattern: /linkedin/i, color: "#4F46E5", icon: FaLinkedin },
+  { source: "Twitter", pattern: /twitter|t\.co/i, color: "#4F46E5", icon: FaTwitter },
+  { source: "Reddit", pattern: /reddit/i, color: "#4F46E5", icon: FaReddit },
+  { source: "Pinterest", pattern: /pinterest/i, color: "#4F46E5", icon: FaPinterest },
+  { source: "Snapchat", pattern: /snapchat/i, color: "#4F46E5", icon: FaSnapchat },
+  { source: "Discord", pattern: /discord/i, color: "#4F46E5", icon: FaDiscord },
+  { source: "Telegram", pattern: /telegram|t\.me/i, color: "#4F46E5", icon: FaTelegramPlane },
+  { source: "Teams", pattern: /teams\.microsoft/i, color: "#4F46E5", icon: BiLogoMicrosoftTeams },
+  { source: "Slack", pattern: /slack/i, color: "#4F46E5", icon: FaSlack },
+  { source: "Gmail", pattern: /mail\.google/i, color: "#4F46E5", icon: SiGmail },
+  { source: "Outlook", pattern: /outlook/i, color: "#4F46E5", icon: PiMicrosoftOutlookLogoDuotone },
+  { source: "WeChat", pattern: /wechat|micromessenger/i, color: "#4F46E5", icon: IoLogoWechat },
+  { source: "Line", pattern: /line/i, color: "#4F46E5", icon: FaLine },
+  { source: "Viber", pattern: /viber/i, color: "#4F46E5", icon: FaViber },
+];
+
+const BROWSER_RULES = [
+  { source: "Hola Browser", pattern: /Hola/i, color: "#4F46E5", icon: Globe },
+  { source: "Opera", pattern: /Opera|OPR\//i, color: "#4F46E5", icon: FaOpera },
+  { source: "Edge", pattern: /Edg\//i, color: "#4F46E5", icon: FaEdge },
+  { source: "Brave", pattern: /Brave/i, color: "#4F46E5", icon: SiBrave },
+  { source: "Tor", pattern: /TorBrowser/i, color: "#4F46E5", icon: SiTorbrowser },
+  { source: "Firefox", pattern: /Firefox|FxiOS/i, color: "#4F46E5", icon: FaFirefox },
+  { source: "Internet Explorer", pattern: /Trident|MSIE/i, color: "#4F46E5", icon: FaInternetExplorer },
+  { source: "Chrome", pattern: /Chrome|CriOS/i, color: "#4F46E5", icon: FaChrome },
+  { source: "iOS Safari", pattern: /Mobile.*Safari/i, color: "#4F46E5", icon: FaSafari },
+  { source: "Safari", pattern: /Safari/i, color: "#4F46E5", icon: FaSafari },
+];
+
+function detectSource(log) {
+  if (log.source && log.source !== "unknown" && log.source !== "Direct") {
+    return log.source;
+  }
+  const ref = log.referer || "";
+  const ua = log.userAgent || "";
+  
+  if (ref) {
+    for (const rule of REFERER_RULES) {
+      if (rule.pattern.test(ref)) return rule.source;
+    }
+  }
+  
+  for (const rule of REFERER_RULES) {
+    if (rule.pattern.test(ua)) return rule.source;
+  }
+  
+  for (const rule of BROWSER_RULES) {
+    if (rule.pattern.test(ua)) return rule.source;
+  }
+  return "Direct";
+}
+
+const ALL_RULES = [...REFERER_RULES, ...BROWSER_RULES];
+const platformIconMap = Object.fromEntries(
+  ALL_RULES.map((r) => [r.source, r.icon]),
+);
 
 function StatCard({ icon, label, value, sub, className = "" }) {
   return (
-    <div className={`bg-white border border-slate-100 rounded-2xl p-5 shadow-sm ${className}`}>
+    <div
+      className={`bg-white border border-slate-100 rounded-2xl p-5 shadow-sm ${className}`}
+    >
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm font-medium text-slate-500">{label}</span>
         <div className="w-9 h-9 bg-indigo-50 rounded-xl flex items-center justify-center">
@@ -54,7 +180,9 @@ function StatCard({ icon, label, value, sub, className = "" }) {
 
 function Card({ children, className = "" }) {
   return (
-    <div className={`bg-white border border-slate-100 rounded-2xl shadow-sm ${className}`}>
+    <div
+      className={`bg-white border border-slate-100 rounded-2xl shadow-sm ${className}`}
+    >
       {children}
     </div>
   );
@@ -82,30 +210,34 @@ function QrModal({ link, onClose }) {
     setQrReady(false);
     setQrError("");
 
-    import("qrcode").then((QRCode) => {
-      if (cancelled || !canvasRef.current) return;
-      QRCode.toCanvas(
-        canvasRef.current,
-        link.short,
-        {
-          width: 200,
-          margin: 2,
-          color: { dark: "#4F46E5", light: "#F8FAFC" },
-        },
-        (err) => {
-          if (cancelled) return;
-          if (err) {
-            setQrError("Failed to generate QR code.");
-          } else {
-            setQrReady(true);
-          }
-        }
-      );
-    }).catch(() => {
-      if (!cancelled) setQrError("Could not load QR library.");
-    });
+    import("qrcode")
+      .then((QRCode) => {
+        if (cancelled || !canvasRef.current) return;
+        QRCode.toCanvas(
+          canvasRef.current,
+          link.short,
+          {
+            width: 200,
+            margin: 2,
+            color: { dark: "#4F46E5", light: "#F8FAFC" },
+          },
+          (err) => {
+            if (cancelled) return;
+            if (err) {
+              setQrError("Failed to generate QR code.");
+            } else {
+              setQrReady(true);
+            }
+          },
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setQrError("Could not load QR library.");
+      });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [link.short]);
 
   function handleDownload() {
@@ -201,9 +333,24 @@ function DeleteModal({ onConfirm, onCancel, deleting }) {
             className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {deleting ? (
-              <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+              <svg
+                className="animate-spin w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8z"
+                />
               </svg>
             ) : (
               <>
@@ -212,6 +359,36 @@ function DeleteModal({ onConfirm, onCancel, deleting }) {
             )}
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function LimitModal({ onClose }) {
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl p-6 sm:p-8 max-w-sm w-full shadow-2xl text-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Zap size={22} className="text-indigo-600" fill="currentColor" />
+        </div>
+        <h3 className="font-extrabold text-slate-900 text-lg mb-1">
+          Plan Limit Reached
+        </h3>
+        <p className="text-slate-500 text-sm mb-6">
+          You have reached the maximum number of active links for your current plan. Please upgrade to create more tracked links.
+        </p>
+        <button
+          onClick={onClose}
+          className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors cursor-pointer"
+        >
+          Understood
+        </button>
       </div>
     </div>
   );
@@ -244,14 +421,104 @@ export default function Campaigns() {
 
   const token = localStorage.getItem("apiToken");
 
+  const isPremium = PREMIUM_USERS.includes(userEmail);
+  const FREE_LIMIT = isPremium ? Infinity : 1;
+
+  // Helper function to format date as YYYY-MM-DD
+  const formatDateToString = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  // Calculate date range: today to 7 days ago
+  const today = new Date();
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const defaultEndDate = formatDateToString(tomorrow);
+  const defaultStartDate = formatDateToString(sevenDaysAgo);
+
   const [links, setLinks] = useState([]);
+
+  // Calculate total links across all campaigns to determine if atLimit
+  const atLimit = !isPremium && links.length >= FREE_LIMIT;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(null);
   const [qrLink, setQrLink] = useState(null);
   const [deleteModal, setDeleteModal] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [showLimitModal, setShowLimitModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [startDate, setStartDate] = useState(defaultStartDate);
+  const [endDate, setEndDate] = useState(defaultEndDate);
+  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedDevice, setSelectedDevice] = useState("");
+  const [selectedSource, setSelectedSource] = useState("");
+  const [pendingStartDate, setPendingStartDate] = useState(defaultStartDate);
+  const [pendingEndDate, setPendingEndDate] = useState(defaultEndDate);
+  const [pendingCountry, setPendingCountry] = useState(selectedCountry);
+  const [pendingDevice, setPendingDevice] = useState(selectedDevice);
+  const [pendingSource, setPendingSource] = useState(selectedSource);
+
+  const [calendarYear, setCalendarYear] = useState(today.getFullYear());
+  const [calendarMonth, setCalendarMonth] = useState(today.getMonth());
+
+  function prevMonth() {
+    if (calendarMonth === 0) {
+      setCalendarMonth(11);
+      setCalendarYear((y) => y - 1);
+    } else {
+      setCalendarMonth((m) => m - 1);
+    }
+  }
+
+  function nextMonth() {
+    if (calendarMonth === 11) {
+      setCalendarMonth(0);
+      setCalendarYear((y) => y + 1);
+    } else {
+      setCalendarMonth((m) => m + 1);
+    }
+  }
+
+  const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+  const firstDayOfWeek = new Date(calendarYear, calendarMonth, 1).getDay();
+
+  const handleDateClick = (dateStr) => {
+    if (!pendingStartDate || (pendingStartDate && pendingEndDate)) {
+      setPendingStartDate(dateStr);
+      setPendingEndDate("");
+    } else if (dateStr < pendingStartDate) {
+      setPendingEndDate(pendingStartDate);
+      setPendingStartDate(dateStr);
+    } else {
+      setPendingEndDate(dateStr);
+    }
+  };
+
+  useEffect(() => {
+    if (filterOpen) {
+      setPendingStartDate(startDate);
+      setPendingEndDate(endDate);
+      setPendingCountry(selectedCountry);
+      setPendingDevice(selectedDevice);
+      setPendingSource(selectedSource);
+    }
+  }, [
+    filterOpen,
+    startDate,
+    endDate,
+    selectedCountry,
+    selectedDevice,
+    selectedSource,
+  ]);
 
   // Campaign State
   const [selectedCampaign, setSelectedCampaign] = useState(null); // name of the campaign, or null for overview
@@ -268,16 +535,24 @@ export default function Campaigns() {
   const [expiresAt, setExpiresAt] = useState("");
 
   useEffect(() => {
-    if (token) {
-      fetchUrls();
-    } else {
+    if (!token) {
       setLoading(false);
+      return;
     }
+
+    fetchUrls();
+
+    // Poll for real-time updates every 3 seconds
+    const interval = setInterval(() => {
+      fetchUrls(true);
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, [token]);
 
-  async function fetchUrls() {
-    setLoading(true);
-    setError("");
+  async function fetchUrls(background = false) {
+    if (!background) setLoading(true);
+    if (!background) setError("");
     try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL;
       const res = await fetch(`${baseUrl}/urls`, {
@@ -301,12 +576,13 @@ export default function Campaigns() {
         }));
         setLinks(mapped);
       } else {
-        setError(data.message || "Failed to fetch URLs.");
+        if (!background) setError(data.message || "Failed to fetch URLs.");
       }
     } catch (err) {
-      setError("Network error. Could not retrieve link statistics.");
+      if (!background)
+        setError("Network error. Could not retrieve link statistics.");
     } finally {
-      setLoading(false);
+      if (!background) setLoading(false);
     }
   }
 
@@ -340,6 +616,26 @@ export default function Campaigns() {
     }
   }
 
+  function logMatchesFilters(log) {
+    const clickedAt = log.clickedAt
+      ? new Date(log.clickedAt).toISOString().slice(0, 10)
+      : null;
+    if (startDate && clickedAt && clickedAt < startDate) return false;
+    if (endDate && clickedAt && clickedAt > endDate) return false;
+    const ua = (log.userAgent || "").toLowerCase();
+    const detectDevice = () => {
+      if (/mobile|android|iphone|phone/i.test(ua)) return "Mobile";
+      if (/tablet|ipad|playbook|silk/i.test(ua)) return "Tablet";
+      return "Desktop";
+    };
+    if (selectedDevice && detectDevice() !== selectedDevice) return false;
+    if (selectedCountry && (log.country || "") !== selectedCountry)
+      return false;
+    const matchedSource = detectSource(log);
+    if (selectedSource && matchedSource !== selectedSource) return false;
+    return true;
+  }
+
   // Group links by campaigns
   const campaignsMap = {};
   links.forEach((link) => {
@@ -347,24 +643,25 @@ export default function Campaigns() {
     if (campaign && campaign.trim()) {
       const name = campaign.trim();
       if (!campaignsMap[name]) {
-        campaignsMap[name] = {
-          name,
-          links: [],
-          clicks: 0,
-          activeCount: 0,
-        };
+        campaignsMap[name] = { name, links: [], clicks: 0, activeCount: 0 };
       }
       campaignsMap[name].links.push(link);
-      campaignsMap[name].clicks += link.clicks;
-      if (link.active) {
-        campaignsMap[name].activeCount += 1;
-      }
+      const linkFilteredCount = (link.clickLogs || []).filter(
+        logMatchesFilters,
+      ).length;
+      campaignsMap[name].clicks += linkFilteredCount;
+      if (link.active) campaignsMap[name].activeCount += 1;
     }
   });
 
-  const campaignsList = Object.values(campaignsMap).sort((a, b) => b.clicks - a.clicks);
+  const campaignsList = Object.values(campaignsMap).sort(
+    (a, b) => b.clicks - a.clicks,
+  );
   const totalCampaigns = campaignsList.length;
-  const totalCampaignClicks = campaignsList.reduce((sum, c) => sum + c.clicks, 0);
+  const totalCampaignClicks = campaignsList.reduce(
+    (sum, c) => sum + c.clicks,
+    0,
+  );
 
   // Dynamic calculations for selected campaign
   let campaignLinks = [];
@@ -379,100 +676,96 @@ export default function Campaigns() {
     if (selectedCampaignData) {
       campaignLinks = selectedCampaignData.links;
 
-      // Clicks over time for selected campaign
+      const allFilteredLogs = [];
+      campaignLinks.forEach((l) => {
+        (l.clickLogs || []).forEach((log) => {
+          if (logMatchesFilters(log)) {
+            allFilteredLogs.push(log);
+          }
+        });
+      });
+
+      const parseDate = (value) => {
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? null : date;
+      };
+
+      const chartStart = parseDate(startDate);
+      const chartEnd = parseDate(endDate);
       const daysMap = {};
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+
+      const rangeStart =
+        chartStart || new Date(new Date().setDate(new Date().getDate() - 6));
+      const rangeEnd = chartEnd || chartStart || new Date();
+
+      const iterator = new Date(rangeStart);
+      while (iterator <= rangeEnd) {
+        const dateStr = iterator.toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+        });
         daysMap[dateStr] = 0;
+        iterator.setDate(iterator.getDate() + 1);
       }
 
-      campaignLinks.forEach((l) => {
-        if (l.clickLogs) {
-          l.clickLogs.forEach((log) => {
-            const dateStr = new Date(log.clickedAt).toLocaleDateString(undefined, {
-              month: "short",
-              day: "numeric",
-            });
-            if (daysMap[dateStr] !== undefined) {
-              daysMap[dateStr] += 1;
-            }
-          });
-        }
+      allFilteredLogs.forEach((log) => {
+        const clickedAt = log.clickedAt ? new Date(log.clickedAt) : null;
+        if (!clickedAt) return;
+        if (chartStart && clickedAt < chartStart) return;
+        if (chartEnd && clickedAt > chartEnd) return;
+        const dateStr = clickedAt.toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+        });
+        if (daysMap[dateStr] !== undefined) daysMap[dateStr]++;
       });
 
       Object.keys(daysMap).forEach((date) => {
         clickHistory.push({ date, clicks: daysMap[date] });
       });
 
-      // Device breakdown for selected campaign
-      let mobile = 0, desktop = 0, tablet = 0, loggedClicks = 0;
-      campaignLinks.forEach((l) => {
-        if (l.clickLogs) {
-          l.clickLogs.forEach((log) => {
-            loggedClicks++;
-            const ua = log.userAgent.toLowerCase();
-            if (/mobile|android|iphone|ipad|phone/i.test(ua)) {
-              mobile++;
-            } else if (/tablet|ipad|playbook|silk/i.test(ua)) {
-              tablet++;
-            } else {
-              desktop++;
-            }
-          });
-        }
+      let mobile = 0,
+        desktop = 0,
+        tablet = 0;
+      allFilteredLogs.forEach((log) => {
+        const ua = (log.userAgent || "").toLowerCase();
+        if (/mobile|android|iphone|phone/i.test(ua)) mobile++;
+        else if (/tablet|ipad|playbook|silk/i.test(ua)) tablet++;
+        else desktop++;
       });
 
-      const divider = loggedClicks || 1;
-      const deviceData = [
+      const divider = allFilteredLogs.length || 1;
+      finalDeviceData = [
         { name: "Desktop", value: Math.round((desktop / divider) * 100) },
         { name: "Mobile", value: Math.round((mobile / divider) * 100) },
         { name: "Tablet", value: Math.round((tablet / divider) * 100) },
       ].filter((d) => d.value > 0);
 
-      finalDeviceData = deviceData;
-
-      // Referrers for selected campaign
-      let direct = 0, social = 0, organic = 0;
-      campaignLinks.forEach((l) => {
-        if (l.clickLogs) {
-          l.clickLogs.forEach((log) => {
-            const ua = log.userAgent.toLowerCase();
-            if (/twitter|t.co|x.com|facebook|fb|instagram|linkedin/i.test(ua)) {
-              social++;
-            } else if (/google|yahoo|bing|duckduckgo/i.test(ua)) {
-              organic++;
-            } else {
-              direct++;
-            }
-          });
-        }
+      const sourceCounts = {};
+      allFilteredLogs.forEach((log) => {
+        const src = detectSource(log);
+        sourceCounts[src] = (sourceCounts[src] || 0) + 1;
       });
+      referrerData = Object.entries(sourceCounts)
+        .map(([source, visits]) => ({
+          source,
+          visits,
+          color: "#4F46E5",
+        }))
+        .sort((a, b) => b.visits - a.visits);
 
-      referrerData = [
-        { source: "Social Media", visits: social },
-        { source: "Search Engines", visits: organic },
-        { source: "Direct / Email", visits: direct || (selectedCampaignData.clicks - social - organic) },
-      ].filter(r => r.visits >= 0);
-
-      // Geographic breakdown for selected campaign
       const geoDataMap = {};
-      campaignLinks.forEach((l) => {
-        if (l.clickLogs) {
-          l.clickLogs.forEach((log) => {
-            const countryName = log.country || "Unknown";
-            const countryCode = log.countryCode || "unknown";
-            if (!geoDataMap[countryName]) {
-              geoDataMap[countryName] = {
-                country: countryName,
-                countryCode: countryCode,
-                clicks: 0,
-              };
-            }
-            geoDataMap[countryName].clicks += 1;
-          });
+      allFilteredLogs.forEach((log) => {
+        const countryName = log.country || "Unknown";
+        const countryCode = log.countryCode || "unknown";
+        if (!geoDataMap[countryName]) {
+          geoDataMap[countryName] = {
+            country: countryName,
+            countryCode,
+            clicks: 0,
+          };
         }
+        geoDataMap[countryName].clicks += 1;
       });
 
       const getFlagEmoji = (code) => {
@@ -488,15 +781,13 @@ export default function Campaigns() {
         }
       };
 
-      const geoData = Object.values(geoDataMap)
+      finalGeoData = Object.values(geoDataMap)
         .sort((a, b) => b.clicks - a.clicks)
         .map((g) => ({
           country: g.country,
           flag: getFlagEmoji(g.countryCode),
           clicks: g.clicks,
         }));
-
-      finalGeoData = geoData;
     }
   }
 
@@ -526,7 +817,9 @@ export default function Campaigns() {
         setLinks((prev) => prev.filter((l) => l.id !== id));
         setDeleteModal(null);
         if (selectedCampaignData) {
-          const updatedLinks = selectedCampaignData.links.filter((l) => l.id !== id);
+          const updatedLinks = selectedCampaignData.links.filter(
+            (l) => l.id !== id,
+          );
           if (updatedLinks.length === 0) {
             setSelectedCampaign(null);
           }
@@ -555,8 +848,8 @@ export default function Campaigns() {
       if (data.success) {
         setLinks((prev) =>
           prev.map((l) =>
-            l.id === id ? { ...l, active: data.url.active } : l
-          )
+            l.id === id ? { ...l, active: data.url.active } : l,
+          ),
         );
       } else {
         setError(data.message || "Failed to update link status.");
@@ -586,7 +879,12 @@ export default function Campaigns() {
         throw new Error("Campaign Name is required.");
       }
 
-      const finalUrl = buildFinalUrl(destUrl, activeCampaign, utmSource, utmMedium);
+      const finalUrl = buildFinalUrl(
+        destUrl,
+        activeCampaign,
+        utmSource,
+        utmMedium,
+      );
       const baseUrl = import.meta.env.VITE_API_BASE_URL;
       const res = await fetch(`${baseUrl}/urls`, {
         method: "POST",
@@ -629,7 +927,9 @@ export default function Campaigns() {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center">
         <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent mb-4"></div>
-        <p className="text-slate-500 font-semibold text-sm">Loading campaign manager...</p>
+        <p className="text-slate-500 font-semibold text-sm">
+          Loading campaign manager...
+        </p>
       </div>
     );
   }
@@ -644,88 +944,16 @@ export default function Campaigns() {
           deleting={deleting}
         />
       )}
-
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-20 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      {showLimitModal && <LimitModal onClose={() => setShowLimitModal(false)} />}
 
       <div className="flex min-h-screen">
-        {/* ── Sidebar ── */}
-        <aside
-          className={`
-            fixed top-0 left-0 bottom-0 z-30 w-64 bg-white border-r border-slate-100
-            flex flex-col py-6 px-4
-            transition-transform duration-300 ease-in-out
-            ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-            md:translate-x-0
-          `}
-        >
-          {/* Close button — mobile only */}
-          <div className="flex justify-end mb-2 md:hidden">
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500"
-            >
-              <X size={20} />
-            </button>
-          </div>
-
-          <Link to="/" className="flex items-center gap-2 px-2 mb-8">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
-              <Zap size={15} className="text-white" fill="white" />
-            </div>
-            <span className="text-lg font-extrabold text-slate-900">Brevly</span>
-          </Link>
-
-          <nav className="flex flex-col gap-1 flex-1">
-            <Link
-              to="/dashboard"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-            >
-              <LinkIcon size={16} /> My Links
-            </Link>
-            <Link
-              to="/dashboard/analytics"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-            >
-              <BarChart2 size={16} /> Analytics
-            </Link>
-            <Link
-              to="/dashboard/campaigns"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors text-left bg-indigo-50 text-indigo-700"
-            >
-              <TrendingUp size={16} /> Campaigns
-            </Link>
-          </nav>
-
-          <div className="border-t border-gray-400 pt-4">
-            <div className="flex items-center gap-3 px-2 mb-3 min-w-0">
-              <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0">
-                {userInitial}
-              </div>
-              <div className="min-w-0">
-                <div className="text-sm font-semibold text-slate-800 truncate">{userName}</div>
-                <div className="text-xs text-slate-400 truncate">{userEmail}</div>
-              </div>
-            </div>
-            <Link
-              to="/dashboard/editprofile"
-              className="flex items-center justify-center gap-2 w-full bg-indigo-700 text-white text-sm font-medium px-3 py-2 rounded-xl text-center mt-2 cursor-pointer hover:bg-indigo-800 transition-colors"
-            >
-              <Pencil size={15} /> Edit Profile
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="bg-indigo-700 text-white text-sm font-medium px-3 py-2 rounded-xl text-center mt-2 cursor-pointer hover:bg-indigo-800 transition-colors flex w-full items-center justify-center gap-2"
-            >
-              <LogOut size={15} /> Logout
-            </button>
-          </div>
-        </aside>
+        <Sidebar
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          linksCount={links.length}
+          FREE_LIMIT={FREE_LIMIT}
+          isPremium={isPremium}
+        />
 
         {/* ── Main Content ── */}
         <main className="flex-1 min-w-0 md:ml-64 px-4 sm:px-6 md:px-8 py-6 md:py-8 space-y-6">
@@ -751,7 +979,9 @@ export default function Campaigns() {
 
               <div className="min-w-0">
                 <h1 className="text-lg sm:text-xl md:text-2xl font-extrabold text-slate-900 truncate">
-                  {selectedCampaign ? `Campaign: ${selectedCampaign}` : "Campaigns Manager"}
+                  {selectedCampaign
+                    ? `Campaign: ${selectedCampaign}`
+                    : "Campaigns Manager"}
                 </h1>
                 <p className="text-slate-500 text-xs sm:text-sm mt-0.5 truncate">
                   {selectedCampaign
@@ -761,14 +991,92 @@ export default function Campaigns() {
               </div>
             </div>
 
-            <button
-              onClick={() => setShowCreateForm(!showCreateForm)}
-              className="flex items-center gap-2 font-semibold text-sm px-3 sm:px-4 py-2.5 rounded-xl transition-colors shadow-sm bg-indigo-600 hover:bg-indigo-700 text-white shrink-0 cursor-pointer"
-            >
-              <Plus size={16} />
-              <span className="hidden sm:inline">New Campaign Link</span>
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => {
+                  if (atLimit) {
+                    setShowLimitModal(true);
+                  } else {
+                    setShowCreateForm(!showCreateForm);
+                  }
+                }}
+                className="flex items-center gap-2 font-semibold text-sm px-3 sm:px-4 py-2.5 rounded-xl transition-colors shadow-sm bg-indigo-600 hover:bg-indigo-700 text-white shrink-0 cursor-pointer"
+              >
+                <Plus size={16} />
+                <span className="hidden sm:inline">
+                  {selectedCampaign ? "New Link" : "New Campaign"}
+                </span>
+              </button>
+              {selectedCampaign && (
+                <button
+                  onClick={() => setFilterOpen((s) => !s)}
+                  className={`ml-2 px-3 py-2 border rounded-xl shadow-sm cursor-pointer flex items-center gap-2 transition-colors ${filterOpen ? "bg-indigo-50 border-indigo-200 text-indigo-600" : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"}`}
+                >
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                  >
+                    <path
+                      d="M22 3H2l7 9v7l6-4v-3l7-9z"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span className="hidden sm:inline text-sm font-medium">
+                    Filters
+                  </span>
+                </button>
+              )}
+            </div>
           </div>
+          {selectedCampaign && filterOpen && (
+            <Filter
+              startDate={pendingStartDate}
+              endDate={pendingEndDate}
+              setStartDate={setPendingStartDate}
+              setEndDate={setPendingEndDate}
+              calendarYear={calendarYear}
+              calendarMonth={calendarMonth}
+              prevMonth={prevMonth}
+              nextMonth={nextMonth}
+              firstDayOfWeek={firstDayOfWeek}
+              daysInMonth={daysInMonth}
+              handleDateClick={handleDateClick}
+              finalGeoData={finalGeoData}
+              finalDeviceData={finalDeviceData}
+              referrerData={referrerData}
+              selectedCountry={pendingCountry}
+              setSelectedCountry={setPendingCountry}
+              selectedDevice={pendingDevice}
+              setSelectedDevice={setPendingDevice}
+              selectedSource={pendingSource}
+              setSelectedSource={setPendingSource}
+              onClear={() => {
+                setPendingStartDate("");
+                setPendingEndDate("");
+                setPendingCountry("");
+                setPendingDevice("");
+                setPendingSource("");
+                setStartDate("");
+                setEndDate("");
+                setSelectedCountry("");
+                setSelectedDevice("");
+                setSelectedSource("");
+              }}
+              onApply={() => {
+                setStartDate(pendingStartDate);
+                setEndDate(pendingEndDate);
+                setSelectedCountry(pendingCountry);
+                setSelectedDevice(pendingDevice);
+                setSelectedSource(pendingSource);
+                setFilterOpen(false);
+              }}
+              setFilterOpen={setFilterOpen}
+            />
+          )}
 
           {/* Error Banner */}
           {error && (
@@ -776,7 +1084,9 @@ export default function Campaigns() {
               <AlertCircle size={17} className="text-red-500 shrink-0 mt-0.5" />
               <div className="min-w-0">
                 <div className="text-sm font-semibold text-red-800">Error</div>
-                <div className="text-xs text-red-700 mt-0.5 break-words">{error}</div>
+                <div className="text-xs text-red-700 mt-0.5 break-words">
+                  {error}
+                </div>
               </div>
             </div>
           )}
@@ -785,7 +1095,8 @@ export default function Campaigns() {
           {showCreateForm && (
             <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm">
               <h2 className="font-bold text-slate-900 mb-4">
-                Create Tracked Link for {selectedCampaign ? `"${selectedCampaign}"` : "a Campaign"}
+                Create Tracked Link for{" "}
+                {selectedCampaign ? `"${selectedCampaign}"` : "a Campaign"}
               </h2>
               <form onSubmit={handleCreate} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -810,7 +1121,11 @@ export default function Campaigns() {
                     <input
                       type="text"
                       value={selectedCampaign ? selectedCampaign : campaignName}
-                      onChange={(e) => setCampaignName(e.target.value.replace(/[^a-z0-9_-]/gi, ""))}
+                      onChange={(e) =>
+                        setCampaignName(
+                          e.target.value.replace(/[^a-z0-9_-]/gi, ""),
+                        )
+                      }
                       disabled={!!selectedCampaign}
                       required
                       placeholder="e.g. summer_2026"
@@ -823,11 +1138,15 @@ export default function Campaigns() {
                       Custom Alias (optional)
                     </label>
                     <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500">
-                      <span className="text-slate-400 text-sm pl-4 pr-1">brev.ly/</span>
+                      <span className="text-slate-400 text-sm pl-4 pr-1">
+                        brev.ly/
+                      </span>
                       <input
                         type="text"
                         value={alias}
-                        onChange={(e) => setAlias(e.target.value.replace(/[^a-z0-9-]/gi, ""))}
+                        onChange={(e) =>
+                          setAlias(e.target.value.replace(/[^a-z0-9-]/gi, ""))
+                        }
                         placeholder="summer-promo"
                         className="flex-1 py-2.5 pr-4 text-sm text-slate-800 outline-none"
                       />
@@ -898,7 +1217,9 @@ export default function Campaigns() {
                   sub="Active groups"
                 />
                 <StatCard
-                  icon={<MousePointerClick size={18} className="text-orange-500" />}
+                  icon={
+                    <MousePointerClick size={18} className="text-orange-500" />
+                  }
                   label="Campaign Clicks"
                   value={totalCampaignClicks.toLocaleString()}
                   sub="Clicks on tagged links"
@@ -906,15 +1227,22 @@ export default function Campaigns() {
                 <StatCard
                   icon={<FolderOpen size={18} className="text-green-500" />}
                   label="Tagged URLs"
-                  value={links.filter(l => getCampaignParam(l.original)).length.toLocaleString()}
+                  value={links
+                    .filter((l) => getCampaignParam(l.original))
+                    .length.toLocaleString()}
                   sub={`Out of ${links.length} total links`}
                 />
               </div>
 
               {/* Campaigns list table */}
               <Card className="p-6">
-                <h2 className="text-base font-bold text-slate-900 mb-1">Your Marketing Campaigns</h2>
-                <p className="text-xs text-slate-400 mb-5">Click on a campaign to view details, trends, and manage its links</p>
+                <h2 className="text-base font-bold text-slate-900 mb-1">
+                  Your Marketing Campaigns
+                </h2>
+                <p className="text-xs text-slate-400 mb-5">
+                  Click on a campaign to view details, trends, and manage its
+                  links
+                </p>
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
@@ -930,11 +1258,19 @@ export default function Campaigns() {
                     <tbody>
                       {campaignsList.length === 0 ? (
                         <tr>
-                          <td colSpan={5} className="text-center py-12 text-slate-400 text-sm">
-                            <FolderOpen size={32} className="mx-auto text-slate-200 mb-2" />
-                            No campaigns detected yet.<br />
+                          <td
+                            colSpan={5}
+                            className="text-center py-12 text-slate-400 text-sm"
+                          >
+                            <FolderOpen
+                              size={32}
+                              className="mx-auto text-slate-200 mb-2"
+                            />
+                            No campaigns detected yet.
+                            <br />
                             <span className="text-xs text-slate-400">
-                              Create a new link with the `utm_campaign` field filled to start a campaign.
+                              Create a new link with the `utm_campaign` field
+                              filled to start a campaign.
                             </span>
                           </td>
                         </tr>
@@ -950,7 +1286,9 @@ export default function Campaigns() {
                                 <div className="w-8 h-8 bg-indigo-50 group-hover:bg-indigo-100 transition-colors rounded-lg flex items-center justify-center text-indigo-600 shrink-0">
                                   <Target size={14} />
                                 </div>
-                                <span className="truncate max-w-[200px]">{c.name}</span>
+                                <span className="truncate max-w-[200px]">
+                                  {c.name}
+                                </span>
                               </div>
                             </td>
                             <td className="py-4 px-4 text-right font-medium text-slate-500">
@@ -989,7 +1327,9 @@ export default function Campaigns() {
                   sub="URLs in this group"
                 />
                 <StatCard
-                  icon={<MousePointerClick size={18} className="text-orange-500" />}
+                  icon={
+                    <MousePointerClick size={18} className="text-orange-500" />
+                  }
                   label="Total Clicks"
                   value={selectedCampaignData.clicks.toLocaleString()}
                   sub="Accumulated visits"
@@ -1003,137 +1343,19 @@ export default function Campaigns() {
                 <StatCard
                   icon={<FolderOpen size={18} className="text-indigo-600" />}
                   label="UTM Parameters"
-                  value={`${[...new Set(campaignLinks.map(l => getSourceParam(l.original)).filter(Boolean))].length} Sources`}
+                  value={`${[...new Set(campaignLinks.map((l) => getSourceParam(l.original)).filter(Boolean))].length} Sources`}
                   sub="Click channels"
                 />
               </div>
-
-              {/* Traffic trend over time */}
-              <Card className="p-6">
-                <div>
-                  <h2 className="text-base font-bold text-slate-900">Campaign Clicks Trend</h2>
-                  <p className="text-xs text-slate-400 mb-5">Aggregated weekly traffic specifically for campaign "{selectedCampaign}"</p>
-                </div>
-                <ResponsiveContainer width="100%" height={220}>
-                  <AreaChart data={clickHistory} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="campClickGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.15} />
-                        <stop offset="95%" stopColor="#4F46E5" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
-                    <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Area
-                      type="monotone"
-                      dataKey="clicks"
-                      stroke="#4F46E5"
-                      strokeWidth={2.5}
-                      fill="url(#campClickGrad)"
-                      dot={{ r: 4, fill: "#4F46E5", strokeWidth: 0 }}
-                      activeDot={{ r: 6 }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </Card>
-
-              {/* Referrers + Devices Breakdowns */}
-              <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
-                {/* Referrers */}
-                <Card className="p-6">
-                  <h2 className="text-base font-bold text-slate-900 mb-1">Referrers</h2>
-                  <p className="text-xs text-slate-400 mb-4">Top channels driving visits to this campaign</p>
-                  <ResponsiveContainer width="100%" height={180}>
-                    <BarChart data={referrerData} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" horizontal={false} />
-                      <XAxis type="number" tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                      <YAxis type="category" dataKey="source" tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} width={80} />
-                      <Tooltip
-                        formatter={(v) => [v.toLocaleString(), "visits"]}
-                        contentStyle={{ borderRadius: 10, border: "1px solid #E2E8F0", fontSize: 11 }}
-                      />
-                      <Bar dataKey="visits" fill="#4F46E5" radius={[0, 6, 6, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </Card>
-
-                {/* Device type breakdown */}
-                <Card className="p-6">
-                  <h2 className="text-base font-bold text-slate-900 mb-1">Devices Breakdown</h2>
-                  <p className="text-xs text-slate-400 mb-4">Platforms used by campaign visitors</p>
-                  <div className="flex items-center gap-4">
-                    <ResponsiveContainer width="55%" height={160}>
-                      <PieChart>
-                        <Pie
-                          data={finalDeviceData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={45}
-                          outerRadius={65}
-                          paddingAngle={3}
-                          dataKey="value"
-                        >
-                          {finalDeviceData.map((_, i) => (
-                            <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          formatter={(v) => [`${v}%`, ""]}
-                          contentStyle={{ borderRadius: 10, border: "1px solid #E2E8F0", fontSize: 11 }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="space-y-2 flex-1">
-                      {finalDeviceData.map((d, i) => (
-                        <div key={d.name} className="flex items-center gap-2 text-xs">
-                          <div className="w-3 h-3 rounded-sm shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                          <span className="text-slate-600 truncate">{d.name}</span>
-                          <span className="font-bold text-slate-800 ml-auto pl-2">{d.value}%</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </Card>
-
-                {/* Geographic Breakdown */}
-                <Card className="p-6">
-                  <h2 className="text-base font-bold text-slate-900 mb-1">Geographic Share</h2>
-                  <p className="text-xs text-slate-400 mb-4">Estimated visitor origins for this campaign</p>
-                  <div className="space-y-3.5">
-                    {finalGeoData.map((geo, i) => {
-                      const max = finalGeoData[0]?.clicks || 1;
-                      const pct = Math.round((geo.clicks / max) * 100);
-                      return (
-                        <div key={geo.country} className="flex items-center gap-3">
-                          <span className="text-xl w-6 text-center shrink-0">{geo.flag}</span>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs text-slate-700 font-semibold truncate">{geo.country}</span>
-                              <span className="text-xs font-bold text-slate-800 ml-2">{geo.clicks.toLocaleString()}</span>
-                            </div>
-                            <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                              <div
-                                className="h-full rounded-full transition-all"
-                                style={{
-                                  width: `${pct}%`,
-                                  background: i === 0 ? "#4F46E5" : i === 1 ? "#6366F1" : i === 2 ? "#818CF8" : "#A5B4FC"
-                                }}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </Card>
-              </div>
-
               {/* Campaign Links List */}
               <Card className="p-6">
-                <h2 className="text-base font-bold text-slate-900 mb-1">URLs Tagged in Campaign</h2>
-                <p className="text-xs text-slate-400 mb-5">Click lists, status, and custom properties of shortened links in this group</p>
+                <h2 className="text-base font-bold text-slate-900 mb-1">
+                  URLs Tagged in Campaign
+                </h2>
+                <p className="text-xs text-slate-400 mb-5">
+                  Click lists, status, and custom properties of shortened links
+                  in this group
+                </p>
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
@@ -1151,7 +1373,10 @@ export default function Campaigns() {
                         const s = getSourceParam(link.original);
                         const m = getMediumParam(link.original);
                         return (
-                          <tr key={link.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors text-sm">
+                          <tr
+                            key={link.id}
+                            className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors text-sm"
+                          >
                             <td className="py-3 pr-3 font-semibold text-indigo-600 max-w-[200px] truncate">
                               <div>
                                 <div className="truncate">{link.short}</div>
@@ -1172,7 +1397,11 @@ export default function Campaigns() {
                                     med: {m}
                                   </span>
                                 )}
-                                {!s && !m && <span className="text-xs text-slate-400">-</span>}
+                                {!s && !m && (
+                                  <span className="text-xs text-slate-400">
+                                    -
+                                  </span>
+                                )}
                               </div>
                             </td>
                             <td className="py-3 px-3 text-right font-bold text-slate-800">
@@ -1184,21 +1413,32 @@ export default function Campaigns() {
                                 className="focus:outline-none inline-flex items-center justify-center cursor-pointer"
                               >
                                 {link.active ? (
-                                  <ToggleRight size={20} className="text-indigo-500" />
+                                  <ToggleRight
+                                    size={20}
+                                    className="text-indigo-500"
+                                  />
                                 ) : (
-                                  <ToggleLeft size={20} className="text-slate-300" />
+                                  <ToggleLeft
+                                    size={20}
+                                    className="text-slate-300"
+                                  />
                                 )}
                               </button>
                             </td>
                             <td className="py-3 pl-3 text-right">
                               <div className="flex items-center justify-end gap-1">
                                 <button
-                                  onClick={() => handleCopy(link.id, link.short)}
+                                  onClick={() =>
+                                    handleCopy(link.id, link.short)
+                                  }
                                   title="Copy Link"
                                   className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
                                 >
                                   {copied === link.id ? (
-                                    <Check size={13} className="text-green-500" />
+                                    <Check
+                                      size={13}
+                                      className="text-green-500"
+                                    />
                                   ) : (
                                     <Copy size={13} />
                                   )}
@@ -1218,7 +1458,9 @@ export default function Campaigns() {
                                   <BarChart2 size={13} />
                                 </Link>
                                 <button
-                                  onClick={() => handleDelete(link.id, link.slug)}
+                                  onClick={() =>
+                                    handleDelete(link.id, link.slug)
+                                  }
                                   title="Delete"
                                   className="p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors cursor-pointer"
                                 >
@@ -1233,6 +1475,257 @@ export default function Campaigns() {
                   </table>
                 </div>
               </Card>
+              {/* Traffic trend over time */}
+              <Card className="p-6">
+                <div>
+                  <h2 className="text-base font-bold text-slate-900">
+                    Campaign Clicks Trend
+                  </h2>
+                  <p className="text-xs text-slate-400 mb-5">
+                    Aggregated weekly traffic specifically for campaign "
+                    {selectedCampaign}"
+                  </p>
+                </div>
+                <ResponsiveContainer width="100%" height={220}>
+                  <AreaChart
+                    data={clickHistory}
+                    margin={{ top: 4, right: 0, left: -20, bottom: 0 }}
+                  >
+                    <defs>
+                      <linearGradient
+                        id="campClickGrad"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="5%"
+                          stopColor="#4F46E5"
+                          stopOpacity={0.15}
+                        />
+                        <stop
+                          offset="95%"
+                          stopColor="#4F46E5"
+                          stopOpacity={0}
+                        />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
+                    <XAxis
+                      dataKey="date"
+                      tick={{ fontSize: 11, fill: "#94A3B8" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      tick={{ fontSize: 11, fill: "#94A3B8" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Area
+                      type="monotone"
+                      dataKey="clicks"
+                      stroke="#4F46E5"
+                      strokeWidth={2.5}
+                      fill="url(#campClickGrad)"
+                      dot={{ r: 4, fill: "#4F46E5", strokeWidth: 0 }}
+                      activeDot={{ r: 6 }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </Card>
+
+              {/* Referrers + Devices Breakdowns */}
+              <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
+                {/* Referrers */}
+                <Card className="p-6">
+                  <h2 className="text-base font-bold text-slate-900 mb-1">
+                    Referrers
+                  </h2>
+                  <p className="text-xs text-slate-400 mb-4">
+                    Hits per platform — WhatsApp, TikTok, Direct and more
+                  </p>
+                  {referrerData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <BarChart
+                        data={referrerData}
+                        margin={{ top: 4, right: 4, left: -20, bottom: 24 }}
+                        barCategoryGap="30%"
+                      >
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          stroke="#F1F5F9"
+                          vertical={false}
+                        />
+                        <XAxis
+                          dataKey="source"
+                          axisLine={false}
+                          tickLine={false}
+                          interval={0}
+                          tick={({ x, y, payload }) => {
+                            const Icon =
+                              platformIconMap[payload.value] || Globe;
+                            return (
+                              <g transform={`translate(${x},${y})`}>
+                                <Icon x={-8} y={8} size={16} color="#94A3B8" />
+                              </g>
+                            );
+                          }}
+                        />
+                        <YAxis
+                          tick={{ fontSize: 10, fill: "#94A3B8" }}
+                          axisLine={false}
+                          tickLine={false}
+                          allowDecimals={false}
+                        />
+                        <Tooltip
+                          formatter={(v, name, props) => [
+                            v.toLocaleString() + " hits",
+                            props.payload.source,
+                          ]}
+                          contentStyle={{
+                            borderRadius: 10,
+                            border: "1px solid #E2E8F0",
+                            fontSize: 11,
+                          }}
+                          cursor={{ fill: "#F1F5F9" }}
+                        />
+                        <Bar
+                          dataKey="visits"
+                          radius={[6, 6, 0, 0]}
+                          maxBarSize={36}
+                        >
+                          {referrerData.map((entry, i) => (
+                            <Cell key={i} fill={entry.color} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-[180px] text-center">
+                      <Globe size={24} className="text-slate-200 mb-2" />
+                      <p className="text-sm text-slate-400 font-medium">
+                        No referrer data yet
+                      </p>
+                      <p className="text-xs text-slate-300 mt-1">
+                        Data will appear once links get clicks
+                      </p>
+                    </div>
+                  )}
+                </Card>
+
+                {/* Device type breakdown */}
+                <Card className="p-6">
+                  <h2 className="text-base font-bold text-slate-900 mb-1">
+                    Devices Breakdown
+                  </h2>
+                  <p className="text-xs text-slate-400 mb-4">
+                    Platforms used by campaign visitors
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <ResponsiveContainer width="55%" height={160}>
+                      <PieChart>
+                        <Pie
+                          data={finalDeviceData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={45}
+                          outerRadius={65}
+                          paddingAngle={3}
+                          dataKey="value"
+                        >
+                          {finalDeviceData.map((_, i) => (
+                            <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          formatter={(v) => [`${v}%`, ""]}
+                          contentStyle={{
+                            borderRadius: 10,
+                            border: "1px solid #E2E8F0",
+                            fontSize: 11,
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="space-y-2 flex-1">
+                      {finalDeviceData.map((d, i) => (
+                        <div
+                          key={d.name}
+                          className="flex items-center gap-2 text-xs"
+                        >
+                          <div
+                            className="w-3 h-3 rounded-sm shrink-0"
+                            style={{
+                              backgroundColor: COLORS[i % COLORS.length],
+                            }}
+                          />
+                          <span className="text-slate-600 truncate">
+                            {d.name}
+                          </span>
+                          <span className="font-bold text-slate-800 ml-auto pl-2">
+                            {d.value}%
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Geographic Breakdown */}
+                <Card className="p-6">
+                  <h2 className="text-base font-bold text-slate-900 mb-1">
+                    Geographic Share
+                  </h2>
+                  <p className="text-xs text-slate-400 mb-4">
+                    Estimated visitor origins for this campaign
+                  </p>
+                  <div className="space-y-3.5">
+                    {finalGeoData.map((geo, i) => {
+                      const max = finalGeoData[0]?.clicks || 1;
+                      const pct = Math.round((geo.clicks / max) * 100);
+                      return (
+                        <div
+                          key={geo.country}
+                          className="flex items-center gap-3"
+                        >
+                          <span className="text-xl w-6 text-center shrink-0">
+                            {geo.flag}
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs text-slate-700 font-semibold truncate">
+                                {geo.country}
+                              </span>
+                              <span className="text-xs font-bold text-slate-800 ml-2">
+                                {geo.clicks.toLocaleString()}
+                              </span>
+                            </div>
+                            <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full transition-all"
+                                style={{
+                                  width: `${pct}%`,
+                                  background:
+                                    i === 0
+                                      ? "#4F46E5"
+                                      : i === 1
+                                        ? "#6366F1"
+                                        : i === 2
+                                          ? "#818CF8"
+                                          : "#A5B4FC",
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </Card>
+              </div>
             </>
           )}
         </main>

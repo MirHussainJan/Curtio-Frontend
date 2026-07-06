@@ -12,7 +12,7 @@ export default function GoogleAuth() {
       token,
     });
 
-    console.log("Backend Response:", res.data);
+    
   };
 
   const handleError = () => {

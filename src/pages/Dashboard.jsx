@@ -29,8 +29,9 @@ import {
   Share2,
 } from "lucide-react";
 import { SHORTENER_DOMAIN } from "../components/Shortner";
+import Sidebar from "../components/Sidebar";
 
-const FREE_LIMIT = 100;
+const PREMIUM_USERS = ["mrabdullahamjid33@gmail.com",  "mirhussainjan10387@gmail.com"];
 const baseUrl = import.meta.env.VITE_API_URL;
 
 function StatCard({ icon, label, value, sub }) {
@@ -193,6 +194,36 @@ function DeleteModal({ onConfirm, onCancel, deleting }) {
   );
 }
 
+function LimitModal({ onClose }) {
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl p-6 sm:p-8 max-w-sm w-full shadow-2xl text-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Zap size={22} className="text-indigo-600" fill="currentColor" />
+        </div>
+        <h3 className="font-extrabold text-slate-900 text-lg mb-1">
+          Plan Limit Reached
+        </h3>
+        <p className="text-slate-500 text-sm mb-6">
+          You have reached the maximum number of active links for your current plan. Please upgrade to create more tracked links.
+        </p>
+        <button
+          onClick={onClose}
+          className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors cursor-pointer"
+        >
+          Understood
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const navigate = useNavigate();
 
@@ -242,10 +273,14 @@ export default function Dashboard() {
   // Delete modal state
   const [deleteModal, setDeleteModal] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [showLimitModal, setShowLimitModal] = useState(false);
 
   const totalClicks = links.reduce((sum, l) => sum + l.clicks, 0);
   const activeLinks = links.filter((l) => l.active).length;
-  const atLimit = false;
+
+  const isPremium = PREMIUM_USERS.includes(userEmail);
+  const FREE_LIMIT = isPremium ? Infinity : 1;
+  const atLimit = !isPremium && links.length >= FREE_LIMIT;
 
   const calculateReturningUsers = () => {
     const deviceCounts = {};
@@ -276,16 +311,24 @@ export default function Dashboard() {
   const returningUsersPercentage = calculateReturningUsers();
 
   useEffect(() => {
-    if (token) {
-      fetchLinks();
-    } else {
+    if (!token) {
       setLoadingLinks(false);
+      return;
     }
+    
+    fetchLinks();
+    
+    // Poll for real-time updates every 3 seconds
+    const interval = setInterval(() => {
+      fetchLinks(true);
+    }, 3000);
+    
+    return () => clearInterval(interval);
   }, [token]);
 
-  async function fetchLinks() {
-    setLoadingLinks(true);
-    setError("");
+  async function fetchLinks(background = false) {
+    if (!background) setLoadingLinks(true);
+    if (!background) setError("");
     try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL;
       const res = await fetch(`${baseUrl}/urls`, {
@@ -309,12 +352,12 @@ export default function Dashboard() {
         }));
         setLinks(mapped);
       } else {
-        setError(data.message || "Failed to fetch short links.");
+        if (!background) setError(data.message || "Failed to fetch short links.");
       }
     } catch (err) {
-      setError("Network error. Could not connect to server.");
+      if (!background) setError("Network error. Could not connect to server.");
     } finally {
-      setLoadingLinks(false);
+      if (!background) setLoadingLinks(false);
     }
   }
 
@@ -444,97 +487,10 @@ export default function Dashboard() {
           deleting={deleting}
         />
       )}
-
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-20 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      {showLimitModal && <LimitModal onClose={() => setShowLimitModal(false)} />}
 
       <div className="flex min-h-screen">
-        {/* ── Sidebar ── */}
-        <aside
-          className={`
-            fixed top-0 left-0 bottom-0 z-30 w-64 bg-white border-r border-slate-100
-            flex flex-col py-6 px-4
-            transition-transform duration-300 ease-in-out
-            ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-            md:translate-x-0
-          `}
-        >
-          {/* Close button — mobile only */}
-          <div className="flex justify-end mb-2 md:hidden">
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500"
-            >
-              <X size={20} />
-            </button>
-          </div>
-
-          <Link to="/" className="flex items-center gap-2 px-2 mb-8">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
-              <Zap size={15} className="text-white" fill="white" />
-            </div>
-            <span className="text-lg font-extrabold text-slate-900">Brevly</span>
-          </Link>
-
-          <nav className="flex flex-col gap-1 flex-1">
-            <Link
-              to="/dashboard"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors text-left bg-indigo-50 text-indigo-700"
-            >
-              <LinkIcon size={16} /> My Links
-            </Link>
-            <Link
-              to="/dashboard/analytics"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-            >
-              <BarChart2 size={16} /> Analytics
-            </Link>
-            <Link
-              to="/dashboard/campaigns"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-            >
-              <TrendingUp size={16} /> Campaigns
-            </Link>
-          </nav>
-
-          {/* Free plan badge */}
-          <div className="border border-indigo-100 bg-indigo-50 rounded-xl p-4 mb-4">
-            <div className="text-xs font-bold text-indigo-700 mb-1">Free Plan</div>
-            <div className="text-xs text-slate-500 mb-2">
-              {links.length}/{FREE_LIMIT} links used
-            </div>
-            <div className="h-1.5 bg-indigo-100 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-indigo-500 rounded-full transition-all"
-                style={{ width: `${(links.length / FREE_LIMIT) * 100}%` }}
-              />
-            </div>
-          </div>
-
-          <div className="border-t border-gray-400 pt-4">
-            <div className="flex items-center gap-3 px-2 mb-3 min-w-0">
-              <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 ">
-                {userInitial}
-              </div>
-              <div className="min-w-0 ">
-                <div className="text-sm font-semibold text-slate-800 truncate">{userName}</div>
-                <div className="text-xs text-slate-400 truncate">{userEmail}</div>
-              </div>
-            </div>
-            <Link to="/dashboard/editprofile" className="flex items-center justify-center gap-2 w-full bg-indigo-700 text-white text-sm font-medium px-3 py-2 rounded-xl text-center mt-2 cursor-pointer hover:bg-indigo-800 transition-colors"><Pencil size={15} /> Edit Profile</Link>
-            <button
-              onClick={handleLogout}
-              className="bg-indigo-700 text-white text-sm font-medium px-3 py-2 rounded-xl text-center mt-2 cursor-pointer hover:bg-indigo-800 transition-colors mt-2 cursor-pointer flex w-full items-center justify-center gap-2"
-            >
-              <LogOut size={15} /> Logout
-            </button>
-          </div>
-        </aside>
+        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} linksCount={links.length} FREE_LIMIT={FREE_LIMIT} isPremium={isPremium} />
 
         {/* ── Main ── */}
         <main className="flex-1 min-w-0 md:ml-64 px-4 sm:px-6 md:px-8 py-6 md:py-8">
@@ -559,7 +515,13 @@ export default function Dashboard() {
             </div>
 
             <button
-              onClick={() => setShowForm(!showForm)}
+              onClick={() => {
+                if (atLimit) {
+                  setShowLimitModal(true);
+                } else {
+                  setShowForm(!showForm);
+                }
+              }}
               className="flex items-center gap-2 font-semibold text-sm px-3 sm:px-4 py-2.5 rounded-xl transition-colors shadow-sm bg-indigo-600 hover:bg-indigo-700 text-white shrink-0 cursor-pointer"
             >
               <Plus size={16} />

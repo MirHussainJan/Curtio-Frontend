@@ -7,7 +7,6 @@ import { syncPendingUrl } from "../lib/sync";
 
 const baseUrl = `${import.meta.env.VITE_API_URL}/auth`;
 
-console.log('Base URL:', baseUrl);
 export default function Login() {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
@@ -33,7 +32,7 @@ export default function Login() {
             localStorage.setItem("apiToken", data.apiToken);
             localStorage.setItem("LoginUser", JSON.stringify(data.LoginUser));
             await syncPendingUrl(data.apiToken);
-            navigate("/dashboard");
+            navigate("/dashboard/analytics");
           }
         } catch {
           setError("Network error during Google login.");

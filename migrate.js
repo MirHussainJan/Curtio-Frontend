@@ -1,9 +1,14 @@
 import { createClient } from '@sanity/client'
+import dotenv from 'dotenv'
+dotenv.config()
 
 const sanityClient = createClient({
-  projectId: 'fk4ygrwd',
-  dataset: 'production',
+  projectId: process.env.VITE_SANITY_PROJECT_ID,
+  dataset: process.env.VITE_SANITY_DATASET,
   useCdn: false,
-  apiVersion: '2024-05-14',
-  token: 'skZl54nZl1b8XJ...', // Wait, I don't have the write token.
+  apiVersion: process.env.VITE_SANITY_API_VERSION,
+  token: process.env.VITE_SANITY_WRITE_TOKEN,
 })
+
+
+
