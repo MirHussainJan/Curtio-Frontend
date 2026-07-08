@@ -1,94 +1,184 @@
-import { Link, useLocation } from 'react-router-dom'
-import { Zap, Menu, X } from 'lucide-react'
-import { useState } from 'react'
+import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Menu, X } from "lucide-react";
 
-export default function Navbar({ dark = false }) {
-  const location = useLocation()
-  const isDashboard = location.pathname === '/dashboard'
-  const [mobileOpen, setMobileOpen] = useState(false)
+export default function Navbar() {
+  const location = useLocation();
+
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+
+    window.addEventListener("scroll", onScroll);
+
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const getStoredUser = () => {
-    const data = localStorage.getItem("LoginUser") || localStorage.getItem("user");
+    const data =
+      localStorage.getItem("LoginUser") || localStorage.getItem("user");
+
     if (!data || data === "undefined") return null;
+
     try {
       return JSON.parse(data);
-    } catch (e) {
+    } catch {
       return null;
     }
   };
 
   const storedUser = getStoredUser();
-  const userInitial = storedUser?.name ? storedUser.name.charAt(0).toUpperCase() : "";
   const isLoggedIn = !!storedUser;
+  const userInitial = storedUser?.name?.charAt(0).toUpperCase() || "";
 
-  const base = dark
-    ? 'bg-slate-900/80 backdrop-blur-md border-slate-800'
-    : 'bg-white/80 backdrop-blur-md border-slate-200'
+  const navItems = [
+    { to: "/features", label: "Features" },
+    { to: "/pricing", label: "Pricing" },
+    { to: "/accuracy", label: "Accuracy" },
+    { to: "/blog", label: "Blog" },
+  ];
 
-  const linkCls = dark
-    ? 'text-slate-300 hover:text-white'
-    : 'text-slate-600 hover:text-slate-900'
+  const isActive = (path) => {
+    if (path.startsWith("/#")) {
+      return (
+        location.pathname === "/" &&
+        location.hash === path.replace("/", "")
+      );
+    }
+
+    return location.pathname === path;
+  };
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 border-b ${base}`}>
-      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shadow-sm group-hover:bg-indigo-700 transition-colors">
-            <Zap size={16} className="text-white" fill="white" />
-          </div>
-          <span className={`text-xl font-bold tracking-tight ${dark ? 'text-white' : 'text-slate-900'}`}>
-            Brevly
-          </span>
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-[14px] transition-colors duration-300 ${
+        scrolled
+          ? "bg-white/80 border-b border-slate-200 shadow-[0_1px_0_rgba(15,23,42,0.03)]"
+          : "bg-[#FAFAFA]/70 border-b border-transparent"
+      }`}
+    >
+      <div className="max-w-[1152px] mx-auto px-6 flex items-center gap-8 h-[68px] relative">
+        {/* Logo */}
+        <Link
+          to="/"
+          className="font-bold text-2xl tracking-[-0.03em] text-slate-900"
+          style={{ fontFamily: "'Space Grotesk','Inter',sans-serif" }}
+        >
+          Curtio<span className="text-indigo-600">.</span>
         </Link>
 
-        {/* Desktop nav */}
-        <div className="hidden sm:flex items-center gap-5">
-          <Link to="/blog" className={`text-sm font-medium transition-colors ${linkCls}`}>Blog</Link>
-          
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-1.5 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          {navItems.map((item) => (
+            <Link
+              key={item.label}
+              to={item.to}
+              className={`font-medium text-[0.95rem] px-3.5 py-2 rounded-[10px] transition-all ${
+                isActive(item.to)
+                  ? "text-slate-900 bg-slate-900/[.04]"
+                  : "text-slate-500 hover:text-slate-900 hover:bg-slate-900/[.04]"
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Desktop Buttons */}
+        <div className="hidden md:flex items-center gap-2 ml-auto">
           {isLoggedIn ? (
-            <div className="flex items-center gap-4">
-              <Link to="/dashboard/analytics" className={`text-sm font-medium transition-colors ${linkCls}`}>
+            <>
+              <Link
+                to="/dashboard/analytics"
+                className="font-semibold text-[0.975rem] px-4 py-3 rounded-xl text-slate-700 hover:text-slate-900 transition"
+              >
                 Dashboard
               </Link>
-              <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm cursor-pointer hover:opacity-90 transition-opacity">
+
+              <Link
+                to="/dashboard"
+                className="w-9 h-9 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold flex items-center justify-center"
+              >
                 {userInitial}
-              </div>
-            </div>
+              </Link>
+            </>
           ) : (
             <>
-              <Link to="/login" className={`text-sm font-medium transition-colors ${linkCls}`}>Sign In</Link>
-              <Link to="/register" className="text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm">
-                Get Started Free
+              <Link
+                to="/login"
+                className="font-semibold text-[0.975rem] px-4 py-3 rounded-xl text-slate-700 hover:text-slate-900 transition"
+              >
+                Sign in
+              </Link>
+
+              <Link
+                to="/register"
+                className="font-semibold text-[0.975rem] px-6 py-3 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition"
+              >
+                Get started free
               </Link>
             </>
           )}
         </div>
 
-        {/* Mobile toggle */}
+        {/* Mobile Button */}
         <button
-          className={`sm:hidden p-1.5 rounded-lg ${dark ? 'text-slate-300' : 'text-slate-600'}`}
           onClick={() => setMobileOpen(!mobileOpen)}
+          className="md:hidden ml-auto border border-slate-200 rounded-lg p-2"
         >
-          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile Menu */}
       {mobileOpen && (
-        <div className={`sm:hidden border-t px-6 py-4 flex flex-col gap-3 ${dark ? 'border-slate-800 bg-slate-900' : 'border-slate-100 bg-white'}`}>
-          <Link to="/blog" className={`text-sm font-medium ${linkCls}`} onClick={() => setMobileOpen(false)}>Blog</Link>
+        <div className="md:hidden flex flex-col gap-1 px-6 py-4 border-t border-slate-200 bg-white">
+          {navItems.map((item) => (
+            <Link
+              key={item.label}
+              to={item.to}
+              onClick={() => setMobileOpen(false)}
+              className={`px-3 py-3 rounded-lg font-medium transition ${
+                isActive(item.to)
+                  ? "bg-indigo-50 text-indigo-600"
+                  : "text-slate-700 hover:bg-indigo-50 hover:text-indigo-600"
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
+
           {isLoggedIn ? (
-            <Link to="/dashboard/analytics" className={`text-sm font-medium ${linkCls}`} onClick={() => setMobileOpen(false)}>Dashboard</Link>
+            <Link
+              to="/dashboard/analytics"
+              onClick={() => setMobileOpen(false)}
+              className="mt-2 px-3 py-3 rounded-lg font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600"
+            >
+              Dashboard
+            </Link>
           ) : (
             <>
-              <Link to="/login" className={`text-sm font-medium ${linkCls}`} onClick={() => setMobileOpen(false)}>Sign In</Link>
-              <Link to="/register" className="text-sm font-semibold bg-indigo-600 text-white px-4 py-2 rounded-lg text-center" onClick={() => setMobileOpen(false)}>
-                Get Started Free
+              <Link
+                to="/login"
+                onClick={() => setMobileOpen(false)}
+                className="mt-2 px-3 py-3 rounded-lg font-medium text-slate-700 hover:bg-indigo-50 hover:text-indigo-600"
+              >
+                Sign in
+              </Link>
+
+              <Link
+                to="/register"
+                onClick={() => setMobileOpen(false)}
+                className="mt-2 px-3 py-3 rounded-xl bg-indigo-600 text-white text-center font-semibold hover:bg-indigo-700"
+              >
+                Get started free
               </Link>
             </>
           )}
         </div>
       )}
-    </nav>
-  )
+    </header>
+  );
 }

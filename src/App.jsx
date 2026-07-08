@@ -11,6 +11,9 @@ import BlogPost from "./pages/BlogPost";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/Fpassword";
+import Features from "./pages/features";
+import Accuracy from "./pages/Accuracy";
+import Pricing from "./pages/Pricing";
 
 
 export default function App() {
@@ -21,6 +24,9 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/features" element={<Features />} />
+        <Route path="/accuracy" element={<Accuracy />} />
+        <Route path="/pricing" element={<Pricing />} />
 
         <Route
           path="/dashboard"

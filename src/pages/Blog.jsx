@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, Clock, Tag } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import { sanityClient, urlForImage } from '../lib/sanity'
+import Footer from '../components/footer'
 
 const CATEGORIES = ['All', 'Marketing', 'Analytics', 'Tips & Tricks', 'Product']
 
@@ -52,7 +53,7 @@ export default function Blog() {
         </div>
       </section>
 
-      <div className="max-w-5xl mx-auto px-6 py-12">
+      <div className="max-w-[1152px] mx-auto px-6 py-12">
         {isLoading ? (
           <div className="text-center py-20 text-slate-400 text-sm">
             Loading posts...
@@ -183,9 +184,7 @@ export default function Blog() {
         )}
       </div>
 
-      <footer className="border-t border-slate-100 py-8 px-6 text-center text-slate-400 text-sm">
-        © {new Date().getFullYear()} Brevly.
-      </footer>
+      <Footer />
     </div>
   )
 }
