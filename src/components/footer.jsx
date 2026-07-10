@@ -37,10 +37,6 @@ const Footer = () => {
               <Link to="/accuracy" className="block text-slate-700 transition hover:text-indigo-600">
                 Accuracy
               </Link>
-
-              <Link to="/qr-codes" className="block text-slate-700 transition hover:text-indigo-600">
-                QR Codes
-              </Link>
             </div>
           </div>
 
@@ -53,14 +49,6 @@ const Footer = () => {
             <div className="space-y-2">
               <Link to="/blog" className="block text-slate-700 transition hover:text-indigo-600">
                 Blog
-              </Link>
-
-              <Link to="/about" className="block text-slate-700 transition hover:text-indigo-600">
-                About
-              </Link>
-
-              <Link to="/contact" className="block text-slate-700 transition hover:text-indigo-600">
-                Contact
               </Link>
             </div>
           </div>
