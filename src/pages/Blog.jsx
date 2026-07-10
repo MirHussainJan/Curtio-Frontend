@@ -22,17 +22,48 @@ export default function Blog() {
   useEffect(() => {
     sanityClient.fetch(`*[_type == "post"] | order(date desc)`)
       .then((data) => {
-        setPosts(data)
-        setIsLoading(false)
+        setPosts(data);
+        const imagesToLoad = data.map(p => p.coverImage ? urlForImage(p.coverImage) : null).filter(Boolean);
+        if (imagesToLoad.length === 0) {
+          setIsLoading(false);
+          return;
+        }
+        let loadedCount = 0;
+        imagesToLoad.forEach(src => {
+          const img = new Image();
+          img.src = src;
+          img.onload = img.onerror = () => {
+            loadedCount++;
+            if (loadedCount === imagesToLoad.length) {
+              setIsLoading(false);
+            }
+          };
+        });
       })
-      .catch(console.error)
-  }, [])
+      .catch((err) => {
+        console.error(err);
+        setIsLoading(false);
+      });
+  }, []);
 
   const featured = posts.find(p => p.featured)
   const filtered = posts.filter(p =>
     !p.featured &&
     (activeCategory === 'All' || p.category === activeCategory)
   )
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="py-16 text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent mb-3" />
+          <div className="text-slate-500 text-sm font-medium">
+            Loading blog posts...
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -54,13 +85,8 @@ export default function Blog() {
       </section>
 
       <div className="max-w-[1152px] mx-auto px-6 py-12">
-        {isLoading ? (
-          <div className="text-center py-20 text-slate-400 text-sm">
-            Loading posts...
-          </div>
-        ) : (
-          <>
-            {/* Featured post */}
+        <>
+          {/* Featured post */}
             {featured && (activeCategory === 'All') && (
               <Link
                 to={`/blog/${featured.slug.current}`}
@@ -181,7 +207,6 @@ export default function Blog() {
               </div>
             )}
           </>
-        )}
       </div>
 
       <Footer />

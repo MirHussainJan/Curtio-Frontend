@@ -7,6 +7,7 @@ import {
   X,
   Pencil,
   LogOut,
+  ArrowLeft,
 } from "lucide-react";
 
 export default function Sidebar({
@@ -72,13 +73,22 @@ export default function Sidebar({
           </button>
         </div>
 
-        <Link
-          to="/dashboard/analytics"
-          className="font-bold text-2xl tracking-[-0.03em] text-slate-900 mb-2 text-center"
-          style={{ fontFamily: "'Space Grotesk','Inter',sans-serif" }}
-        >
-          curtio<span className="text-indigo-600">.</span>
-        </Link>
+        <div className="relative flex items-center justify-center mb-6 mt-1">
+          <Link
+            to="/"
+            className="absolute left-0 p-1.5 rounded-[10px] text-slate-600 bg-slate-50/60 border border-slate-200/80 backdrop-blur-md shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] hover:bg-white hover:border-slate-300 hover:text-slate-900 hover:shadow-[0_4px_12px_-2px_rgba(0,0,0,0.08)] transition-all"
+            title="Back to Landing Page"
+          >
+            <ArrowLeft size={18} />
+          </Link>
+          <Link
+            to="/dashboard/analytics"
+            className="font-bold text-2xl tracking-[-0.03em] text-slate-900"
+            style={{ fontFamily: "'Space Grotesk','Inter',sans-serif" }}
+          >
+            curtio<span className="text-indigo-600">.</span>
+          </Link>
+        </div>
 
         <nav className="flex flex-col gap-1 flex-1">
           <Link

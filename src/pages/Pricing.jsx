@@ -8,20 +8,20 @@ import CTASection from "../components/cta";
    DATA
 ───────────────────────────────────────────────────────────── */
 const TABLE_ROWS = [
-  ["Price",                  "$0",       "$0",         "$9/mo ($7 annual)"],
-  ["Account needed",         "No",       "Yes",        "Yes"],
-  ["Short links",            "5 / day",  "Unlimited*", "Unlimited*"],
-  ["Tracked links",          "None",     "1",          "25"],
-  ["Accurate analytics",     "None",     "Full",       "Full"],
-  ["QR codes",               "Yes",      "Yes",        "Yes"],
-  ["Custom alias",           "None",     "Yes",        "Yes"],
-  ["UTM builder",            "None",     "Yes",        "Yes"],
-  ["Password and expiry",    "None",     "Yes",        "Yes"],
-  ["Analytics history",      "None",     "Standard",   "Extended"],
-  ["Bulk creation",          "None",     "None",       "Yes"],
-  ["Custom branded domain",  "None",     "None",       "Yes"],
-  ["API access",             "None",     "None",       "Yes"],
-  ["Priority support",       "None",     "None",       "Yes"],
+  ["Price", "$0", "$0", "$9/mo ($7 annual)"],
+  ["Account needed", "No", "Yes", "Yes"],
+  ["Short links", "5 / day", "Unlimited*", "Unlimited*"],
+  ["Tracked links", "None", "1", "25"],
+  ["Accurate analytics", "None", "Full", "Full"],
+  ["QR codes", "Yes", "Yes", "Yes"],
+  ["Custom alias", "None", "Yes", "Yes"],
+  ["UTM builder", "None", "Yes", "Yes"],
+  ["Password and expiry", "None", "Yes", "Yes"],
+  ["Analytics history", "None", "Standard", "Extended"],
+  ["Bulk creation", "None", "None", "Yes"],
+  ["Custom branded domain", "None", "None", "Yes"],
+  ["API access", "None", "None", "Yes"],
+  ["Priority support", "None", "None", "Yes"],
 ];
 
 const FAQ_ITEMS = [
@@ -100,8 +100,8 @@ const ChevronIcon = ({ open }) => (
 
 /* Render a table cell value */
 function TableCell({ val, plus }) {
-  if (val === "Yes")   return <CheckIcon className={plus ? "text-indigo-600" : "text-indigo-500"} />;
-  if (val === "None" || val === "No") return <XIcon />;
+  if (val === "Yes") return <div className="flex justify-center"><CheckIcon className={plus ? "text-indigo-600" : "text-indigo-500"} /></div>;
+  if (val === "None" || val === "No") return <div className="flex justify-center"><XIcon /></div>;
   return <span className="text-[0.93rem] text-slate-700">{val}</span>;
 }
 
@@ -112,8 +112,8 @@ export default function Pricing() {
   const [annual, setAnnual] = useState(false);
   const [openFaq, setOpenFaq] = useState(0);
 
-  const plusPrice  = annual ? "$7" : "$9";
-  const plusNote   = annual ? "Billed $84 a year" : "Save 22% with annual billing";
+  const plusPrice = annual ? "$7" : "$9";
+  const plusNote = annual ? "Billed $84 a year" : "Save 22% with annual billing";
 
   return (
     <>
@@ -154,11 +154,10 @@ export default function Pricing() {
                 type="button"
                 onClick={() => setAnnual(false)}
                 aria-pressed={!annual}
-                className={`px-[22px] py-2.5 rounded-full text-[0.95rem] font-semibold transition-all ${
-                  !annual
+                className={`px-[22px] py-2.5 rounded-full text-[0.95rem] font-semibold transition-all ${!annual
                     ? "bg-indigo-600 text-white shadow-[0_6px_16px_-6px_rgba(79,70,229,0.6)]"
                     : "text-slate-500 hover:text-slate-800"
-                }`}
+                  }`}
               >
                 Monthly
               </button>
@@ -166,19 +165,17 @@ export default function Pricing() {
                 type="button"
                 onClick={() => setAnnual(true)}
                 aria-pressed={annual}
-                className={`px-[22px] py-2.5 rounded-full text-[0.95rem] font-semibold transition-all flex items-center gap-2 ${
-                  annual
+                className={`px-[22px] py-2.5 rounded-full text-[0.95rem] font-semibold transition-all flex items-center gap-2 ${annual
                     ? "bg-indigo-600 text-white shadow-[0_6px_16px_-6px_rgba(79,70,229,0.6)]"
                     : "text-slate-500 hover:text-slate-800"
-                }`}
+                  }`}
               >
                 Annual{" "}
                 <span
-                  className={`text-[0.72rem] font-bold px-2 py-0.5 rounded-full ${
-                    annual
+                  className={`text-[0.72rem] font-bold px-2 py-0.5 rounded-full ${annual
                       ? "bg-white/20 text-white"
                       : "bg-orange-50 text-orange-700"
-                  }`}
+                    }`}
                 >
                   Save 22%
                 </span>
@@ -191,7 +188,7 @@ export default function Pricing() {
       {/* ── PRICING CARDS ────────────────────────────────────── */}
       <section className="pb-20" id="plans">
         <div className="max-w-[1152px] mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-6 items-start max-w-[1080px] mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 items-stretch max-w-[1080px] mx-auto">
 
             {/* Guest */}
             {/* <article className="bg-white border border-slate-200 rounded-[16px] p-8 shadow-[0_1px_3px_rgba(0,0,0,.07)] flex flex-col transition-all hover:shadow-[0_16px_38px_-10px_rgba(15,23,42,.20)] hover:-translate-y-1">
@@ -332,9 +329,8 @@ export default function Pricing() {
               return (
                 <div
                   key={i}
-                  className={`bg-white border rounded-[16px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,.07)] transition-all ${
-                    isOpen ? "border-slate-300 shadow-[0_4px_14px_-2px_rgba(15,23,42,0.10)]" : "border-slate-200"
-                  }`}
+                  className={`bg-white border rounded-[16px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,.07)] transition-all ${isOpen ? "border-slate-300 shadow-[0_4px_14px_-2px_rgba(15,23,42,0.10)]" : "border-slate-200"
+                    }`}
                 >
                   <button
                     type="button"
