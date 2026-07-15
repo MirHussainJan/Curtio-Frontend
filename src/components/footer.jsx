@@ -30,9 +30,9 @@ const Footer = () => {
                 Features
               </Link>
 
-              <Link to="/pricing" className="block text-slate-700 transition hover:text-indigo-600">
+              {/* <Link to="/pricing" className="block text-slate-700 transition hover:text-indigo-600">
                 Pricing
-              </Link>
+              </Link> */}
 
               <Link to="/accuracy" className="block text-slate-700 transition hover:text-indigo-600">
                 Accuracy
