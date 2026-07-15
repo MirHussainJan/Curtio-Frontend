@@ -281,8 +281,10 @@ export default function Dashboard() {
   const totalClicks = links.reduce((sum, l) => sum + l.clicks, 0);
   const activeLinks = links.filter((l) => l.active).length;
 
-  const isPremium = PREMIUM_USERS.includes(userEmail);
-  const FREE_LIMIT = isPremium ? Infinity : 1;
+  // const isPremium = PREMIUM_USERS.includes(userEmail);
+  // const FREE_LIMIT = isPremium ? Infinity : 1;
+  const isPremium = true;
+  const FREE_LIMIT = Infinity;
   const atLimit = !isPremium && links.length >= FREE_LIMIT;
 
   const calculateReturningUsers = () => {

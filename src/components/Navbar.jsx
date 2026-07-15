@@ -35,7 +35,7 @@ export default function Navbar() {
 
   const navItems = [
     { to: "/features", label: "Features" },
-    { to: "/pricing", label: "Pricing" },
+    // { to: "/pricing", label: "Pricing" },
     { to: "/accuracy", label: "Accuracy" },
     { to: "/blog", label: "Blog" },
   ];

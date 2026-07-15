@@ -43,7 +43,7 @@ export default function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/features" element={<Features/>} />
         <Route path="/accuracy" element={<Accuracy />} />
-        <Route path="/pricing" element={<Pricing />} />
+        {/* <Route path="/pricing" element={<Pricing />} /> */}
 
         <Route
           path="/dashboard"

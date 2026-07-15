@@ -411,8 +411,10 @@ export default function AnalytcsDashboard() {
 
   const token = localStorage.getItem("apiToken");
 
-  const isPremium = PREMIUM_USERS.includes(userEmail);
-  const FREE_LIMIT = isPremium ? Infinity : 1;
+  // const isPremium = PREMIUM_USERS.includes(userEmail);
+  // const FREE_LIMIT = isPremium ? Infinity : 1;
+  const isPremium = true;
+  const FREE_LIMIT = Infinity;
 
   // Helper function to format date as YYYY-MM-DD
   const formatDateToString = (date) => {
