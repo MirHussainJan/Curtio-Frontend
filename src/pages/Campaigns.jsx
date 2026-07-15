@@ -61,6 +61,7 @@ import {
   FaEdge,
   FaOpera,
   FaInternetExplorer,
+  FaFacebookMessenger,
 } from "react-icons/fa";
 import { IoLogoWechat } from "react-icons/io5";
 import { IoIosMail } from "react-icons/io";
@@ -94,6 +95,7 @@ import {
 import { SHORTENER_DOMAIN } from "../components/Shortner";
 import Sidebar from "../components/Sidebar";
 import Filter from "../components/filter";
+import ShareModal from "../components/LinkShareModal";
 
 const PREMIUM_USERS = ["mrabdullahamjid33@gmail.com",  "mirhussainjan10387@gmail.com"];
 const COLORS = ["#4F46E5", "#F97316", "#22C55E", "#EAB308", "#EC4899"];
@@ -111,13 +113,23 @@ const REFERER_RULES = [
   { source: "Snapchat", pattern: /snapchat/i, color: "#4F46E5", icon: FaSnapchat },
   { source: "Discord", pattern: /discord/i, color: "#4F46E5", icon: FaDiscord },
   { source: "Telegram", pattern: /telegram|t\.me/i, color: "#4F46E5", icon: FaTelegramPlane },
-  { source: "Teams", pattern: /teams\.microsoft/i, color: "#4F46E5", icon: BiLogoMicrosoftTeams },
+  { source: "Teams", pattern: /teams\.microsoft|teams\.cdn\.office|onecdn\.static\.microsoft/i, color: "#4F46E5", icon: BiLogoMicrosoftTeams },
   { source: "Slack", pattern: /slack/i, color: "#4F46E5", icon: FaSlack },
   { source: "Gmail", pattern: /mail\.google/i, color: "#4F46E5", icon: SiGmail },
   { source: "Outlook", pattern: /outlook/i, color: "#4F46E5", icon: PiMicrosoftOutlookLogoDuotone },
   { source: "WeChat", pattern: /wechat|micromessenger/i, color: "#4F46E5", icon: IoLogoWechat },
   { source: "Line", pattern: /line/i, color: "#4F46E5", icon: FaLine },
   { source: "Viber", pattern: /viber/i, color: "#4F46E5", icon: FaViber },
+  { source: "Asana", pattern: /asana/i, color: "#4F46E5", icon: SiAsana },
+  { source: "Trello", pattern: /trello/i, color: "#4F46E5", icon: FaTrello },
+  { source: "Confluence", pattern: /atlassian|confluence/i, color: "#4F46E5", icon: FaConfluence },
+  { source: "Zoom", pattern: /zoom\.us/i, color: "#4F46E5", icon: SiZoom },
+  { source: "Google Meet", pattern: /meet\.google/i, color: "#4F46E5", icon: SiGooglemeet },
+  { source: "Notion", pattern: /notion\.so/i, color: "#4F46E5", icon: SiNotion },
+  { source: "Twitch", pattern: /twitch/i, color: "#4F46E5", icon: FaTwitch },
+  { source: "Yahoo", pattern: /yahoo/i, color: "#4F46E5", icon: FaYahoo },
+  { source: "Signal", pattern: /signal/i, color: "#4F46E5", icon: FaSignal },
+  { source: "Messenger", pattern: /messenger/i, color: "#4F46E5", icon: FaFacebookMessenger },
 ];
 
 const BROWSER_RULES = [
@@ -421,8 +433,10 @@ export default function Campaigns() {
 
   const token = localStorage.getItem("apiToken");
 
-  const isPremium = PREMIUM_USERS.includes(userEmail);
-  const FREE_LIMIT = isPremium ? Infinity : 1;
+  // const isPremium = PREMIUM_USERS.includes(userEmail);
+  // const FREE_LIMIT = isPremium ? Infinity : 1;
+  const isPremium = true;
+  const FREE_LIMIT = Infinity;
 
   // Helper function to format date as YYYY-MM-DD
   const formatDateToString = (date) => {
@@ -451,6 +465,7 @@ export default function Campaigns() {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(null);
   const [qrLink, setQrLink] = useState(null);
+  const [shareLink, setShareLink] = useState(null);
   const [deleteModal, setDeleteModal] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [showLimitModal, setShowLimitModal] = useState(false);
@@ -937,6 +952,7 @@ export default function Campaigns() {
   return (
     <div className="min-h-screen bg-slate-50">
       {qrLink && <QrModal link={qrLink} onClose={() => setQrLink(null)} />}
+      {shareLink && <ShareModal link={shareLink} onClose={() => setShareLink(null)} />}
       {deleteModal && (
         <DeleteModal
           onConfirm={performDelete}
@@ -1302,10 +1318,16 @@ export default function Campaigns() {
                                 {c.activeCount} / {c.links.length} Active
                               </span>
                             </td>
-                            <td className="py-4 pl-4 text-right">
-                              <button className="text-slate-400 hover:text-slate-800 transition-colors p-1">
-                                <ChevronRight size={16} />
-                              </button>
+                             <td className="py-4 pl-4 text-right" onClick={(e) => e.stopPropagation()}>
+                              <div className="flex items-center justify-end gap-2">
+                                
+                                <button
+                                  onClick={() => setSelectedCampaign(c.name)}
+                                  className="text-slate-400 hover:text-slate-800 transition-colors p-1"
+                                >
+                                  <ChevronRight size={16} />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))
@@ -1427,6 +1449,13 @@ export default function Campaigns() {
                             </td>
                             <td className="py-3 pl-3 text-right">
                               <div className="flex items-center justify-end gap-1">
+                                <button
+                                  onClick={() => setShareLink(link)}
+                                  title="Share on WhatsApp"
+                                  className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-green-600 transition-colors cursor-pointer"
+                                >
+                                  <FaWhatsapp size={13} />
+                                </button>
                                 <button
                                   onClick={() =>
                                     handleCopy(link.id, link.short)

@@ -7,6 +7,7 @@ import {
   X,
   Pencil,
   LogOut,
+  ArrowLeft,
 } from "lucide-react";
 
 export default function Sidebar({
@@ -72,43 +73,50 @@ export default function Sidebar({
           </button>
         </div>
 
-        <Link to="/dashboard/analytics" className="flex items-center gap-2 px-2 mb-8">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
-            <Zap size={15} className="text-white" fill="white" />
-          </div>
-          <span className="text-lg font-extrabold text-slate-900">Brevly</span>
-        </Link>
+        <div className="relative flex items-center justify-center mb-6 mt-1">
+          <Link
+            to="/"
+            className="absolute left-0 p-1.5 rounded-[10px] text-slate-600 bg-slate-50/60 border border-slate-200/80 backdrop-blur-md shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] hover:bg-white hover:border-slate-300 hover:text-slate-900 hover:shadow-[0_4px_12px_-2px_rgba(0,0,0,0.08)] transition-all"
+            title="Back to Landing Page"
+          >
+            <ArrowLeft size={18} />
+          </Link>
+          <Link
+            to="/dashboard/analytics"
+            className="font-bold text-2xl tracking-[-0.03em] text-slate-900"
+            style={{ fontFamily: "'Space Grotesk','Inter',sans-serif" }}
+          >
+            curtio<span className="text-indigo-600">.</span>
+          </Link>
+        </div>
 
         <nav className="flex flex-col gap-1 flex-1">
           <Link
             to="/dashboard/analytics"
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors text-left ${
-              currentPath === "/dashboard/analytics"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors text-left ${currentPath === "/dashboard/analytics"
                 ? "bg-indigo-50 text-indigo-700 font-semibold"
                 : "font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-            }`}
+              }`}
           >
             <BarChart2 size={16} /> Analytics Dashboard
           </Link>
 
           <Link
             to="/dashboard"
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors text-left ${
-              currentPath === "/dashboard"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors text-left ${currentPath === "/dashboard"
                 ? "bg-indigo-50 text-indigo-700 font-semibold"
                 : "font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-            }`}
+              }`}
           >
             <LinkIcon size={16} /> Links
           </Link>
 
           <Link
             to="/dashboard/campaigns"
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors text-left ${
-              currentPath === "/dashboard/campaigns"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors text-left ${currentPath === "/dashboard/campaigns"
                 ? "bg-indigo-50 text-indigo-700 font-semibold"
                 : "font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-            }`}
+              }`}
           >
             <TrendingUp size={16} /> Campaigns
           </Link>
@@ -148,13 +156,13 @@ export default function Sidebar({
           </div>
           <Link
             to="/dashboard/editprofile"
-            className="flex items-center justify-center gap-2 w-full bg-indigo-700 text-white text-sm font-medium px-3 py-2 rounded-xl text-center mt-2 cursor-pointer hover:bg-indigo-800 transition-colors"
+            className="flex items-center justify-center gap-2 w-full bg-indigo-600 text-white text-sm font-medium px-3 py-2 rounded-xl text-center mt-2 cursor-pointer hover:bg-indigo-800 transition-colors"
           >
             <Pencil size={15} /> Edit Profile
           </Link>
           <button
             onClick={handleLogout}
-            className="bg-indigo-700 text-white text-sm font-medium px-3 py-2 rounded-xl text-center mt-2 cursor-pointer hover:bg-indigo-800 transition-colors flex w-full items-center justify-center gap-2"
+            className="bg-indigo-600 text-white text-sm font-medium px-3 py-2 rounded-xl text-center mt-2 cursor-pointer hover:bg-indigo-800 transition-colors flex w-full items-center justify-center gap-2"
           >
             <LogOut size={15} /> Logout
           </button>

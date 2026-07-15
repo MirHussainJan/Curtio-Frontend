@@ -3,21 +3,28 @@ import { Link } from 'react-router-dom'
 import {
   ArrowRight, Zap, BarChart2, Shield, Globe, Copy, Check,
   Link as LinkIcon, QrCode, Clock, Lock, Target, Users,
-  RefreshCw, FileDown, Filter, Shuffle
+  RefreshCw, FileDown, Filter, Shuffle, AlertTriangle,
+  ChevronRight,
+  AlertCircle
 } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import Shortener, { SHORTENER_DOMAIN, generateSlug } from '../components/Shortner'
 import ShortenerModal from '../components/shortenerModal'
+import { BiLeftArrow } from 'react-icons/bi'
+import { FaArrowRight } from 'react-icons/fa6'
+import Footer from '../components/footer'
+import ComparisonSection from '../components/Comparison.jsx'
+import CTASection from '../components/cta.jsx'
 
 const FEATURES = [
-  { icon: <Zap size={20} className="text-indigo-500" />, title: 'Lightning Fast Shortening', desc: 'Turn any URL into a clean short link in under a second. No friction, no account needed for quick shares.' },
-  { icon: <BarChart2 size={20} className="text-orange-500" />, title: 'Real-Time Analytics', desc: 'See every click: device, country, referrer, browser, OS — all updated live.' },
-  { icon: <QrCode size={20} className="text-indigo-500" />, title: 'QR Code Generation', desc: 'Every link gets a downloadable QR code — PNG or SVG, ready for print or digital.' },
-  { icon: <Globe size={20} className="text-orange-500" />, title: 'Custom Aliases', desc: 'Brand your links with human-readable slugs like brev.ly/your-campaign.' },
-  { icon: <Clock size={20} className="text-indigo-500" />, title: 'Link Expiration', desc: 'Set an expiry date on any link. After it expires, visitors see a clean "expired" message.' },
-  { icon: <Lock size={20} className="text-orange-500" />, title: 'Password Protection', desc: 'Add a password to any link. Only people with the password get redirected.' },
-  { icon: <Target size={20} className="text-indigo-500" />, title: 'Retargeting Pixels', desc: 'Embed your Facebook, Google, or LinkedIn pixel into any link — retarget every visitor automatically.' },
-  { icon: <Shuffle size={20} className="text-orange-500" />, title: 'Geo & Device Routing', desc: 'Send iOS users to the App Store, Android users to Play Store, and desktop users to your site — automatically.' },
+  { icon: <Zap size={20} />, tone: 'indigo', title: 'Lightning Fast Shortening', desc: 'Turn any URL into a clean short link in under a second. No friction, no account needed for quick shares.' },
+  { icon: <BarChart2 size={20} />, tone: 'orange', title: 'Real-Time Analytics', desc: 'See every click: device, country, referrer, browser, OS — all updated live.' },
+  { icon: <QrCode size={20} />, tone: 'indigo', title: 'QR Code Generation', desc: 'Every link gets a downloadable QR code — PNG or SVG, ready for print or digital.' },
+  { icon: <Globe size={20} />, tone: 'orange', title: 'Custom Aliases', desc: 'Brand your links with human-readable slugs like brev.ly/your-campaign.' },
+  { icon: <Clock size={20} />, tone: 'indigo', title: 'Link Expiration', desc: 'Set an expiry date on any link. After it expires, visitors see a clean "expired" message.' },
+  { icon: <Lock size={20} />, tone: 'orange', title: 'Password Protection', desc: 'Add a password to any link. Only people with the password get redirected.' },
+  { icon: <Target size={20} />, tone: 'indigo', title: 'Retargeting Pixels', desc: 'Embed your Facebook, Google, or LinkedIn pixel into any link — retarget every visitor automatically.' },
+  { icon: <Shuffle size={20} />, tone: 'orange', title: 'Geo & Device Routing', desc: 'Send iOS users to the App Store, Android users to Play Store, and desktop users to your site — automatically.' },
 ]
 
 const STATS = [
@@ -66,7 +73,6 @@ export default function Landing() {
 
     const token = localStorage.getItem('apiToken')
 
-
     if (token) {
       try {
         const baseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -114,207 +120,171 @@ export default function Landing() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#FAFAFA] text-[#334155]">
       <Navbar />
 
-      {/* Hero */}
-      <section className="pt-32 pb-20 px-6 text-center relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-indigo-100 rounded-full opacity-40 blur-3xl" />
-          <div className="absolute -top-20 -right-40 w-[500px] h-[500px] bg-orange-100 rounded-full opacity-40 blur-3xl" />
-        </div>
+      {/* ===================== HERO ===================== */}
+      <section className="relative pt-36 pb-20 px-6 text-center overflow-hidden">
+        <div
+          className="absolute -top-40 left-1/2 -translate-x-1/2 w-[760px] h-[520px] rounded-full opacity-[0.16] blur-[120px] pointer-events-none"
+          style={{ background: 'linear-gradient(120deg,#1E1B4B,#312E81 45%,#4F46E5)' }}
+        />
 
-        <div className="relative max-w-3xl mx-auto">
-          <span className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-600 text-xs md:text-sm font-semibold px-4 py-1.5 rounded-full mb-6 border border-indigo-100">
-            <Zap size={14} fill="currentColor" /> Free forever · No credit card needed
+        <div className="relative max-w-3xl mx-auto z-10">
+          <span className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-600 text-xs md:text-sm font-semibold px-4 py-1.5 rounded-full mb-6">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
+            URL shortener with real click tracking
           </span>
 
-          <h1 className="text-3xl md:text-5xl sm:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight mb-5">
-            Shorten. Share.{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-orange-500">
-              Track.
+          <h1 className="text-[clamp(2.2rem,5vw,3.6rem)] font-extrabold text-slate-900 tracking-tight leading-[1.12] mb-5 max-w-[20ch] mx-auto">
+            One visitor.{' '}
+            <span
+              className="text-transparent bg-clip-text"
+              style={{ backgroundImage: 'linear-gradient(120deg,#4F46E5 0%,#7C3AED 100%)' }}
+            >
+              One click.{' '}
             </span>
+            Not Four.
           </h1>
-          <p className=" md:text-lg sm:text-xl text-slate-500 mb-4 max-w-xl mx-auto leading-relaxed">
-            Brevly turns long URLs into clean, trackable links — with real-time analytics, QR codes, and link controls built right in.
+          <p className="md:text-lg sm:text-xl text-slate-500 mb-8 max-w-xl mx-auto leading-relaxed">
+            curtio turns long URLs into clean short links and counts every click the right way. You see real visitors, not bots and link previews padding your numbers. That is the data you need before you spend another dollar or another hour on a channel.
           </p>
 
-          {/* Free tier callout */}
-          <div className="md:hidden inline-flex items-center gap-2 text-sm text-slate-500 bg-slate-50 border border-slate-200 rounded-full px-4 py-2 mb-4">
-            <span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
-            <Link to="/register" className="text-indigo-600 font-semibold hover:underline">Sign up for free</Link>.
-          </div>
 
-          <div className="hidden md:inline-flex items-center gap-2 text-sm text-slate-500 bg-slate-50 border border-slate-200 rounded-full px-4 py-2 mb-8">
-            <span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
-            Shorten instantly — no account needed.
-            <Link to="/register" className="text-indigo-600 font-semibold hover:underline">Sign up free</Link>
-            to unlock analytics.
-          </div>
-
-          {/* Shortener */}
-          <form onSubmit={handleShorten} className="max-w-2xl mx-auto">
-            <div className="flex flex-col sm:flex-row gap-3 bg-white border border-slate-200 rounded-2xl p-2 shadow-lg shadow-slate-100">
-              <div className="flex items-center gap-3 flex-1 px-3">
-                <LinkIcon size={18} className="text-slate-400 shrink-0" />
-                <input
-                  type="text"
-                  value={url}
-                  onChange={e => { setUrl(e.target.value); setShortened(null); setError('') }}
-                  placeholder="Paste your long URL here..."
-                  className="flex-1 text-slate-800 placeholder-slate-400 bg-transparent outline-none text-sm py-2"
-                />
-              </div>
-
-              <Shortener loading={loading} />
-            </div>
-            {error && <p className="text-red-500 text-sm mt-2 text-left px-2">{error}</p>}
-          </form>
-
-          {shortened && (
-            <div className="max-w-2xl mx-auto mt-4 rounded-xl px-5 py-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border transition-all bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-indigo-600">
-                  <Zap size={14} className="text-white" fill="white" />
+          {/* Shortener card */}
+          <form onSubmit={handleShorten} className="max-w-2xl mx-auto text-left">
+            <div className="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-[0_4px_14px_-2px_rgba(15,23,42,0.10)]">
+              <div className="flex flex-col sm:flex-row gap-2.5">
+                <div className="flex items-center gap-3 flex-1 bg-[#FAFAFA] border border-slate-200 rounded-xl px-4 py-3.5 focus-within:border-indigo-600 focus-within:bg-white focus-within:shadow-[0_0_0_4px_#EEF2FF] transition-colors">
+                  <LinkIcon size={18} className="text-slate-400 shrink-0" />
+                  <input
+                    type="text"
+                    value={url}
+                    onChange={e => { setUrl(e.target.value); setShortened(null); setError('') }}
+                    placeholder="Paste your long URL here..."
+                    className="flex-1 text-slate-800 placeholder-slate-400 bg-transparent outline-none text-sm"
+                  />
                 </div>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 min-w-0 text-left">
-                  <span className="font-semibold text-sm truncate text-indigo-700">
-                    {shortened}
-                  </span>
+                <Shortener loading={loading} />
+              </div>
+              <p className="text-xs text-slate-500 mt-3 ml-1">
+                No account needed to try.{' '}
+                <Link to="/register" className="text-indigo-600 font-semibold hover:underline">Sign up free</Link> to track it.
+              </p>
+              {error && (
+                <div className="mt-4 animate-[riseIn_.4s_ease] border-t border-dashed border-slate-200 pt-4">
+                  <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
+                    <AlertCircle
+                      size={16}
+                      className="mt-0.5 flex-shrink-0 text-red-500"
+                    />
+                    <span className="text-sm text-red-600">
+                      {error}
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  onClick={handleCopy}
-                  type="button"
-                  className="flex items-center gap-2 text-sm font-medium bg-white border border-indigo-200 hover:border-indigo-400 text-indigo-600 px-4 py-2 rounded-lg transition-all"
-                >
-                  {copied ? <><Check size={14} /> Copied!</> : <><Copy size={14} /> Copy</>}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {shortened && (
-            <p className="text-xs text-slate-500 mt-3 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5 inline-block">
-              {localStorage.getItem('apiToken') ? (
-                <span>
-                  🎉 This link has been successfully saved to your account! Visit your{' '}
-                  <Link to="/dashboard" className="text-indigo-600 font-semibold hover:underline">Dashboard</Link>
-                  {' '}to track clicks, customize UTMs, set passwords, and view detailed visitor logs.
-                </span>
-              ) : (
-                <span>
-                  This link is active but <strong>not tracked</strong> — it's a guest link.{' '}
-                  <Link to="/register" className="text-indigo-600 font-semibold hover:underline">Create a free account</Link>
-                  {' '}to get full click analytics on your link.
-                </span>
               )}
-            </p>
-          )}
+
+              {shortened && (
+                <div className="mt-4 border-t border-dashed border-slate-200 pt-4 animate-[riseIn_.4s_ease]">
+                  <div className="text-[0.7rem] font-semibold tracking-wide text-slate-500 uppercase mb-2">Your short link</div>
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <div className="flex-1 min-w-[180px] bg-indigo-50 border border-indigo-100 rounded-xl px-4 py-3 font-semibold text-indigo-700 text-base truncate">
+                      {shortened}
+                    </div>
+                    <button
+                      onClick={handleCopy}
+                      type="button"
+                      className="flex items-center gap-2 text-sm font-semibold border border-slate-200 hover:border-slate-300 hover:bg-white text-slate-900 px-3.5 py-2.5 rounded-xl transition-colors cursor-pointer"
+                    >
+                      {copied ? <><Check size={14} /> Copied</> : <><Copy size={14} /> Copy</>}
+                    </button>
+                  </div>
+
+                  <div className="flex gap-3 items-start mt-3.5 bg-amber-50 border border-amber-200 rounded-xl px-3.5 py-3 text-sm text-amber-800 leading-relaxed">
+                    <AlertTriangle size={19} className="text-amber-500 shrink-0 mt-0.5" />
+                    {localStorage.getItem('apiToken') ? (
+                      <span>
+                        🎉 <strong className="text-amber-900">Saved to your account.</strong> Visit your{' '}
+                        <Link to="/dashboard" className="text-indigo-600 font-semibold hover:underline">Dashboard</Link>{' '}
+                        to track clicks, customize UTMs, set passwords, and view visitor logs.
+                      </span>
+                    ) : (
+                      <span>
+                        <strong className="text-amber-900">This link works, but it is not tracked yet.</strong>{' '}
+                        <Link to="/register" className="text-indigo-600 font-semibold hover:underline">Create a free account</Link>{' '}
+                        to see who's clicking, counted accurately.
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="text-md font-semibold text-slate-500 mt-3  text-center flex items-center gap-2 justify-center pt-2">
+              <Link to="/accuracy" className="text-indigo-600 font-semibold">See how we count clicks</Link>
+              <FaArrowRight size={12} className="text-indigo-600 inline" />
+            </div>
+
+          </form>
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="border-y border-slate-100 bg-slate-50 py-10 px-6">
+      {/* ===================== STATS STRIP ===================== */}
+      <section className="bg-[#F1F5F9] border-y border-slate-200 py-12 px-6">
         <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6">
           {STATS.map(stat => (
-            <div key={stat.label} className="text-center">
-              <div className="text-2xl md:text-3xl font-extrabold text-slate-900">{stat.value}</div>
-              <div className="text-xs md:text-sm text-slate-500 mt-1">{stat.label}</div>
+            <div key={stat.label} className="text-center relative">
+              <div className="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight">{stat.value}</div>
+              <div className="text-xs md:text-sm text-slate-500 mt-2 font-medium">{stat.label}</div>
             </div>
           ))}
         </div>
       </section>
 
-    
-      {/* <section className="py-10 md:py-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
-              Always free. Seriously.
-            </h2>
-            <p className="text-slate-500 md:text-lg max-w-xl mx-auto">
-              No credit card. No trial. No catch. Use Brevly as a guest or sign up to unlock analytics.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-5">
-         
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-7">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-bold uppercase tracking-widest text-slate-500">Guest</span>
-                <span className="text-xs bg-slate-200 text-slate-600 font-semibold px-2 py-0.5 rounded-full">No account</span>
-              </div>
-              <div className="text-2xl font-extrabold text-slate-900 mb-1">Free</div>
-              <p className="text-slate-500 text-sm mb-6">Paste and go. No signup, no waiting.</p>
-              <ul className="space-y-3 mb-8">
-                {FREE_FEATURES.map(f => (
-                  <li key={f} className="flex items-start gap-2.5 text-sm text-slate-700">
-                    <Check size={16} className="text-slate-400 mt-0.5 shrink-0" />
-                    {f}
-                  </li>
-                ))}
-                <li className="flex items-start gap-2.5 text-sm text-slate-400">
-                  <span className="w-4 h-4 mt-0.5 shrink-0 text-center">✗</span>
-                  Analytics &amp; click tracking
-                </li>
-                <li className="flex items-start gap-2.5 text-sm text-slate-400">
-                  <span className="w-4 h-4 mt-0.5 shrink-0 text-center">✗</span>
-                  Link management dashboard
-                </li>
-              </ul>
-              <Link to="/" className="block text-center text-sm font-semibold border border-slate-300 text-slate-700 hover:bg-slate-100 py-2.5 rounded-xl transition-colors">
-                Use as Guest
-              </Link>
-            </div>
-
-            <div className="bg-white border-2 border-indigo-500 rounded-2xl p-7 relative shadow-lg shadow-indigo-100">
-              <div className="absolute -top-3 left-6">
-                <span className="bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full">
-                  Recommended
-                </span>
-              </div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-bold uppercase tracking-widest text-indigo-500">Free Account</span>
-                <span className="text-xs bg-indigo-50 text-indigo-600 font-semibold px-2 py-0.5 rounded-full">1 tracked link</span>
-              </div>
-              <div className="text-2xl font-extrabold text-slate-900 mb-1">Free</div>
-              <p className="text-slate-500 text-sm mb-6">Sign up in 30 seconds. No card needed.</p>
-              <ul className="space-y-3 mb-8">
-                {REGISTERED_FEATURES.map(f => (
-                  <li key={f} className="flex items-start gap-2.5 text-sm text-slate-700">
-                    <Check size={16} className={`mt-0.5 shrink-0 ${f.startsWith('Everything') ? 'text-slate-400' : 'text-indigo-500'}`} />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link to="/register" className="block text-center text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl transition-colors">
-                Create Free Account
-              </Link>
-            </div>
-          </div>
-          <p className="text-center text-xs text-slate-400 mt-5">
-            One tracked link is all most people need. Use it for your most important destination — portfolio, landing page, calendar link.
+      {/* ===================== PROBLEM / SOLUTION ===================== */}
+      <section className="py-20 px-6">
+        <div className="max-w-3xl mx-auto text-center mb-14">
+          <h2 className="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
+            The numbers you've been trusting are wrong
+          </h2>
+          <p className="text-slate-500 text-base md:text-lg">
+            Most shorteners log a click every time anything touches your link. A bot crawls it. A chat app fetches a preview. A spam filter scans it. All of that gets counted. So one real person can show up as four, and you never know which number was real.
           </p>
         </div>
-      </section> */}
+        <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6">
+          <div className="bg-white border border-slate-200 rounded-2xl p-7 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 text-slate-500 font-bold text-sm mb-4">1</span>
+            <h3 className="font-bold text-slate-900 text-lg mb-2">Counted four times</h3>
+            <p className="text-slate-500 text-sm">A visitor opens your link. A preview bot grabs it. A scanner checks it. Other tools count all three as clicks.</p>
+          </div>
+          <div className="bg-white border border-slate-200 rounded-2xl p-7 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 text-slate-500 font-bold text-sm mb-4">2</span>
+            <h3 className="font-bold text-slate-900 text-lg mb-2">Real and noise look the same</h3>
+            <p className="text-slate-500 text-sm">When the count is inflated, you can't see which channel actually worked. So effort goes into traffic that was never there.</p>
+          </div>
+          <div className="bg-indigo-50 border border-indigo-600 rounded-2xl p-7 shadow-[0_8px_30px_-10px_rgba(79,70,229,0.35)]">
+            <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-600 text-white font-bold text-sm mb-4">3</span>
+            <h3 className="font-bold text-indigo-700 text-lg mb-2">Brevly counts once</h3>
+            <p className="text-indigo-700/80 text-sm">We remove the duplicates. One real visitor counts as one click, a number on your dashboard you can actually act on.</p>
+          </div>
+        </div>
+      </section>
 
-      {/* Features grid */}
-      <section className="py-10 md:py-20 px-6 bg-slate-50 border-y border-slate-100">
+      {/* ===================== FEATURES ===================== */}
+      <section className="py-10 md:py-20 px-6 bg-[#F1F5F9] border-y border-slate-200" id="features">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-6 md:mb-12">
-            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight mb-3">
-              Everything you need to{' '}
-              <span className="text-indigo-600">go further</span>
+            <h2 className="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
+              Everything you need, nothing you do not
             </h2>
             <p className="text-slate-500 text-sm md:text-lg max-w-xl mx-auto">
-              Brevly isn't just a URL shortener — it's a full link management platform.
+              curtio respects your time and your data. Here is what every link gives you.
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {FEATURES.map(f => (
-              <div key={f.title} className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
-                <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center mb-4">
+              <div key={f.title} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 ${f.tone === 'indigo' ? 'bg-indigo-50 text-indigo-600' : 'bg-orange-50 text-orange-500'}`}>
                   {f.icon}
                 </div>
                 <h3 className="font-bold text-slate-900 text-sm mb-1.5">{f.title}</h3>
@@ -325,77 +295,87 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* How it works */}
+      {/* ===================== HOW IT WORKS ===================== */}
       <section className="py-10 md:py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight mb-3">
-            How it works
+          <h2 className="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
+            Three steps and you're done
           </h2>
-          <p className="text-slate-500 text-sm md:text-lg mb-12">Three steps from long URL to full insight.</p>
-          <div className="grid sm:grid-cols-3 gap-8">
+          <p className="text-slate-500 text-sm md:text-lg mb-12">From long URL to full insight.</p>
+          <div className="grid sm:grid-cols-3 relative">
             {[
-              { step: '01', title: 'Paste your URL', desc: 'Drop any long URL into the Brevly shortener — no account needed for a basic short link.' },
-              { step: '02', title: 'Get your short link', desc: 'Instantly receive a clean brev.ly/… link. Sign up to claim a custom alias and track it.' },
-              { step: '03', title: 'Track every click', desc: 'Watch real-time analytics roll in: who clicked, from where, on what device, from which channel.' },
-            ].map(item => (
-              <div key={item.step} className="flex flex-col items-center text-center">
-                <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-extrabold md:text-lg mb-4 shadow-md shadow-indigo-200">
+              { step: '1', title: 'Paste', desc: 'Drop any long URL into the Brevly shortener — no account needed for a basic short link.' },
+              { step: '2', title: 'Shorten', desc: 'Instantly receive a clean brev.ly/… link. Sign up to claim a custom alias and track it.' },
+              { step: '3', title: 'Track', desc: 'Watch real-time analytics roll in: who clicked, from where, on what device, from which channel.' },
+            ].map((item, i) => (
+              <div key={item.step} className="flex flex-col items-center text-center relative px-4">
+                {i > 0 && (
+                  <span className="hidden sm:block absolute top-[30px] left-[calc(-50%+30px)] w-[calc(100%-60px)] h-0.5"
+                    style={{ background: 'repeating-linear-gradient(90deg,#CBD5E1 0 6px,transparent 6px 12px)' }} />
+                )}
+                <div className="relative z-10 w-[60px] h-[60px] rounded-full bg-indigo-600 text-white flex items-center justify-center text-xl font-bold mb-5 shadow-[0_8px_20px_-6px_rgba(79,70,229,0.5)]">
                   {item.step}
                 </div>
-                <h3 className="font-bold text-slate-900 text-sm md:text-lg mb-2">{item.title}</h3>
-                <p className="text-slate-500 text-sm md:text-md leading-relaxed">{item.desc}</p>
+                <h3 className="font-bold text-slate-900 text-lg mb-2">{item.title}</h3>
+                <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
+      <ComparisonSection />
+      {/* ===================== TESTIMONIAL ===================== */}
+
       <section className="py-10 md:py-20 px-6">
-        <div className="max-w-3xl mx-auto bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-3xl px-8 py-14 text-center shadow-xl shadow-indigo-200 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500 opacity-10 rounded-full -translate-y-1/2 translate-x-1/3 blur-2xl" />
-          <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-4">
-            Ready to level up your links?
-          </h2>
-          <p className="text-indigo-200 text-sm md:text-lg mb-8 max-w-md mx-auto">
-            Create your free account in 30 seconds. Get one tracked link with full analytics, forever free.
-          </p>
-          <Link
-            to="/register"
-            className="hidden md:inline-flex items-center gap-2 bg-white text-indigo-700 font-bold text-sm px-7 py-3.5 rounded-xl hover:bg-indigo-50 transition-colors shadow-sm"
-          >
-            Get Started — It's Free <ArrowRight size={16} />
-          </Link>
+        <div className="max-w-[1152px] mx-auto">
+          {/* Section Heading */}
+          <div className="max-w-3xl mx-auto text-center mb-10">
+            <h2 className="text-lg md:text-4xl font-extrabold tracking-[-0.02em] text-slate-900">
+              Made for people who live by their numbers
+            </h2>
+          </div>
 
-          <Link
-            to="/register"
-            className="inline-flex md:hidden items-center gap-2 bg-white text-indigo-700 font-bold text-sm px-7 py-3.5 rounded-xl hover:bg-indigo-50 transition-colors shadow-sm"
-          >
-            Get Started<ArrowRight size={16} />
-          </Link>
+          {/* Testimonial */}
+          <div className="max-w-3xl mx-auto text-center">
+            <p className="text-2xl md:text-[2rem] font-semibold leading-[1.3] tracking-[-0.02em] text-slate-900">
+              <span className="text-indigo-600">&ldquo;</span>
+              I share links in Facebook groups all day. curtio is the first tool
+              where the click count actually matches what I see.
+              <span className="text-indigo-600">&rdquo;</span>
+            </p>
 
+            {/* Author */}
+            <div className="mt-8 inline-flex items-center gap-4 text-left">
+              <div
+                className="flex h-[50px] w-[50px] items-center justify-center rounded-full border border-slate-200 text-sm font-bold text-slate-500"
+                style={{
+                  background:
+                    "linear-gradient(135deg,#EEF2FF,#FFF3EA)",
+                }}
+              >
+                AM
+              </div>
 
-          <p className="text-indigo-300 text-xs mt-4">No credit card · No trial · Cancel anytime</p>
+              <div>
+                <p className="font-semibold text-slate-900">[Name]</p>
+                <p className="text-sm text-slate-500">
+                  Affiliate marketer · placeholder, replace before launch
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <footer className="border-t border-slate-100 py-8 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
-              <Zap size={13} className="text-white" fill="white" />
-            </div>
-            <span className="font-extrabold text-slate-900">Brevly</span>
-          </Link>
-          <div className="flex items-center gap-5 text-sm text-slate-400">
-            <Link to="/blog" className="hover:text-slate-700 transition-colors">Blog</Link>
-            <span>Privacy</span>
-            <span>Terms</span>
-          </div>
-          <p className="text-slate-400 text-sm">© {new Date().getFullYear()} Brevly</p>
-          <ShortenerModal open={showAuthModal} onClose={() => setShowAuthModal(false)} shortened={shortened} originalUrl={url} />
-        </div>
-      </footer>
+      {/* ===================== CTA ===================== */}
+      <CTASection heading={"Ready for numbers you can trust?"}
+        description={"Make a free account in about 30 seconds. You get one fully tracked link with complete analytics, and you can move up to Plus whenever you outgrow it."}
+        buttonText={"Get started free"}
+        buttonLink="/register"
+      />
+
+      <Footer />
     </div>
   )
 }
