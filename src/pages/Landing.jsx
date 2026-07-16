@@ -20,7 +20,7 @@ const FEATURES = [
   { icon: <Zap size={20} />, tone: 'indigo', title: 'Lightning Fast Shortening', desc: 'Turn any URL into a clean short link in under a second. No friction, no account needed for quick shares.' },
   { icon: <BarChart2 size={20} />, tone: 'orange', title: 'Real-Time Analytics', desc: 'See every click: device, country, referrer, browser, OS — all updated live.' },
   { icon: <QrCode size={20} />, tone: 'indigo', title: 'QR Code Generation', desc: 'Every link gets a downloadable QR code — PNG or SVG, ready for print or digital.' },
-  { icon: <Globe size={20} />, tone: 'orange', title: 'Custom Aliases', desc: 'Brand your links with human-readable slugs like brev.ly/your-campaign.' },
+  { icon: <Globe size={20} />, tone: 'orange', title: 'Custom Aliases', desc: 'Brand your links with human-readable slugs like redirect.curtio.io/your-campaign.' },
   { icon: <Clock size={20} />, tone: 'indigo', title: 'Link Expiration', desc: 'Set an expiry date on any link. After it expires, visitors see a clean "expired" message.' },
   { icon: <Lock size={20} />, tone: 'orange', title: 'Password Protection', desc: 'Add a password to any link. Only people with the password get redirected.' },
   { icon: <Target size={20} />, tone: 'indigo', title: 'Retargeting Pixels', desc: 'Embed your Facebook, Google, or LinkedIn pixel into any link — retarget every visitor automatically.' },
@@ -305,7 +305,7 @@ export default function Landing() {
           <div className="grid sm:grid-cols-3 relative">
             {[
               { step: '1', title: 'Paste', desc: 'Drop any long URL into the Brevly shortener — no account needed for a basic short link.' },
-              { step: '2', title: 'Shorten', desc: 'Instantly receive a clean brev.ly/… link. Sign up to claim a custom alias and track it.' },
+              { step: '2', title: 'Shorten', desc: 'Instantly receive a clean redirect.curtio.io/… link. Sign up to claim a custom alias and track it.' },
               { step: '3', title: 'Track', desc: 'Watch real-time analytics roll in: who clicked, from where, on what device, from which channel.' },
             ].map((item, i) => (
               <div key={item.step} className="flex flex-col items-center text-center relative px-4">

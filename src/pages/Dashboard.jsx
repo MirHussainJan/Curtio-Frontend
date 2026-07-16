@@ -571,7 +571,7 @@ export default function Dashboard() {
                   </label>
                   <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500">
                     <span className="text-slate-400 text-sm pl-4 pr-1 whitespace-nowrap">
-                      brev.ly/
+                      redirect.curtio.io/
                     </span>
                     <input
                       type="text"
