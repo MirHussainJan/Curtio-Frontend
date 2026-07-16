@@ -73,7 +73,7 @@ export default function Blog() {
       <section className="pt-28 pb-6 md:pb-12 px-6 text-center border-b border-slate-100">
         <div className="max-w-2xl mx-auto">
           <span className="inline-block bg-indigo-50 text-indigo-600 text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full mb-4">
-            The Brevly Blog
+            The Curtio Blog
           </span>
           <h1 className="text-2xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
             Insights on links, analytics & growth

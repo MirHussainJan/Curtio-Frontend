@@ -157,7 +157,7 @@ export default function BlogPost() {
 
         {/* CTA */}
         <div className="mt-14 bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-2xl px-8 py-10 text-center">
-          <h3 className="text-xl font-extrabold text-white mb-2">Ready to try Brevly?</h3>
+          <h3 className="text-xl font-extrabold text-white mb-2">Ready to try Curtio?</h3>
           <p className="text-indigo-200 text-sm mb-6">Free forever. One tracked link. Full analytics.</p>
           <Link
             to="/register"
@@ -208,7 +208,7 @@ export default function BlogPost() {
       )}
 
       <footer className="border-t border-slate-100 py-8 px-6 text-center text-slate-400 text-sm">
-        © {new Date().getFullYear()} Brevly.
+        © {new Date().getFullYear()} Curtio.
       </footer>
     </div>
   )

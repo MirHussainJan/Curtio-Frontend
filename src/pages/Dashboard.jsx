@@ -896,7 +896,7 @@ export default function Dashboard() {
           <div className="mt-4 flex items-start gap-2 text-xs text-slate-400">
             <Info size={13} className="shrink-0 mt-0.5" />
             <span>
-              Free plan: up to {FREE_LIMIT} tracked links. Delete a link to free up a slot.
+              Free plan: up to {FREE_LIMIT} tracked links.
             </span>
           </div>
         </main>

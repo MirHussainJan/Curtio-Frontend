@@ -211,7 +211,7 @@ export default function Register() {
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
               <Zap size={16} className="text-white" fill="white" />
             </div>
-            <span className="text-xl font-extrabold text-slate-900">Brevly</span>
+            <span className="text-xl font-extrabold text-slate-900">Curtio</span>
           </Link>
 
           {/* ─── STEP 1: Registration Form ─── */}

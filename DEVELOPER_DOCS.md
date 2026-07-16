@@ -1,4 +1,4 @@
-# Brevly — Developer Documentation
+# Curtio — Developer Documentation
 
 **Version:** 1.0  
 **Last Updated:** May 2026  
@@ -41,7 +41,7 @@
 
 ## 1. Project Overview
 
-**Brevly** is a free link shortening and analytics SaaS. Users can shorten URLs, track clicks with detailed analytics, generate QR codes, and configure advanced link settings (UTM parameters, password protection, expiration dates).
+**Curtio** is a free link shortening and analytics SaaS. Users can shorten URLs, track clicks with detailed analytics, generate QR codes, and configure advanced link settings (UTM parameters, password protection, expiration dates).
 
 ### Core Value Proposition
 
@@ -52,7 +52,7 @@
 
 ### Competitive Positioning
 
-Brevly is positioned as the "always free, no credit card, genuinely useful" link shortener. The free tier is intentionally generous for individual users (one link with full analytics), making it a credible alternative to Bitly, Cuttly, and similar tools for personal use.
+Curtio is positioned as the "always free, no credit card, genuinely useful" link shortener. The free tier is intentionally generous for individual users (one link with full analytics), making it a credible alternative to Bitly, Cuttly, and similar tools for personal use.
 
 ---
 
@@ -118,7 +118,7 @@ The **redirect service** is intentionally separate from the main API because it 
 **File:** `src/pages/Landing.jsx`
 
 #### What it does
-- Marketing page explaining Brevly's value proposition.
+- Marketing page explaining Curtio's value proposition.
 - Contains a functional URL shortener form (guest usage).
 - Shows the Free vs. Free Account tier comparison.
 - Displays features, stats, and a CTA to register.
@@ -644,7 +644,7 @@ The backend receives and stores the final URL with UTM params already appended. 
 
 ## 10. Redirect Service
 
-This is the most performance-critical component. Every time a user clicks a Brevly short link, this service runs.
+This is the most performance-critical component. Every time a user clicks a Curtio short link, this service runs.
 
 ### Requirements
 - **Latency target:** < 50ms p99.

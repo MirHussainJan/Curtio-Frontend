@@ -264,7 +264,7 @@ export default function Landing() {
           </div>
           <div className="bg-indigo-50 border border-indigo-600 rounded-2xl p-7 shadow-[0_8px_30px_-10px_rgba(79,70,229,0.35)]">
             <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-600 text-white font-bold text-sm mb-4">3</span>
-            <h3 className="font-bold text-indigo-700 text-lg mb-2">Brevly counts once</h3>
+            <h3 className="font-bold text-indigo-700 text-lg mb-2">Curtio counts once</h3>
             <p className="text-indigo-700/80 text-sm">We remove the duplicates. One real visitor counts as one click, a number on your dashboard you can actually act on.</p>
           </div>
         </div>
@@ -304,7 +304,7 @@ export default function Landing() {
           <p className="text-slate-500 text-sm md:text-lg mb-12">From long URL to full insight.</p>
           <div className="grid sm:grid-cols-3 relative">
             {[
-              { step: '1', title: 'Paste', desc: 'Drop any long URL into the Brevly shortener — no account needed for a basic short link.' },
+              { step: '1', title: 'Paste', desc: 'Drop any long URL into the Curtio shortener — no account needed for a basic short link.' },
               { step: '2', title: 'Shorten', desc: 'Instantly receive a clean redirect.curtio.io/… link. Sign up to claim a custom alias and track it.' },
               { step: '3', title: 'Track', desc: 'Watch real-time analytics roll in: who clicked, from where, on what device, from which channel.' },
             ].map((item, i) => (

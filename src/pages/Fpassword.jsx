@@ -118,7 +118,7 @@ export default function ForgotPassword() {
           </div>
 
           <span className="text-2xl font-extrabold text-white tracking-tight">
-            Brevly
+            Curtio
           </span>
         </Link>
 
@@ -134,7 +134,7 @@ export default function ForgotPassword() {
 
             <div>
               <div className="text-white font-semibold text-sm">
-                Brevly Security
+                Curtio Security
               </div>
 
               <div className="text-indigo-300 text-sm">
@@ -157,7 +157,7 @@ export default function ForgotPassword() {
             </div>
 
             <span className="text-xl font-extrabold text-slate-900">
-              Brevly
+              Curtio
             </span>
           </Link>
 
