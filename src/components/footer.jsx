@@ -71,7 +71,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-3 border-t border-slate-200 pt-6 text-sm text-slate-500 md:flex-row md:items-center md:justify-between text center">
+        <div className="mt-12 flex flex-col gap-3 border-t border-slate-200 pt-6 text-sm text-slate-500 md:flex-row md:items-center md:justify-between text-center">
           <span>© 2026 curtio.io</span>
         </div>
       </div>
