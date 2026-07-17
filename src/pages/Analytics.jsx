@@ -78,6 +78,7 @@ import {
 } from "react-icons/si";
 import { SHORTENER_DOMAIN } from "../components/Shortner";
 import ShareModal from "../components/LinkShareModal";
+import LabelCell from "../components/LabelCell";
 
 const COLORS = ["#4F46E5", "#F97316", "#22C55E", "#EAB308", "#EC4899"];
 
@@ -270,6 +271,7 @@ export default function Analytics() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [link, setLink] = useState(null);
+  const [accountLabels, setAccountLabels] = useState({});
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -301,12 +303,16 @@ export default function Analytics() {
         });
         const data = await res.json();
         if (data.success) {
+          if (data.labels) {
+            setAccountLabels(data.labels);
+          }
           const match = data.urls.find((u) => u._id === id);
           if (match) {
             setLink({
               ...match,
               short: `${SHORTENER_DOMAIN}/${match.shortCode}`,
               original: match.originalUrl,
+              labels: match.labels || [],
             });
           } else {
             if (!background) setError("Link not found or not owned by you.");
@@ -529,6 +535,11 @@ export default function Analytics() {
             <span className="font-bold text-slate-900 text-sm">
               {link.short}
             </span>
+            {link.labels && link.labels.length > 0 && (
+              <div className="ml-2 pl-2 border-l border-slate-200 flex items-center">
+                <LabelCell link={link} accountLabels={accountLabels} readOnly={true} />
+              </div>
+            )}
           </div>
           <div className="ml-auto flex items-center gap-2">
             <button

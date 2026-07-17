@@ -53,11 +53,10 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-[14px] transition-colors duration-300 ${
-        scrolled
-          ? "bg-white/80 border-b border-slate-200 shadow-[0_1px_0_rgba(15,23,42,0.03)]"
-          : "bg-[#FAFAFA]/70 border-b border-transparent"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-[14px] transition-colors duration-300 ${scrolled
+        ? "bg-white/80 border-b border-slate-200 shadow-[0_1px_0_rgba(15,23,42,0.03)]"
+        : "bg-[#FAFAFA]/70 border-b border-transparent"
+        }`}
     >
       <div className="max-w-[1152px] mx-auto px-6 flex items-center gap-8 h-[68px] relative">
         {/* Logo */}
@@ -75,11 +74,10 @@ export default function Navbar() {
             <Link
               key={item.label}
               to={item.to}
-              className={`font-medium text-[0.95rem] px-3.5 py-2 rounded-[10px] transition-all ${
-                isActive(item.to)
-                  ? "text-slate-900 bg-slate-900/[.04]"
-                  : "text-slate-500 hover:text-slate-900 hover:bg-slate-900/[.04]"
-              }`}
+              className={`font-medium text-[0.95rem] px-3.5 py-2 rounded-[10px] transition-all ${isActive(item.to)
+                ? "text-slate-900 bg-slate-900/[.04]"
+                : "text-slate-500 hover:text-slate-900 hover:bg-slate-900/[.04]"
+                }`}
             >
               {item.label}
             </Link>
@@ -140,11 +138,10 @@ export default function Navbar() {
               key={item.label}
               to={item.to}
               onClick={() => setMobileOpen(false)}
-              className={`px-3 py-3 rounded-lg font-medium transition ${
-                isActive(item.to)
-                  ? "bg-indigo-50 text-indigo-600"
-                  : "text-slate-700 hover:bg-indigo-50 hover:text-indigo-600"
-              }`}
+              className={`px-3 py-3 rounded-lg font-medium transition ${isActive(item.to)
+                ? "bg-indigo-50 text-indigo-600"
+                : "text-slate-700 hover:bg-indigo-50 hover:text-indigo-600"
+                }`}
             >
               {item.label}
             </Link>

@@ -358,7 +358,7 @@ export default function Landing() {
               </div>
 
               <div>
-                <p className="font-semibold text-slate-900">[Name]</p>
+                <p className="font-semibold text-slate-900">Alfrad Matt</p>
                 <p className="text-sm text-slate-500">
                   Affiliate marketer · placeholder, replace before launch
                 </p>

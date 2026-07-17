@@ -46,6 +46,7 @@ import { SHORTENER_DOMAIN } from "../components/Shortner";
 import Sidebar from "../components/Sidebar";
 import Filter from "../components/filter";
 import ShareModal from "../components/LinkShareModal";
+import LabelCell from "../components/LabelCell";
 
 const FREE_LIMIT = 100;
 import {
@@ -437,6 +438,7 @@ export default function AnalytcsDashboard() {
 
   const [rawUrls, setRawUrls] = useState([]);
   const [links, setLinks] = useState([]);
+  const [accountLabels, setAccountLabels] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(null);
@@ -540,6 +542,9 @@ export default function AnalytcsDashboard() {
       const data = await res.json();
       if (data.success) {
         setRawUrls(data.urls);
+        if (data.labels) {
+          setAccountLabels(data.labels);
+        }
         const mapped = data.urls.map((u) => ({
           id: u._id,
           slug: u.shortCode,
@@ -553,6 +558,7 @@ export default function AnalytcsDashboard() {
             ? new Date(u.expiresAt).toISOString().slice(0, 16)
             : null,
           clickLogs: u.clickLogs || [],
+          labels: u.labels || [],
         }));
         setLinks(mapped);
       } else {
@@ -1217,13 +1223,14 @@ export default function AnalytcsDashboard() {
               <div className="overflow-x-auto">
                 <table
                   className="w-full text-left border-collapse"
-                  style={{ minWidth: "600px" }}
+                  style={{ minWidth: "700px" }}
                 >
                   <thead>
                     <tr className="border-b border-slate-100 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
                       <th className="py-2.5 pr-3">Short Link</th>
                       <th className="py-2.5 px-3 text-right">Clicks</th>
                       <th className="py-2.5 px-3 text-center">Status</th>
+                      <th className="py-2.5 px-3 text-center">Labels</th>
                       <th className="py-2.5 pl-3 text-right">Actions</th>
                     </tr>
                   </thead>
@@ -1231,7 +1238,7 @@ export default function AnalytcsDashboard() {
                     {topLinks.length === 0 ? (
                       <tr>
                         <td
-                          colSpan={4}
+                          colSpan={5}
                           className="text-center py-8 text-slate-400 text-sm"
                         >
                           No links created yet.
@@ -1271,6 +1278,13 @@ export default function AnalytcsDashboard() {
                                 />
                               )}
                             </button>
+                          </td>
+                          <td className="py-3 px-3 text-center" style={{ minWidth: "120px" }}>
+                            <LabelCell 
+                              link={link} 
+                              accountLabels={accountLabels} 
+                              onLabelsChanged={fetchUrls} 
+                            />
                           </td>
                           <td className="py-3 pl-3 text-right">
                             <div className="flex items-center justify-end gap-1">

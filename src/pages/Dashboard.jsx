@@ -32,6 +32,7 @@ import { SHORTENER_DOMAIN } from "../components/Shortner";
 import Sidebar from "../components/Sidebar";
 import { FaWhatsapp } from "react-icons/fa6";
 import ShareModal from "../components/LinkShareModal";
+import LabelCell from "../components/LabelCell";
 
 const PREMIUM_USERS = ["mrabdullahamjid33@gmail.com", "mirhussainjan10387@gmail.com"];
 const baseUrl = import.meta.env.VITE_API_URL;
@@ -257,6 +258,7 @@ export default function Dashboard() {
   const [links, setLinks] = useState([]);
   const [loadingLinks, setLoadingLinks] = useState(true);
   const [error, setError] = useState("");
+  const [accountLabels, setAccountLabels] = useState({});
 
   const [url, setUrl] = useState("");
   const [alias, setAlias] = useState("");
@@ -339,8 +341,18 @@ export default function Dashboard() {
       const res = await fetch(`${baseUrl}/urls`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (res.status === 401) {
+        localStorage.removeItem("apiToken");
+        localStorage.removeItem("userEmail");
+        localStorage.removeItem("userName");
+        window.location.href = "/login";
+        return;
+      }
       const data = await res.json();
       if (data.success) {
+        if (data.labels) {
+          setAccountLabels(data.labels);
+        }
         const mapped = data.urls.map((u) => ({
           id: u._id,
           slug: u.shortCode,
@@ -354,6 +366,7 @@ export default function Dashboard() {
             ? new Date(u.expiresAt).toISOString().slice(0, 16)
             : null,
           clickLogs: u.clickLogs || [],
+          labels: u.labels || [],
         }));
         setLinks(mapped);
       } else {
@@ -747,7 +760,7 @@ export default function Dashboard() {
             ) : (
               /* Scroll container — ONLY horizontal, no vertical scroll */
               <div className="overflow-x-auto">
-                <table className="w-full" style={{ minWidth: "640px" }}>
+                <table className="w-full" style={{ minWidth: "780px" }}>
                   <thead>
                     <tr className="border-b border-slate-100 bg-slate-50">
                       <th className="text-left text-xs font-semibold text-slate-500 px-5 py-3 whitespace-nowrap">
@@ -761,6 +774,9 @@ export default function Dashboard() {
                       </th>
                       <th className="text-center text-xs font-semibold text-slate-500 px-5 py-3 whitespace-nowrap">
                         Status
+                      </th>
+                      <th className="text-center text-xs font-semibold text-slate-500 px-5 py-3 whitespace-nowrap">
+                        Labels
                       </th>
                       <th className="text-right text-xs font-semibold text-slate-500 px-5 py-3 whitespace-nowrap">
                         Actions
@@ -825,6 +841,15 @@ export default function Dashboard() {
                               <ToggleLeft size={22} className="text-slate-300" />
                             )}
                           </button>
+                        </td>
+
+                        {/* Labels */}
+                        <td className="px-5 py-4 text-center" style={{ minWidth: "140px" }}>
+                          <LabelCell 
+                            link={link} 
+                            accountLabels={accountLabels} 
+                            onLabelsChanged={fetchLinks} 
+                          />
                         </td>
 
                         {/* Actions */}

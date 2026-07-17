@@ -96,6 +96,7 @@ import { SHORTENER_DOMAIN } from "../components/Shortner";
 import Sidebar from "../components/Sidebar";
 import Filter from "../components/filter";
 import ShareModal from "../components/LinkShareModal";
+import LabelCell from "../components/LabelCell";
 
 const PREMIUM_USERS = ["mrabdullahamjid33@gmail.com",  "mirhussainjan10387@gmail.com"];
 const COLORS = ["#4F46E5", "#F97316", "#22C55E", "#EAB308", "#EC4899"];
@@ -458,6 +459,7 @@ export default function Campaigns() {
   const defaultStartDate = formatDateToString(sevenDaysAgo);
 
   const [links, setLinks] = useState([]);
+  const [accountLabels, setAccountLabels] = useState({});
 
   // Calculate total links across all campaigns to determine if atLimit
   const atLimit = !isPremium && links.length >= FREE_LIMIT;
@@ -575,6 +577,9 @@ export default function Campaigns() {
       });
       const data = await res.json();
       if (data.success) {
+        if (data.labels) {
+          setAccountLabels(data.labels);
+        }
         const mapped = data.urls.map((u) => ({
           id: u._id,
           slug: u.shortCode,
@@ -588,6 +593,7 @@ export default function Campaigns() {
             ? new Date(u.expiresAt).toISOString().slice(0, 16)
             : null,
           clickLogs: u.clickLogs || [],
+          labels: u.labels || [],
         }));
         setLinks(mapped);
       } else {
@@ -1380,13 +1386,14 @@ export default function Campaigns() {
                 </p>
 
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
+                  <table className="w-full text-left border-collapse" style={{ minWidth: "780px" }}>
                     <thead>
                       <tr className="border-b border-slate-100 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
                         <th className="py-2.5 pr-3">Short Link</th>
                         <th className="py-2.5 px-3">UTM Details</th>
                         <th className="py-2.5 px-3 text-right">Clicks</th>
                         <th className="py-2.5 px-3 text-center">Status</th>
+                        <th className="py-2.5 px-3 text-center">Labels</th>
                         <th className="py-2.5 pl-3 text-right">Actions</th>
                       </tr>
                     </thead>
@@ -1446,6 +1453,13 @@ export default function Campaigns() {
                                   />
                                 )}
                               </button>
+                            </td>
+                            <td className="py-3 px-3 text-center">
+                              <LabelCell 
+                                link={link} 
+                                accountLabels={accountLabels} 
+                                onLabelsChanged={fetchUrls} 
+                              />
                             </td>
                             <td className="py-3 pl-3 text-right">
                               <div className="flex items-center justify-end gap-1">
