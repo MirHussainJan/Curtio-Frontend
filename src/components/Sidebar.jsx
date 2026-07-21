@@ -74,13 +74,13 @@ export default function Sidebar({
         </div>
 
         <div className="relative flex items-center justify-center mb-6 mt-1">
-          <Link
+          {/* <Link
             to="/"
             className="absolute left-0 p-1.5 rounded-[10px] text-slate-600 bg-slate-50/60 border border-slate-200/80 backdrop-blur-md shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] hover:bg-white hover:border-slate-300 hover:text-slate-900 hover:shadow-[0_4px_12px_-2px_rgba(0,0,0,0.08)] transition-all"
             title="Back to Landing Page"
           >
             <ArrowLeft size={18} />
-          </Link>
+          </Link> */}
           <Link
             to="/dashboard/analytics"
             className="font-bold text-2xl tracking-[-0.03em] text-slate-900"

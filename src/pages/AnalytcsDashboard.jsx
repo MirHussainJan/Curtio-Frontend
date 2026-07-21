@@ -128,7 +128,7 @@ const REFERER_RULES = [
   { source: "Trello", pattern: /trello/i, color: "#4F46E5", icon: FaTrello },
   { source: "ClickUp", pattern: /clickup/i, color: "#4F46E5", icon: SiClickup },
   { source: "Confluence", pattern: /atlassian|confluence/i, color: "#4F46E5", icon: FaConfluence },
-  { source: "Upwork", pattern: /upwork/i, color: "#4F46E5", icon: FaUpwork},
+  { source: "Upwork", pattern: /upwork/i, color: "#4F46E5", icon: FaUpwork },
   { source: "Zoom", pattern: /zoom\.us/i, color: "#4F46E5", icon: SiZoom },
   { source: "Google Meet", pattern: /meet\.google/i, color: "#4F46E5", icon: SiGooglemeet },
   { source: "Notion", pattern: /notion\.so/i, color: "#4F46E5", icon: SiNotion },
@@ -796,6 +796,26 @@ export default function AnalytcsDashboard() {
 
   const topLinks = [...links].sort((a, b) => b.clicks - a.clicks).slice(0, 5);
 
+  const isDefaultDateRange = startDate === defaultStartDate && endDate === defaultEndDate;
+  
+  let dateBadgeText = "Last 7 Days";
+  let dateDescriptionText = <>Total clicks recorded across all links in the <strong className="text-slate-900">last 7 days</strong></>;
+  
+  if (!isDefaultDateRange && startDate && endDate) {
+    const formattedStart = new Date(startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    const formattedEnd = new Date(endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    dateBadgeText = `${formattedStart} - ${formattedEnd}`;
+    dateDescriptionText = <>Total clicks recorded across all links from <strong className="text-slate-900">{formattedStart}</strong> to <strong className="text-slate-900">{formattedEnd}</strong></>;
+  } else if (!isDefaultDateRange && startDate) {
+    const formattedStart = new Date(startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    dateBadgeText = `From ${formattedStart}`;
+    dateDescriptionText = <>Total clicks recorded across all links since <strong className="text-slate-900">{formattedStart}</strong></>;
+  } else if (!isDefaultDateRange && endDate) {
+    const formattedEnd = new Date(endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    dateBadgeText = `Until ${formattedEnd}`;
+    dateDescriptionText = <>Total clicks recorded across all links up to <strong className="text-slate-900">{formattedEnd}</strong></>;
+  }
+
   return (
     <div className="min-h-screen bg-slate-50">
       {qrLink && <QrModal link={qrLink} onClose={() => setQrLink(null)} />}
@@ -915,30 +935,34 @@ export default function AnalytcsDashboard() {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard
-              icon={<LinkIcon size={18} className="text-indigo-600" />}
-              label="Total Links"
-              value={totalUrls.toLocaleString()}
-              sub="Created URLs"
-            />
+            <Link to="/dashboard">
+              <StatCard
+                icon={<LinkIcon size={18} className="text-indigo-600" />}
+                label="Total Links "
+                value={totalUrls.toLocaleString()}
+                sub="Created URLs"
+              />
+            </Link>
             <StatCard
               icon={<MousePointerClick size={18} className="text-orange-500" />}
               label="Total Clicks"
               value={totalClicks.toLocaleString()}
               sub="All time traffic"
             />
-            <StatCard
+            <Link to="/dashboard" state={{ filter: "Active" }}><StatCard
               icon={<Activity size={18} className="text-green-500" />}
               label="Active Links"
               value={activeLinks.toLocaleString()}
               sub="Currently redirecting"
             />
-            <StatCard
+            </Link>
+            <Link to="/dashboard" state={{ filter: "Inactive" }}><StatCard
               icon={<ToggleLeft size={18} className="text-slate-400" />}
               label="Inactive Links"
               value={inactiveLinks.toLocaleString()}
               sub="Disabled links"
             />
+            </Link>
           </div>
 
           {/* Clicks Over Time Aggregated Chart */}
@@ -949,12 +973,14 @@ export default function AnalytcsDashboard() {
                   Aggregate Traffic Trend
                 </h2>
                 <p className="text-xs text-slate-400">
-                  Total clicks recorded across all links in the last 7 days
+                  {dateDescriptionText}
                 </p>
               </div>
-              <div className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full w-max">
-                Last 7 Days
-              </div>
+              {isDefaultDateRange && (
+                <div className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full w-max">
+                  {dateBadgeText}
+                </div>
+              )}
             </div>
             <ResponsiveContainer width="100%" height={260}>
               <AreaChart
@@ -1280,10 +1306,10 @@ export default function AnalytcsDashboard() {
                             </button>
                           </td>
                           <td className="py-3 px-3 text-center" style={{ minWidth: "120px" }}>
-                            <LabelCell 
-                              link={link} 
-                              accountLabels={accountLabels} 
-                              onLabelsChanged={fetchUrls} 
+                            <LabelCell
+                              link={link}
+                              accountLabels={accountLabels}
+                              onLabelsChanged={fetchUrls}
                             />
                           </td>
                           <td className="py-3 pl-3 text-right">

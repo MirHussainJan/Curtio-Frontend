@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, Links, useNavigate } from "react-router-dom";
+import { Link, Links, useNavigate, useLocation } from "react-router-dom";
 import {
   Zap,
   Plus,
@@ -229,6 +229,7 @@ function LimitModal({ onClose }) {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [shareLink, setShareLink] = useState(null);
 
   const getStoredUser = () => {
@@ -274,6 +275,9 @@ export default function Dashboard() {
   const [search, setSearch] = useState("");
   const [qrLink, setQrLink] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState(location.state?.filter || "All");
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   // Delete modal state
   const [deleteModal, setDeleteModal] = useState(null);
@@ -304,6 +308,20 @@ export default function Dashboard() {
         });
       }
     });
+
+    useEffect(() => {
+      function handleClickOutside(event) {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+          setOpen(false);
+        }
+      }
+
+      document.addEventListener("mousedown", handleClickOutside);
+
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, []);
 
     let returningCount = 0;
     let uniqueDevices = 0;
@@ -489,11 +507,16 @@ export default function Dashboard() {
     }
   }
 
-  const filtered = links.filter(
-    (l) =>
-      l.slug.toLowerCase().includes(search.toLowerCase()) ||
-      l.original.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = links.filter((l) => {
+  const matchesSearch =
+    l.slug.toLowerCase().includes(search.toLowerCase()) ||
+    l.original.toLowerCase().includes(search.toLowerCase());
+  const matchesFilter =
+    selectedFilter === "All" ||
+    (selectedFilter === "Active" && l.active) ||
+    (selectedFilter === "Inactive" && !l.active);
+  return matchesSearch && matchesFilter;
+});
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -728,17 +751,61 @@ export default function Dashboard() {
             />
           </div>
 
-          {/* Search */}
-          <div className="relative mb-4">
-            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search links..."
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm placeholder-slate-400 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            />
+          <div className="flex items-center gap-3 mb-4">
+            {/* Search */}
+            <div className="relative flex-1">
+              <Search
+                size={15}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search links..."
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm placeholder-slate-400 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* Filter Dropdown */}
+            <div className="relative w-40" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setOpen(!open)}
+                className="w-full flex items-center justify-between px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 hover:border-slate-300 focus:outline-none cursor-pointer"
+              >
+                <span>{selectedFilter}</span>
+
+                <ChevronDown
+                  size={16}
+                  className={`transition-transform duration-200 ${open ? "rotate-180" : ""
+                    }`}
+                />
+              </button>
+
+              {open && (
+                <div className="absolute top-full left-0 mt-2 w-full bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden z-20">
+                  {["All", "Active", "Inactive"].map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => {
+                        setSelectedFilter(item);
+                        setOpen(false);
+                      }}
+                      className={`w-full px-4 py-2.5 text-left text-sm cursor-pointer transition-colors ${selectedFilter === item
+                          ? "bg-indigo-50 text-indigo-600 font-medium"
+                          : "text-slate-700 hover:bg-slate-100"
+                        }`}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
+
 
           {/* ── Links Table — only the table scrolls on x-axis ── */}
           <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
@@ -845,10 +912,10 @@ export default function Dashboard() {
 
                         {/* Labels */}
                         <td className="px-5 py-4 text-center" style={{ minWidth: "140px" }}>
-                          <LabelCell 
-                            link={link} 
-                            accountLabels={accountLabels} 
-                            onLabelsChanged={fetchLinks} 
+                          <LabelCell
+                            link={link}
+                            accountLabels={accountLabels}
+                            onLabelsChanged={fetchLinks}
                           />
                         </td>
 
