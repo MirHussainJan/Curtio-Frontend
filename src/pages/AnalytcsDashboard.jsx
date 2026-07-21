@@ -185,7 +185,7 @@ const platformIconMap = Object.fromEntries(
 function StatCard({ icon, label, value, sub, className = "" }) {
   return (
     <div
-      className={`bg-white border border-slate-100 rounded-2xl p-5 shadow-sm ${className}`}
+      className={`bg-white border border-slate-100 rounded-2xl p-5 shadow-sm hover:border-indigo-400 hover:shadow-md hover:shadow-indigo-200 transition-all duration-300 cursor-pointer ${className}`}
     >
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm font-medium text-slate-500">{label}</span>
